@@ -8,7 +8,7 @@ In order to get this project running:
 
 * Upload LoRa3GServer to the arduino with a LoRa shield and 3G shield stacked onto it. This acts as the LoRa server which sends data from all sensors to the Raspberry Pi server.
 
-* If using Atlas Scientific EC and DO sensors, you can upload the ECClient and DOClient to the Arduinos with those respective sensors attached and a LoRa shield installed. 
+* If using Atlas Scientific EC and DO sensors, you can upload the ECClient and DOClient sensorval sketches to the Arduinos with those respective sensors attached and a LoRa shield installed. 
 
 * If using the setup with new sensors, you can follow the sketches used to send values from Atlas Scientific sensors as a guideline to create a program for the new sensors.
 
