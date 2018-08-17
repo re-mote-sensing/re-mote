@@ -1,5 +1,7 @@
 # arduino-motes
 
+**For instructions on how to set up the shields and connections to avoid pin overlaps, please refer to the [Pin Mapping](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/wikis/Pin-Mappings) wiki page**
+
 In order to get this project running:
 
 * Install the Arduino IDE if you do not have it.
