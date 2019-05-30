@@ -14,6 +14,8 @@
 
 SoftwareSerial loraPort = SoftwareSerial(MCU_LORA_RX, MCU_LORA_TX);
 
+String latS, lngS;
+
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
@@ -85,18 +87,23 @@ long HexToDouble(uint8_t* payload, uint8_t payloadLength) {
 /*
   Print the 32-bit integer degrees *as if* they were high-precision floats
 */
-static void printL(Print& outs, int32_t degE7)
+static String dataToString(int32_t degE7)
 {
+
+
+	String data;
+
 	// Extract and print negative sign
 	if (degE7 < 0) {
 		degE7 = -degE7;
-		outs.print('-');
+		data.concat('-');
 	}
 
 	// Whole degrees
 	int32_t deg = degE7 / 1000000L;
-	outs.print(deg);
-	outs.print('.');
+	data.concat(deg);
+	data.concat('.');
+
 
 	// Get fractional degrees
 	degE7 -= deg * 1000000L;
@@ -104,12 +111,14 @@ static void printL(Print& outs, int32_t degE7)
 	// Print leading zeroes, if needed
 	int32_t factor = 100000L;
 	while ((degE7 < factor) && (factor > 1L)) {
-		outs.print('0');
+		data.concat('0');
 		factor /= 10L;
 	}
 
 	// Print fractional degrees
-	outs.print(degE7);
+	data.concat(degE7);
+
+	return data;
 }
 
 void printByte(uint8_t b) {
@@ -300,10 +309,14 @@ void readData(Stream &port) {
 	Serial.print("Recieved Data from Node #: ");
 	Serial.println(srcAddr);
 	Serial.print("GPS coordinates:  ");
-	printL(Serial, lat); // prints int like a float
+
+	latS = dataToString(lat); // prints int like a float
+	Serial.print(latS);
 	Serial.print(" , ");
-	printL(Serial, lng); // prints int like a float
+	lngS = dataToString(lng); // prints int like a float
+	Serial.print(lngS);
 	Serial.println();
+
 	Serial.println("--------------------------------------");
 	free(payload);
 }
