@@ -9,6 +9,10 @@
 
 * The best option may be to configure everything via U-center, and stick to recieving NMEA messages via Arduino. You can't really monitor when or if Assist Autonomous has done anything. Same goes for downloading Ephemeris and Alamanc data. Maybe every so often, let the GPS run a bit longer after getting a fix to get some ephemeris data (but that may just be a waste of time since it won't be valid for very long)
 
+* I think Assist Autonomous starts running after it has downloaded the ephemeris data from a satellite. Look at how long it takes to download the data to get an idea of total time to completion
+
+* Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on
+
 * Let the Other GPS module run for awhile and record the log. DO that again tomorrow and comapre the data (and see if the data even saved overnight)
 
 
