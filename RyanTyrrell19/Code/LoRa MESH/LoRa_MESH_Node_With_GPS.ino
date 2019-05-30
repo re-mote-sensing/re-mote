@@ -158,8 +158,8 @@ void prepareData() {
 	uint8_t* payload = (uint8_t*)malloc(sizeof(uint8_t) * payloadLen);
 	uint8_t* payload1 = (uint8_t*)malloc(sizeof(uint8_t) * payloadLen);
 
-	lat = gps.location.lat();//random(-90000000, 90000000);  //gps.location.lat();
-	lng = gps.location.lng();//random(-180000000, 180000000);  //gps.location.lng();
+	lat = random(-90000000, 90000000);  //gps.location.lat();
+	lng = random(-180000000, 180000000);  //gps.location.lng();
 
 	Serial.print("GPS Data:    ");
 	printL(Serial, lat); // prints int like a float
