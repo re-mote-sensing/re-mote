@@ -11,7 +11,7 @@
     * Inactive for update and Inactive for search states, Acquisition state, Tracking state and Power Optimized Tracking (POT) state
 * Test consumption with and without the antenna (or look up antenna power draw via datasheet)
 
-* There is an option called _reduce peak current_. through practice, this feature does not seem to do much
+* There is an option called _reduce peak current_. Through practice, this feature does not seem to do much. There may be a slight decrease in current drawn during the -Acquisition_ phase (1 -2mA). This decrease in power will just lead to a longer TTFF; most likly not worth enabling this feature.
 
 ## Continuous Mode
 
@@ -26,7 +26,7 @@ SBAS - Enables
 Assist Autonomous - Enabled
 Jamming Monitor - Disabled (since it needs to reference a good signal first)
 Jamming Indiactor - Use it
-Update RTC & Ephemeris - Enabled
+Update RTC & Ephemeris - Enabled?
 
 ## Power Save Mode
 * The receiver is not able to download satellite data (e.g. the ephemeris) while it is working in ON/OFF or cyclic tracking operation.
@@ -42,10 +42,9 @@ Aquisition Timout (minAqcTime) - 30 s
 Search Period - 20 s  
 onTime (on Time) - 0 s  
 update Period - 5 s  
-
 doNotEnterOff - May enable if cannot get fix
 
-General State Cycle:  
+**General State Cycle:**  
 Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Gets fix) -> Tracking (onTime) -> POT (update Period) -> Aquisition...  
 
 
@@ -69,7 +68,7 @@ onTime (on Time) - 20 s
 update Period - 20 s  
 doNotEnterOff - May enable if cannot get fix  
 
-General State Cycle:  
+**General State Cycle:**  
 Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Gets fix) -> Tracking (onTime) -> POT and Inactive for update state (Update Period) -> Aquisition...
 
 | Mode                | Average Value (mA) |
@@ -81,7 +80,9 @@ Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Ge
 
 * Acquisition holds steady at the above ranges until a fix is obtained. After that, it flucuates between 40 - 53mA
 
-
+## Concluding Notes:
+* Power SAving Mode doesn't seem to be appropriate for the Turtle Trackers. This mode is geard towards GPS's that will always remaine powered on and require position fixes relativley frequently.
+For our application the idea is to get a fix as quickly as possible, record the position, than cut all power to the GPS. The usefulness of PSM occurs after the GPS has aquired it's fix, and it is at this point that all power is cut to the GPS anyway's. Therefore, it makes no difference to have the GPS run in Continuous mode or Power Saving Mode.
 
 # GPS Accuracy
 ## Settings consistent across all tests
