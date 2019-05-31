@@ -8,12 +8,13 @@ OverView and Plan:
 
 * GPS must initially run for approx. 12.5min to aquire all Almanac data. The more the better. Acquiring it from all satellites would be ideal
 
-* Ideally, want satelliete to Hot Start. 
+* Ideally, want GPS to Hot Start. 
 
 * **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only if the aids are being used, but if they've made any noticable difference. Their effectiveness also fluctuates with the position of the satellites**
 
 
 * The best option may be to configure everything via U-center, and stick to recieving NMEA messages via Arduino. You can't really monitor when or if Assist Autonomous has done anything. Same goes for downloading Ephemeris and Alamanc data. Maybe every so often, let the GPS run a bit longer after getting a fix to get some ephemeris data (but that may just be a waste of time since it won't be valid for very long)
+    * Can save the confiuration options and quickly load it onto the GPS via U-center. Could probs do via Arduino (just load and send the text file)
 
 * **Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on**
 * **Use the Gateways as a Base Station**
@@ -31,6 +32,17 @@ OverView and Plan:
 * Both the original and the NEO-6M GPS's **DID NOT** save the data (at least not long enough to be useful). After 16 hours, the set configuration and almanac data was gone)
     * 1 hour intervals may be okay
 
+
+* **100% confirmed - The Original GPS's do not have memory to store the config. or other data**
+
+* Time underwater is propotional to the additional amount of time the logger can spend to get a fix
+    * If the Tracker is underwater, it won't turn on to get a fix. FOr everytime this occurs, the Tracker is allowed to spend that much longer getting it fix once it surfaces without taking a loss on battery life
+    * Have a counter. If Tracker is does not acquire a fix after x coiunts (each count representing  time it should have gotten a fix but didn't because it was underwater), increase the time the Tracker stays on when it can get a fix
+
+* Use noise/jammer/combo of 2 to check the following
+    * Underwater and won't get a fix
+    * Above water but very cloudy - fix unlikley
+    * Above water and clear skies - easy fix
 
 Hardware Configuration:
 ===

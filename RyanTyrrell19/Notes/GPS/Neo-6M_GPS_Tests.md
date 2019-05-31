@@ -73,6 +73,8 @@ For our application the idea is to get a fix as quickly as possible, record the 
 # GPS Accuracy
 ## Changeable Parameters
 
+* **Use the Deviation Map, input the exact coordiantes (User-defined) than see how the acquired coordinates compare (over time)**
+
 * **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only if the aids are being used, but if they've made any noticable difference. Their effectiveness also fluctuates with the position of the satellites**
 
 
