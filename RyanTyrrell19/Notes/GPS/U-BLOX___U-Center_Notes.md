@@ -2,6 +2,8 @@
 
 ## Overview
 
+* Start-up
+
 * AID (GPS Aiding)
     * ALM (Almanac)
     * EPH (Ephemeris)
@@ -22,7 +24,6 @@
     * SBAS (SBAS Settings)
     * USB (Universal Serial Bus):
 
-
 * MON (Hardware Status)
     * HW (Hardware Status)
     * TXBUF (TX Buffer)
@@ -35,6 +36,16 @@
     * SOL (Navigation Solution)
     * STATUS (Navigation Status)
     * SVINFO (SV Information)
+
+* Extra Notes
+    * Power Management
+        * Various States
+        * Satellite data download
+        * Communication
+        * Cooperation with the AssistNow Autonomous feature
+    * Jamming/Interference
+        * Jamming/Interference Indicator
+        * Jamming/Interference Monitor
 
 Start-up:
 ===
