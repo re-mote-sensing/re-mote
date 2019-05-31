@@ -14,6 +14,8 @@
 * Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on
 
 * Let the Other GPS module run for awhile and record the log. DO that again tomorrow and comapre the data (and see if the data even saved overnight)
+* Both the original and the NEO-6M GPS's DID NOT save the data (at least not long enough to be useful). After 16 hours, the set configuration and almanac data was gone)
+    * 1 hour intervals may be okay
 
 
 
@@ -63,13 +65,13 @@ s EEPROM, BBC Memory
 * How does the GPS know when the saved data is no longer valid? (it would need a clock)
     * Note that the receiver requires an **approximate value of the absolute time** to calculate AssistNow Autonomous orbits. For best performance it is, therefore, recommended to supply this information to the receiver using the UBX-AID-INI message in a scenario without a running RTC (i.e. without backup battery).
 
-Option A:
----
-* 
+Concluding Thoughts:
+===
 
 
-Option B:
----
+
+
+
 
 
 [1]: https://www.measurementsystems.co.uk/docs/TTFFstartup.pdf

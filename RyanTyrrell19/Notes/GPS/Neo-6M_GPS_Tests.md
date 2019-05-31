@@ -4,61 +4,83 @@
 | Setting               |   Set As   | Description/Note              |
 |:---------------------:|:----------:|---                            |
 |    Input Voltage      | 3V3        | The Breakout Board that the GPS chip is attached to contains a MIC5205 ultra-low dropout 3V3 regulator                            |
-|      Peak Current     |   Enabled  | The peak current during acquisition can be reduced. A peak current reduction will result in longer start-up times of the receiver. This setting is independent of the activated mode (Maximum Performance, Eco or Power Save Mode). |
 
 ## Testing Procedure Outline
 
-* Record Current Consumption during various stages of GPS aquisition (cold, warm, & hot start)
-    * Utilize the start-up buttons in U-Center to do this
+* Record Current Consumption during various modes that the GPS can be in:
+    * Inactive for update and Inactive for search states, Acquisition state, Tracking state and Power Optimized Tracking (POT) state
 * Test consumption with and without the antenna (or look up antenna power draw via datasheet)
 
-## Maximum Performance Mode
+* There is an option called _reduce peak current_. through practice, this feature does not seem to do much
 
-During a Cold start, a receiver in Maximum Performance Mode continuously deploys the acquisition engine to search for all satellites. Once the receiver has a position fix (or if pre-positioning information is available), the acquisition engine continues to be used to search for all visible satellites that are not being tracked.
+## Continuous Mode
 
-* Only applies to **cold starts**
+Aquisition Timout (minAqcTime) - 30 s  
+Search Period - 20 s  
+onTime (on Time) - 0 s  
+update Period - 5 s 
+Wait for Timefix - Enabled
 
-| Test #     | Min Value (mA) | Max Value (mA) | Average Value (mA) |
-|:----------:|:--------------:| :--------:     |:-------------:     |
-| 1          |                |                |                    |
-| 2          |                |                |                    |
-| 3          |                |                |                    |
-
-
-## Eco Mode
-
-**Stage A (analogous to a Cold Start)**:
-* reciever continuously deploys the acquisition engine to search for all satellites (exactly like Maximum Performance Mode)
-
-**Stage B (analogous to a Warm Start)**:
-* Once a position can be calculated and a sufficient number of satellites are being tracked, the acquisition engine is powered off resulting in significant power savings. The tracking engine continuously tracks acquired satellites and acquires other available or emerging satellites.
-    * Note that even if the acquisition engine is powered off, satellites continue to be acquired.
-
-Stage A:
-
-| Test #     | Min Value (mA) | Max Value (mA) | Average Value (mA) |
-|:----------:|:--------------:| :--------:     |:-------------:     |
-| 1          |                |                |                    |
-| 2          |                |                |                    |
-| 3          |                |                |                    |
-
-Stage B:
-
-| Test #     | Min Value (mA) | Max Value (mA) | Average Value (mA) |
-|:----------:|:--------------:| :--------:     |:-------------:     |
-| 1          |                |                |                    |
-| 2          |                |                |                    |
-| 3          |                |                |                    |
+GNSS - Enabled
+SBAS - Enables
+Assist Autonomous - Enabled
+Jamming Monitor - Disabled (since it needs to reference a good signal first)
+Jamming Indiactor - Use it
+Update RTC & Ephemeris - Enabled
 
 ## Power Save Mode
 * The receiver is not able to download satellite data (e.g. the ephemeris) while it is working in ON/OFF or cyclic tracking operation.
 * **When enabling Power Save Mode, SBAS support can be disabled (UBX-CFG-SBAS) since the receiver will be unable to download any SBAS data in this mode.**
 
+* The duration for each state can be configured
+
 ### Cyclic Tracking
+
+* Try with peak current setting on & off (no noticable change)
+
+Aquisition Timout (minAqcTime) - 30 s  
+Search Period - 20 s  
+onTime (on Time) - 0 s  
+update Period - 5 s  
+
+doNotEnterOff - May enable if cannot get fix
+
+General State Cycle:  
+Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Gets fix) -> Tracking (onTime) -> POT (update Period) -> Aquisition...  
+
+
+| Mode                | Average Value (mA) |
+|:-------------------:|:------------------:|
+| Inactive for search | 10.58              |
+| Acquisition         | 51 - 53            |
+| Tracking            | 38 - 40            |
+|  POT                | 16 - 18            |
+
+* Acquisition holds steady at the above ranges until a fix is obtained. After that, it flucuates between 40 - 53mA
+    * I beleive at this point, it is bceause it is downloading satellities data
+* After a good fix is obtained, Acquisition holds at 40 -41
+    * At this point, I believe the only work being done is updating the posiion fix
 
 ### ON/OFF Operation
 
-### Custom Power Save Mode Configuration?
+Aquisition Timout (minAqcTime) - 30 s  
+Search Period - 20 s  
+onTime (on Time) - 20 s  
+update Period - 20 s  
+doNotEnterOff - May enable if cannot get fix  
+
+General State Cycle:  
+Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Gets fix) -> Tracking (onTime) -> POT and Inactive for update state (Update Period) -> Aquisition...
+
+| Mode                | Average Value (mA) |
+|:-------------------:|:------------------:|
+| Inactive for search | 10.58              |
+| Acquisition         | 51 - 53            |
+| Tracking            | 38 - 40            |
+| Inactive for update | 10.57              |
+
+* Acquisition holds steady at the above ranges until a fix is obtained. After that, it flucuates between 40 - 53mA
+
 
 
 # GPS Accuracy
