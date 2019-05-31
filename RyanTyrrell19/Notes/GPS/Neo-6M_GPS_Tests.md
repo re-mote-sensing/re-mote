@@ -93,12 +93,12 @@ onTime (on Time) - 0 s
 update Period - 5 s 
 Wait for Timefix - Enabled
 
-GNSS - Enabled
-SBAS - Enables
-Assist Autonomous - Enabled
-Jamming Monitor - Disabled (since it needs to reference a good signal first)
-Jamming Indiactor - Use it
-Update RTC & Ephemeris - Enabled?
+GNSS - Enabled  
+SBAS - Enables  
+Assist Autonomous - Enabled  
+Jamming Monitor - Disabled (since it needs to reference a good signal first)  
+Jamming Indiactor - Use it  
+Update RTC & Ephemeris - Enabled?  
 
 ## Additional Pre-Test Notes
 * Can use the Hot, Warm, and Cold commands so "one can force the receiver to reset and clear data, in order to see the effects of maintaining/losing such data between restarts."
