@@ -1,14 +1,19 @@
-* GPS must initially run for approx. 12.5min to aquire all Almanac data. The more the better. Aquiring it from all satellites would be ideal
-    * The GPS will also record other
+* GPS must initially run for approx. 12.5min to aquire all Almanac data. The more the better. Acquiring it from all satellites would be ideal
 
 * Ideally, want satelliete to Hot Start. For this to occur, the following conditions must be met: [[1]]
-    * It has a valid Almanac.
-    * The cuurent location is not w
+
+* **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only if the aids are being used, but if they've made any noticable difference. Their effectiveness also fluctuates with the position of the satellites**
 
 
 * The best option may be to configure everything via U-center, and stick to recieving NMEA messages via Arduino. You can't really monitor when or if Assist Autonomous has done anything. Same goes for downloading Ephemeris and Alamanc data. Maybe every so often, let the GPS run a bit longer after getting a fix to get some ephemeris data (but that may just be a waste of time since it won't be valid for very long)
 
 * **Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on**
+* **Use the Gateways as a Base Station**
+    * If the Trackers and Gateways are in sync, can have the Gateways braodcast relevant data for the Trackers to use
+
+
+
+
 
 
 * I think Assist Autonomous starts running after it has downloaded the ephemeris data from a satellite. Look at how long it takes to download the data to get an idea of total time to completion
@@ -24,7 +29,7 @@ Hardware Configuration:
 * Configuration data, Almanac data, ephemeris data, and Assist Autonomous data will be saved to the BBR (Battery Backed RAM)
 *  GPS's most recent position, time, etc. are automatically saved to the BBR
 
-    * The battery is **suppose to** automatically recharges when the unit is powered and has a lifespan of approx. 2 weeks (the Arduino will still peridocially be waking up so the battery should always have a charge)
+* The battery is **suppose to** automatically recharges when the unit is powered and has a lifespan of approx. 2 weeks (the Arduino will still peridocially be waking up so the battery should always have a charge)
     * May need an RTC for this data to be useful
 
 
