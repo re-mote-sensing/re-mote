@@ -1,6 +1,14 @@
+OverView and Plan:
+
+* Overall Goal - Reduce how long the GPS's are on to minimum current drawn and maximize battery life
+* How to acheive this - Provide the GPS was data that will aid in aquring a quicker fix.
+* How is this data provided
+
+
+
 * GPS must initially run for approx. 12.5min to aquire all Almanac data. The more the better. Acquiring it from all satellites would be ideal
 
-* Ideally, want satelliete to Hot Start. For this to occur, the following conditions must be met: [[1]]
+* Ideally, want satelliete to Hot Start. 
 
 * **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only if the aids are being used, but if they've made any noticable difference. Their effectiveness also fluctuates with the position of the satellites**
 
@@ -9,6 +17,7 @@
 
 * **Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on**
 * **Use the Gateways as a Base Station**
+
     * If the Trackers and Gateways are in sync, can have the Gateways braodcast relevant data for the Trackers to use
 
 
