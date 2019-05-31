@@ -83,6 +83,8 @@
 * valid for a period of up to **90 days** [[18]]
 * Used to speed up time to first fix by 15 seconds (compared to not having almanac stored) [[18]]
 
+* Many sites give conflicting data
+
 # Ephemeris Data
 ## Overview
 
