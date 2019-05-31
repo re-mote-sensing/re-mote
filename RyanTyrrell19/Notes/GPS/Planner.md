@@ -1,6 +1,5 @@
-* GPS must initially run for approx. 15min to aquire enough Almanac data. The more the better. Aquiring it from all satellites would be ideal
+* GPS must initially run for approx. 12.5min to aquire all Almanac data. The more the better. Aquiring it from all satellites would be ideal
     * The GPS will also record other
-
 
 * Ideally, want satelliete to Hot Start. For this to occur, the following conditions must be met: [[1]]
     * It has a valid Almanac.
@@ -9,15 +8,14 @@
 
 * The best option may be to configure everything via U-center, and stick to recieving NMEA messages via Arduino. You can't really monitor when or if Assist Autonomous has done anything. Same goes for downloading Ephemeris and Alamanc data. Maybe every so often, let the GPS run a bit longer after getting a fix to get some ephemeris data (but that may just be a waste of time since it won't be valid for very long)
 
+* **Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on**
+
+
 * I think Assist Autonomous starts running after it has downloaded the ephemeris data from a satellite. Look at how long it takes to download the data to get an idea of total time to completion
 
-* Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on
-
-* Let the Other GPS module run for awhile and record the log. DO that again tomorrow and comapre the data (and see if the data even saved overnight)
-* Both the original and the NEO-6M GPS's DID NOT save the data (at least not long enough to be useful). After 16 hours, the set configuration and almanac data was gone)
+* Let the other GPS module run for a while and record the log. Do that again tomorrow and comapre the data (and see if the data even saved overnight)
+* Both the original and the NEO-6M GPS's **DID NOT** save the data (at least not long enough to be useful). After 16 hours, the set configuration and almanac data was gone)
     * 1 hour intervals may be okay
-
-
 
 
 Hardware Configuration:
@@ -25,9 +23,9 @@ Hardware Configuration:
 
 * Configuration data, Almanac data, ephemeris data, and Assist Autonomous data will be saved to the BBR (Battery Backed RAM)
 *  GPS's most recent position, time, etc. are automatically saved to the BBR
-    * The battery automatically recharges when the unit is powered and has a lifespan of approx. 2 weeks (the Arduino will still peridocially be waking up so the battery should always have a charge)
-    * May need an RTC for this data to be useful
 
+    * The battery is **suppose to** automatically recharges when the unit is powered and has a lifespan of approx. 2 weeks (the Arduino will still peridocially be waking up so the battery should always have a charge)
+    * May need an RTC for this data to be useful
 
 
 * Using the SPI pins, the GPS can utilise the Arduinos EEPROM. This can be used to store Assist Offline Data and the GPS's most recent position
@@ -41,9 +39,6 @@ Hardware Configuration:
 Software Configuration:
 ===
 
-1) Power is provided to the GPS Module. It's configuration data 
-2) sdd
-
 
 Algorithm:
 ---
@@ -53,9 +48,8 @@ Algorithm:
     * When Jamming is occuring
     * When to perform Autonomous calculations
     * How much time to provide for getting a fix, performing calculations, and aquireing new data
-    * 
-s EEPROM, BBC Memory
-* 
+    * When it is safe to power the GPS off
+ 
 * Combo of Downloaded data and AssitAutonomous (in case memory is an issue)
     * Download data 3 days apart. Use AssistAutonomous to determine data within those time blocks
 

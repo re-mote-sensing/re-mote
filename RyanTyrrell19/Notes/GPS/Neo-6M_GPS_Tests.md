@@ -66,11 +66,15 @@ Aquisition (minAqcTime) -> Inactive for Search (Search Period) -> Aquisition (Ge
 * Acquisition holds steady at the above ranges until a fix is obtained. After that, it flucuates between 40 - 53mA
 
 ## Concluding Notes:
+
 * Power SAving Mode doesn't seem to be appropriate for the Turtle Trackers. This mode is geard towards GPS's that will always remaine powered on and require position fixes relativley frequently.  
 For our application the idea is to get a fix as quickly as possible, record the position, than cut all power to the GPS. The usefulness of PSM occurs after the GPS has aquired it's fix, and it is at this point that all power is cut to the GPS anyway's.   Therefore, it makes no difference to have the GPS run in Continuous mode or Power Saving Mode.
 
 # GPS Accuracy
-## Settings consistent across all tests
+## Changeable Parameters
+
+* **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only if the aids are being used, but if they've made any noticable difference. Their effectiveness also fluctuates with the position of the satellites**
+
 
 | Setting               |   Set As   | Description                   |
 |:---------------------:|:----------:|---                            |
@@ -78,8 +82,8 @@ For our application the idea is to get a fix as quickly as possible, record the 
 |      Static Mode      |   Enabled  | Allows the navigation algorithms to decrease the noise in  the position output when the velocity is below a pre-defined  ‘Static Hold Threshold’. This reduces the position wander  caused by environmental factors such as multi-path and  improves position accuracy especially in stationary applications.                      |
 | NMEA Filtration Flags |     NA     | Will leave Default Settings   |
 | GNSS Configuration    | Default Values | Specifies how many channels to be allocated for each satellite system (GPS, SBAS, QZSS, GLONASS). Channels are used to search for satellites. Changing the number of channels available will influence TTFF and power consumption. |
-| DGNSS|     Enabled    |    |                            
-| SBAS |     Enabled    |
+| DGNSS|     Enabled    |  See "GPS Notes"  |                            
+| SBAS |     Enabled    | See "GPS Notes"   |
 | Assited Data Online/Offline |    TBD   |
 | Assisted Data Autonomous |     TBD   |
 
@@ -101,7 +105,7 @@ Update RTC & Ephemeris - Enabled?
 
 * Manual entry of Exact GPS coordinates will be logged (found using Google Maps)
 
-* The following data will be logged to determine effectivness of setup and accuracy of GPS. Each will be logged for a Cold, Warm, and Hot Start. After TTFF, 100 additional indexes will be logged
+* The following data will be logged to determine effectiveness of setup and accuracy of GPS. Each will be logged for a Cold, Warm, and Hot Start. After TTFF, 100 additional indexes will be logged
     * TTFF
     * PDOP, HDOP, VDOP
     * GPS Values
@@ -110,43 +114,47 @@ Update RTC & Ephemeris - Enabled?
         * Average Lat, Lon, & Alt (msl) - Recorded 100 Indexes after TTFF
     * Num. of satellites used
 
+* The Data outputted by the GPS reciever can be recorded and saved.
 
-* The GPS reciever configurations for each test setup have been saved
-* The Data outputted by the gPS reciever has also been recorded and saved.
+## Test Location: Cubicle in Room 201 - ITB  
+### Cold Start
+### Warm Start:
+### Hot Start:
 
-* **Many of these Assisting features are extremely challenging to test. It's very difficult to determine not only is the aids are being used, but if they've made any noticable difference.
 
-## Baseline Test
-* All Accuracy Assisting features are disabled to determine a baseline that all other tests will be compared to
-    * DGNSS - Disabled
-    * SBAS - Disabled
-    * Assited Data Offline - Disabled
-    * Assisted Data Autonomous - Disabled
+## Test Location: JHE Field  
 
-Test Location: Cubicle in Room 201 - ITB  
-
-Test Location: JHE Field  
 Exact GPS Coordinates: 
 
-| Test #     | Time to Valid Fix (2D or 3D)    |       | Average Value (mA) |
+### Cold Start:
+| Test #     | TTFF    |   PDOP    |            |
 |:----------:|:--------------:| :--------:     |:-------------:     |
 | 1          |                |                |                    |
 | 2          |                |                |                    |
 | 3          |                |                |                    |
 
+### Warm Start:
 
-Test Location: Cootes Paradise  
+
+
+### Hot Start:
+
+
+
+
+
+## Test Location: Cootes Paradise  
 Exact GPS Coordinates: 
+
+### Cold Start:
+### Warm Start:
+### Hot Start:
 
 ## SBAS & Differential GNSS
 
 * Enable SBAS
 * View output to see if connection is established and whether GPS has improved once a connection is established
 * See SBAS Section in Specs. for more info
-
-## Providing Aided Data
-* Providing general lat/lng/height data,
-* Requires an external memory device connected to the GPS chip using SPI. Alternativly, the data can be saved on thr Arduino (or maybe computer for testing) as the 'Host' and sent via the EX/TX pins to the GPS chip
 
 ## AssistNow Offline
 * u-blox provides AlmanacPlus data files in different sizes, which contain differential almanac corrections that are valid for a period of between 1 and 14 days thereafter.
