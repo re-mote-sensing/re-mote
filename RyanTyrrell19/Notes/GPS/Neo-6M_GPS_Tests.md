@@ -87,18 +87,15 @@ For our application the idea is to get a fix as quickly as possible, record the 
 | Assited Data Online/Offline |    TBD   |
 | Assisted Data Autonomous |     TBD   |
 
-Aquisition Timout (minAqcTime) - 30 s  
-Search Period - 20 s  
-onTime (on Time) - 0 s  
-update Period - 5 s 
-Wait for Timefix - Enabled
-
 GNSS - Enabled  
 SBAS - Enables  
 Assist Autonomous - Enabled  
 Jamming Monitor - Disabled (since it needs to reference a good signal first)  
 Jamming Indiactor - Use it  
 Update RTC & Ephemeris - Enabled?  
+
+Messages Enabled:
+    * AIDS (GPS Aiding) -> INI (Initial )
 
 ## Additional Pre-Test Notes
 * Can use the Hot, Warm, and Cold commands so "one can force the receiver to reset and clear data, in order to see the effects of maintaining/losing such data between restarts."
