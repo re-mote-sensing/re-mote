@@ -1,3 +1,16 @@
+# Meeting Outline & Notes
+1) Go over GPS Notes again, going over the sections that have been added and given more detail
+    * How to guage the GPS accuracy (PDOP)
+    * Improving GPS Accuracy (DGNSS, SBAS)
+    * Almanac Data, Ephemeris data, trasnmission of this data
+    * Start-up modes and their requirments
+2) Show U-Center Notes
+3) Testing Notes
+    * Power Saving Mode doesn't seem to be appropriate for the Turtle Trackers. This mode is geard towards GPS's that will always remaine powered on and require position fixes relativley frequently.  
+For our application the idea is to get a fix as quickly as possible, record the position, than cut all power to the GPS. The usefulness of PSM occurs after the GPS has aquired it's fix, and it is at this point that all power is cut to the GPS anyway's.   Therefore, it makes no difference to have the GPS run in Continuous mode or Power Saving Mode.
+4) Thoughts and Ideas (below)
+
+
 # OverView and Plan:
 
 * Overall Goal - Reduce how long the GPS's are ON to minimize current drawn and maximize battery life
