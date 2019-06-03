@@ -26,7 +26,6 @@
     * Will discuss in more detail later
 
 ## Gauging the Accuracy of a GPS Signal:
-
 ### PDOP, HDOP, VDOP [[20]]
 
 * PDOP (Position Dilution of Precision) describes error caused by the relative position of the GPS satellites. 
@@ -37,7 +36,17 @@
     * VDOP - Vertical Dilution of Precision
 
 ## Sources of Error:
----
+### Signal-to-Noise Ratio (SNR) & C/N0
+
+* SNR is usually expressed in terms of decibels. It refers to the ratio of the signal power and noise power in a given bandwidth [[25]
+    * **S is the signal power**, usually the carrier power expressed in units of decibel/milliwatt (dBm) or decibel/watts (dBW);
+    * **N is the noise power** in a given bandwidth in units of dBm or dBW. 
+* ***The SNR is very useful when evaluating the performance of the acquisition and tracking stages in a receiver** [[25]]
+
+
+* C/N0, on the other hand, is usually expressed in decibel-Hertz (dB-Hz) and refers to the ratio of the carrier power and the noise power per unit bandwidth. [[25]]
+    *  C/N0 output by a receiver clearly provides an indication of the signal power of the tracked satellite and the noise density as seen by the receiver’s front-end. [[25]]
+
 ### Ionosphere (Atmosphere Refraction) 
     * 
 
@@ -67,15 +76,12 @@
     * Simply there are more AVAILABLE satellites to choose from
 
 # Almanac Data
-
 ## Overview
 
 * Tells the GPS receiver where each GPS satellite should be at any time throughout the day and shows the orbital information for that satellite and every other satellite in the system. [[5]]
     * The almanac gives the approximate orbit for each satellite and is valid for long time periods **(up to 180 days)**. The almanac is used to predict satelite visibility and estimate the pseudorange to a satellite, thereby narrowing the search window for a ranging code. [[13]]
-
     
 * It takes up to 12 1/2 minutes to collect a complete almanac after initial acquisition. **An almanac can be obtained from any GPS satellite**. [[13]]
-
 
 ## In-Depth:
 
@@ -83,20 +89,20 @@
 * valid for a period of up to **90 days** [[18]]
 * Used to speed up time to first fix by 15 seconds (compared to not having almanac stored) [[18]]
 
-* Many sites give conflicting data
+* **Many sites give conflicting data**
 
 # Ephemeris Data
 ## Overview
 
 * needed to determine a satellite's position and gives important information about the health of a satellite, current date and time [[5]]
     * ephemeris must be collected from each satellite being tracked on acquisition and at least once every hour. Ephemeris information is normally **valid for 4 hours from the time of transmission**, and a receiver can normally store up to 8 sets of ephemeris data in its memory [[13]]
-    * Depending on the NAV msg collection scheme employed in a particular receiver, it can take between 30 seconds and 3 minutes to collect the ephemeris information. [[13]]
+    * Depending on the NAV msg collection scheme employed in a particular receiver, it can take between **30 seconds and 3 minutes to collect the ephemeris information**. [[13]]
 
 ## In-depth
 
 * contains information on week number, satellite accuracy and health, age of data, satellite clock correction coefficients, orbital parameters [[18]]
 * valid two hours before and two hours after time of ephemeris (toe). The toe can be thought of as when the data was computed from the GNSS control segment [[18]]
-    * Most sorces simplify this to 4 hours of validity
+    * Most sources simplify this to 4 hours of validity
 * Used for real time satellite coordinate computation which is required in position computation [[18]]
 
 ## Purpose/Data Provided
@@ -119,10 +125,9 @@ On the other hand, the ephemerides takes 6 seconds/subframe x 5 subframes = **30
 **Note that the almanac is the same for all satellites whereas the ephemeris is unique to each satellite.**
 
 # GPS Startup
-
 ## Overview
 
-* _Start-up Times (Hot, Warm, and Cold)_: Some GPS modules have a super-capacitor or battery backup to save previous satellite data in volatile memory after a power down. This helps decrease the TTFF on subsequent power-ups. Also, a faster start time translates into less overall power draw [[1]]
+* _Start-up Times (Hot, Warm, and Cold)_: Some GPS modules have a super-capacitor or battery backup to save previous satellite data in volatile memory after a power down. This helps decrease the TTFF on subsequent power-ups. **Also, a faster start time translates into less overall power draw** [[1]]
 
     * _Cold Start_: If you power down the module for a long period of time and the backup cap dissipates, the data is lost. On the next power up, the GPS will need to download new almanac and ephemeris data. [[1]]
 
@@ -246,3 +251,4 @@ Source [[2]] is quite informative and goes very in-depth reagrding how GPS's wor
 [22]: https://www.u-blox.com/sites/default/files/products/documents/u-blox7-V14_ReceiverDescriptionProtocolSpec_%28GPS.G7-SW-12001%29_Public.pdf
 [23]: https://i.ibb.co/mvgY3kZ/1.png
 [24]: https://www.measurementsystems.co.uk/docs/TTFFstartup.pdf
+[25]: https://insidegnss.com/measuring-gnss-signal-strength/
