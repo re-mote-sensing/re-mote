@@ -159,7 +159,7 @@ PM (Power Management):
 * _Update Period_: Time between two position fix attempts
 * _Search Period_: Time between two acquisition attempts if the receiver is unable to get a position fix
 *_Acquisition timeout_: Time after which the receiver stops acquisition and enters _Inactive for search_ state
-On-time
+On-time  
     * If the receiver determines that it needs more time for the given starting conditions, it will automatically prolong this time. If set to zero, the acquisition timeout is exclusively determined by the receiver. In case of a very weak or no GPS signal, the timeout determined by the receiver may be shortened in order to save power. However, the acquisition timeout will never be shorter than the configured value.
 
 * _On-time_: Time the receiver remains in Tracking state and produces position fixes
