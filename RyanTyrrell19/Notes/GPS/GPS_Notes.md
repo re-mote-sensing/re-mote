@@ -115,11 +115,11 @@
 
 GNSS almanacs and ephemerides both form the navigation message transmitted by each satellite. The navigation message consists of **5 subframes**, where **each frame is made up of 10 words and takes up 6 seconds to download**. The navigation message frame structure is as follows:
 
-subframes 1 -3: ephemerides
+subframes 1 -3: ephemerides  
 subframes 4-5: almanac --> full almanac requires 25 pages to completely download. 
 
-Thus one page of frames 1-5 takes 30 seconds to download.
-Since the **almanac contains 25 pages**, the total time required to download almanac is: 25 pages x 30 seconds/page = 750 seconds = **12.5 minutes**
+Thus one page of frames 1-5 takes 30 seconds to download.  
+Since the **almanac contains 25 pages**, the total time required to download almanac is: 25 pages x 30 seconds/page = 750 seconds = **12.5 minutes**  
 On the other hand, the ephemerides takes 6 seconds/subframe x 5 subframes = **30 seconds to download**. 
 
 **Note that the almanac is the same for all satellites whereas the ephemeris is unique to each satellite.**

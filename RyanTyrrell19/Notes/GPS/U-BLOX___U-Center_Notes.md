@@ -1,4 +1,4 @@
-# Relevent U-Center Headings Overview:
+# Relevent U-Center Headings & Other Notes:
 
 ## Overview
 
@@ -55,7 +55,7 @@ Start-up:
     * Almanac
         * General info about satellites
     * Health
-        * Health of the GPS reciever (I'm assuming)
+        * Health of the satellites (I'm assuming)
     * Klobuchar
         * A model used to reduce the error caused by the ionosphere
     * Position
@@ -73,7 +73,7 @@ Start-up:
     * TCT Parameters
         * ???
     * AssistNow Autonomous
-        * Computed data used to extrapolat the ephemeris data
+        * Computed data used to extrapolate the ephemeris data
 
 * Hot Start has **all data**
 * Warm Start has all data **except Ephemeris**
@@ -88,19 +88,19 @@ ALM (Almanac)
 
 EPH (Ephemeris):
 ---
-* Display's what Ephemeris data has been downloaded, from which satetliite, and how many of the _pages_ have been downlaoded (reference to how Almanac data is downloaded and stored)  
+* Display's what Ephemeris data has been downloaded, from which satetliite, and how many of the _pages_ have been downlaoded (reference to how Ephemeris data is downloaded and stored)  
 ![alt-text][2]
 
 HUI (GPS Health, UTC and Ionosphere Parameter):
 ---
 * Data relevant to the start-up time of the GPS. This data is automatically updated and saved to the GPS Modules BBR (Battery-Backed RAM)
-    * UTC Parameters and Klobuchar are both needed for a Warm Start  
+    * UTC Parameters and Klobuchar are both needed for a Warm Start. I beleive these valeus are obtaiend with the Almanac data
 ![alt-text][3]
 
 INI (Initial Data):
 ---
 * Data relevant to the start-up time of the GPS. This data is automatically updated and saved to the GPS Modules BBR (Battery-Backed RAM)
-    * Position and Time are both needed for a Warm Start  
+    * Position and Time are both needed for a Warm Start. They are automatically saved to the BBR
 ![alt-text][4]
 
 
@@ -143,8 +143,8 @@ NAV5 (Navigation 5):
 * Various parameters that are best left as the default values.
 * Only _Dynamic Model_ need be changed. This value reflects what sort of movement the GPS reveiver will undergo  
     * The settings improve the receiver's interpretation of the measurements and thus provide a more accurate position output. Setting the receiver to an unsuitable platform model for the given application environment results in a loss of receiver performance and position accuracy.
-* **The** _Navigation Input_ **settings are already optimized. Do not change any parameters unless advised by u-blox support** engineers.**
-* _Navigation Ouput Filters_ configure the quality of the position fixes   
+* **The** _Navigation Input_ **settings are already optimized. Do not change any parameters unless advised by u-blox support engineers.**
+* _Navigation Ouput Filters_ configure the **quality of the position fixes**   
 ![alt-text][9]
 
 
@@ -257,7 +257,7 @@ AOPSTATUS (AssistNow Autonomous Status):
 
 CLOCK (Clock Status):
 ---
-* COntains various clock data
+* Contains various clock data
 * Of interest because _Clock Drift_ is required for quicker startup
 
 ![alt-text][19]
@@ -275,13 +275,13 @@ SBAS (SBAS Status):
 
 SOL (Navigation Solution):
 ---
-* Provides a list of the more important data recieved for the GPS reciever.
+* Provides a list of the more important data recieved from the GPS reciever.
 
 ![alt-text][22]
 
 STATUS (Navigation Status):
 ---
-* Provides a list of the more important data recieved for the GPS reciever.
+* Provides a list of the more important data recieved from the GPS reciever.
 
 ![alt-text][23]
 

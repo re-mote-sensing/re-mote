@@ -1,5 +1,5 @@
 # Meeting Outline & Notes
-1) Go over GPS Notes again, going over the sections that have been added and given more detail
+1) Go over GPS Notes again, going over the sections that have been added and given in more detail
     * How to guage the GPS accuracy (PDOP)
     * Improving GPS Accuracy (DGNSS, SBAS)
     * Almanac Data, Ephemeris data, trasnmission of this data
@@ -48,6 +48,9 @@ For our application the idea is to get a fix as quickly as possible, record the 
 
 * I think Assist Autonomous starts running after it has downloaded the ephemeris data from a satellite. Look at how long it takes to download the data to get an idea of total time to completion
 
+* **Use of an RTC will be useful for the following reasons,**
+    * Provides accurate time to the GPS
+    * Allow us ti implement a secific time interval for the GPS Trackers, which can increase the battery life
 
 ## Potential Plan A:
 * The original GPS's data not stored data for future use, resulting in them always running a Cold Start. The addition of a BBR is the major change to the GPS's (minor changes include altering the configuration sttings via U-center)
