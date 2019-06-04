@@ -29,17 +29,16 @@ For our application the idea is to get a fix as quickly as possible, record the 
         * ephemeric data downloaded
         * Aided data downloaded (Assit Autonomous)
 
+
+
 * Look at which ephemeris data has been downloaed for each sateliites
-* Use Watchdog timer to sleep during specific time - get GPS time when available to self-corrcect
-* Look through UBC protocol to see what data can be read from GPS
-
-
-
+* Use Watchdog timer to sleep during specific time - get GPS time when available to self-correct
+* Look through UBX protocol to see what data can be read from GPS
 
 * Use the LoRa Module to check if Tracker is underwater. If no acknowledgment is recieved, GPS is underwater
     * Issues - Gateway breaks at some point, Gateway is out of range
     * Pros - Much cheaper on power
-    * Use either LoRa or GPs, check the noise level
+* Use either LoRa or GPs, check the noise level
 
 * 
 
