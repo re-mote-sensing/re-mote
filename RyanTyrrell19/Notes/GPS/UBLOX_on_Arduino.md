@@ -13,3 +13,7 @@
 3) Read from reciver
     * RTC
         * USe to compute time since last fix
+
+
+
+* Turns out you are limited by what messages can be read via the Arduino only PUBX (Proprietary UBX Messages) messages can be read by the Arduino. This data is much similar to that provided by NMEA. I do believe it is formated differently to iincrease transmission speed
