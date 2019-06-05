@@ -6,7 +6,7 @@
 
 * Distances will be measured out using a GPS watch (Forerunner 235)
 
-# Changeable Parameters
+# Changeable Parameters (Of the Node)
 
 * Distance
     * Increase distance over set intervals
@@ -26,6 +26,8 @@
     * Head height
 
 * LoRa Settings?
+
+* Gateway elevation
 
 # Record
 
