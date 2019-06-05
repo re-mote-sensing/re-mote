@@ -1,32 +1,74 @@
 # Test Outline
 
-4 tests will be conducted. Each in a different environemntal setting. For each setting, tests will be conducted over several distances.
+1) 4 tests will be conducted, each in a different environmental setting. 
+2) For each setting, tests will be conducted over several distances. 
+3) for each distance, elvation and antenna used will be changed
 
-The following procesure will be followed for all tests
-
-1) T
-2) 
-
-# Non-Changeable Parameters
-
-
-
-
-
+* Distances will be measured out using a GPS watch (Forerunner 235)
 
 # Changeable Parameters
 
 * Distance
+    * Increase distance over set intervals
+    * When no longer recieving, slowly move back until it does again
 * Environment
     * Line-of-sight (no obstructions)
     * Rural (Tress & hills)
     * Urban (City)
+
 * Antenna
     * Powerful, large antenna
     * no antenna
-    * Any other antenna I can find
+    * Any other antenna I can find?
 * Elevation
     * On the ground
     * Waist height
     * Head height
+
 * LoRa Settings?
+
+# Record
+
+* If data was recieved
+* Signal strength
+
+# Test Set-Up
+
+## Node
+### General
+
+* LoRa MESH Module Connected to Arduino Nano
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Node.ino'
+* LoRa MESH communicates with Arduino via SoftwareSerial
+
+### Pinout
+
+LoRa       Arduino
+GND    ->   GND
+VCC    ->   5V
+RX     ->   D2
+TX     ->   D3
+
+
+## Gateway
+### General
+
+* LoRa MESH Module Connected to Arduino Uno
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Gateway.ino'
+* LoRa MESH communicates with Arduino via SoftwareSerial
+
+### Pinout
+
+LoRa       Arduino
+GND    ->   GND
+VCC    ->   5V
+RX     ->   D2
+TX     ->   D3
+
+# Test 1: Line-of-Sight
+
+General Location:
+Gatway Location:
+Node Locations: 
+
+

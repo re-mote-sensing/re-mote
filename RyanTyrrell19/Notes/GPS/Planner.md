@@ -14,7 +14,7 @@
 * RTC on GPS?
 * Read RTC without fix (and if it's reliable)
 * antennas (what would be good for our application)
-* Bounce back to LoRa every so often to 
+* Bounce back to LoRa every so often
 
 
 * Lora test
