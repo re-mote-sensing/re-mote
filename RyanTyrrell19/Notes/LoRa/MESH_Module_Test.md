@@ -1,8 +1,8 @@
 # Test Outline
 
-1) 4 tests will be conducted, each in a different environmental setting. 
+1) Four tests will be conducted, each in a different environmental setting. 
 2) For each setting, tests will be conducted over several distances. 
-3) for each distance, elvation and antenna used will be changed
+3) For each distance, elevation and the antenna used will be changed
 
 * Distances will be measured out using a GPS watch (Forerunner 235)
 
@@ -27,7 +27,7 @@
 
 * LoRa Settings?
 
-* Gateway elevation
+* Gateway elevation?
 
 # Record
 
