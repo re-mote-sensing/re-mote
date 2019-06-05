@@ -20,6 +20,7 @@
     * # SVs Used
     * Valid Fix
     * Lat/lng
+    * TTFF
 
 * Use NeoGPS Library
 
@@ -32,3 +33,19 @@
 * need to know max time BBR can last and if Arduino does in fact recharge it
 
 * Turns out you are limited by what messages can be read via the Arduino only PUBX (Proprietary UBX Messages) messages can be read by the Arduino. This data is much similar to that provided by NMEA. I do believe it is formated differently to iincrease transmission speed
+
+* Return GS reciever because it is defected
+* BBR
+    * Test the BBR more. It may not work properly
+        * Last time recorded on GPS was 1am. So it lasted about 8 hours
+    * Difficult to say how long it'll last, how charged it is, etc. May be easier to use the Arduino?
+
+
+* Cannot send/recive UBX commands (at least not with this module). Arduino cannot read the message format of the data
+    * Different modules may support raw output, which could potentially be read by the Arduino
+    * At least, there is minimal info out there on reading/writing UBX
+* Ideally, want everything done via the Arduino to make it easier for the user. This may not be possible though for several reasons
+    * Challenging to send UBX commands via the Arduino
+    * would need additional connections to save data to the Arduinos EEPROM
+
+* Really difficult to test something that should last so long with so many unknowns
