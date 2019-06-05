@@ -1,3 +1,34 @@
+# Future Plans
+
+* Look at which ephemeris data has been downloaed for each sateliites
+* Use Watchdog timer to sleep during specific time - get GPS time when available to self-correct
+* Look through UBX protocol to see what data can be read from GPS
+* Use the LoRa Module to check if Tracker is underwater. If no acknowledgment is recieved, GPS is underwater
+    * Issues - Gateway breaks at some point, Gateway is out of range
+    * Pros - Much cheaper on power
+* Use either LoRa or GPs, check the noise level
+
+
+* Look at different GPS modules 
+* Watchdog accuracy test
+* RTC on GPS?
+* Read RTC without fix (and if it's reliable)
+* antennas (what would be good for our application)
+* Bounce back to LoRa every so often to 
+
+
+* Lora test
+    * Go to Cootes
+    * Test range & record signal strength
+    * Specify settings, location (GPS coordiantes)
+        * 
+    * Results when LoRa is in differnt elvations/locations
+    * Vary settings of LoRa/ location settings (line-of-site/Field/hills/trees)
+    * Record other relevant data ()
+    * antenna (with good/ okay/ no antenna)
+    * vary distance (use google maps)
+
+
 # Meeting Outline & Notes
 1) Go over GPS Notes again, going over the sections that have been added and given in more detail
     * How to guage the GPS accuracy (PDOP)
@@ -28,44 +59,6 @@ For our application the idea is to get a fix as quickly as possible, record the 
     * Run time will influence,
         * ephemeric data downloaded
         * Aided data downloaded (Assit Autonomous)
-
-
-
-
-
-
-
-* Look at which ephemeris data has been downloaed for each sateliites
-* Use Watchdog timer to sleep during specific time - get GPS time when available to self-correct
-* Look through UBX protocol to see what data can be read from GPS
-
-* Use the LoRa Module to check if Tracker is underwater. If no acknowledgment is recieved, GPS is underwater
-    * Issues - Gateway breaks at some point, Gateway is out of range
-    * Pros - Much cheaper on power
-* Use either LoRa or GPs, check the noise level
-
-
-
-* Look at different GPS modules 
-* Watchdog accuracy test
-* RTC on GPS?
-* Read RTC without fix (and if it's reliable)
-* antennas (what would be good for our application)
-* Bounce back to LoRa every so often to 
-
-* Lora test
-    * Go to Cootes
-    * Test range & record signal strength
-    * Specify settings, location (GPS coordiantes)
-        * 
-    * Results when LoRa is in differnt elvations/locations
-    * Vary settings of LoRa/ location settings (line-of-site/Field/hills/trees)
-    * Record other relevant data ()
-    * antenna (with good/ okay/ no antenna)
-    * vary distance (use google maps)
-
-
-
 
 
 
