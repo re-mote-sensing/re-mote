@@ -31,6 +31,10 @@ For our application the idea is to get a fix as quickly as possible, record the 
 
 
 
+
+
+
+
 * Look at which ephemeris data has been downloaed for each sateliites
 * Use Watchdog timer to sleep during specific time - get GPS time when available to self-correct
 * Look through UBX protocol to see what data can be read from GPS
@@ -40,7 +44,32 @@ For our application the idea is to get a fix as quickly as possible, record the 
     * Pros - Much cheaper on power
 * Use either LoRa or GPs, check the noise level
 
-* 
+
+
+* Look at different GPS modules 
+* Watchdog accuracy test
+* RTC on GPS?
+* Read RTC without fix (and if it's reliable)
+* antennas (what would be good for our application)
+* Bounce back to LoRa every so often to 
+
+* Lora test
+    * Go to Cootes
+    * Test range & record signal strength
+    * Specify settings, location (GPS coordiantes)
+        * 
+    * Results when LoRa is in differnt elvations/locations
+    * Vary settings of LoRa/ location settings (line-of-site/Field/hills/trees)
+    * Record other relevant data ()
+    * antenna (with good/ okay/ no antenna)
+    * vary distance (use google maps)
+
+
+
+
+
+
+
 
 ## Additional Ideas:
 * **Could have the Gateway transmit the ephemeris data to the Turtle Trackers to minimize the time the trackers remain on**
