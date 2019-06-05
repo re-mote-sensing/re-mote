@@ -5,9 +5,17 @@
     * PUBX (Proprietary UBX Messages) is essentailly the same as NMEA (in terms of data available). The only difference is how the data is formatetd for quicker transmission
     * Binary UBX protocol relates to all the various commands you can send, and the multitude of data you may recieve. T
 
-* There are limited resources on how to read and write UBX commands using the Arduino. Most sites limit themselves to reading only the GPS data using UBX. Nothing on
+* There are limited resources on how to read and write UBX commands using the Arduino. Most sites limit themselves to reading only the GPS data using UBX.
 
 * I2C buffer is limited to 32 bytes (not sure if this value is programmable)
+
+## Potential Libraries
+
+* https://github.com/AuraUAS/UBLOX
+    * Was unable to get this library to work. I belive this is because it is only compatible with UBLOX 7 or 8
+* https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library
+    * This library is tailored to specific Sparkfun GPS modules
+
 
 # Connecting GPS to Hardware Serial, and still viewing debugging data [[1]] [[2]]
 
