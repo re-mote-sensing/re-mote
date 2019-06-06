@@ -23,6 +23,12 @@
 * Send/recieve messages using UBX via the Arduino
 
 
+* New GPS is connected to battery, running normally, but with EN wired to ground. Hopefully, this will keep the RTC running. Unpug in morning plug into computer, and see what it's outputting
+
+* Other GPS, have periodically wake up, power GS for a few seconds, go back to sleep. See if this will keep the RTC around. Again,  Unpug in moring plug into computer, and see what it's outputting
+    * Need to plug GPS into digital pin, and need a transistor to do that
+
+
 * Lora test
     * Go to Cootes
     * Test range & record signal strength
