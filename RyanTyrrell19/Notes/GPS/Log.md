@@ -41,6 +41,63 @@
     * a constant supply of power to contineu running (i.e. a cell battery)
 
 
-# If looking into noise again, start here (may be useful for figuring out what antenna to use)
+# Evidence that the Watchdog Timer (used when the Arduino enters LowPower.Sleep() mode) is indeed inaccurate
+* https://forum.arduino.cc/index.php?topic=425222.0
+    * “I'm going to tell you this though, the watchdog timer SUCKS for accuracy. I found that out on a project I did for school. The frequency varies significantly with supply voltage and temperature, so it should not be used for anything requiring any degree of accuracy.”
+* https://jeelabs.org/2012/03/27/tracking-time-via-the-watchdog/
+    * "**This is only 10% accurate**, because it uses the hardware watchdog which is based on an internally RC-generated 128 KHz frequency."
+    * note how 8192 ms ends up being 8255 ms, due to the watchdog timer inaccuracy."
+* https://forum.arduino.cc/index.php?topic=49549.0
+    * "The watchdog rate changes based on the power passing through the chip.  Going from idle to power down, the watchdog will run at a different rate.  Turn on a few digital outputs; different rate.  The watchdog timer is also sensitive to the ambient temperature and the supply voltage.  Even changing the watchdog timer settings alters the rate.
+In addition, the watchdog timer has a lot of jitter.  Under the exact same conditions, the timer will expire at slightly different times"
 
+* Timer used while the Arduino is in Low Power Mode. This timer is know to be very inaccurate, with it flucuating depending on the input voltage and temperature.
+
+
+# If looking into noise again, start here (may be useful for figuring out what antenna to use)
 https://ava.upuaut.net/?p=836
+
+
+# Rather then use GPS, setup up an abundant supply of Gateways and use them to triangulate the location of the Nodes
+* Although a viable solution, it does not seem like the best one; especially for tracking a non-static object
+
+* http://orbit.dtu.dk/ws/files/130478296/paper_final_2.pdf
+    * This paper, titles “GPS-free Geolocation using LoRa in Low-Power WANs”, pursues the possibility of geolocation with LoRa. This tested used 1 non-moving node and 4 gateways
+    * Taken from the paper are the following,
+        * “it can be feasible to locate a device in a static spot with an accuracy of around 100 meters. However, for a real-time tracking application it can only be seen as a first approach, and not as a usable one”
+        * “Another problem is the multipath of the signal, which causes wrong measurements of the TDOAs. Gateways do not always receive the direct path of the signal due to the reflections with terrestrial objects like buildings, forests or mountains. The ability to resolve this phenomenon depends on the bandwidth of the signal. If the bandwidth is large, the resolution is better and vice versa. The bandwidth employed in LoRa is small (125 kHz), so the recorded times in the gateways can be the time of a multipath signal instead of the direct one.”
+* https://www.link-labs.com/blog/lora-localization
+    * This website discusses “using 3 or more gateways to make a time difference of arrival (TDOA) calculation on the received LoRa signal and calculating the position.”
+    * Taken from the site,
+        * “our professional expertise leads us to the conclusion that accurate localization using LoRa (or any low power, narrowband, RF technology- Sigfox, etc.) is extremely difficult or impossible to successfully develop into a usable approach”
+        * Visit the site for more info; it is well laid out and effectively concludes each topic. It’s quite informative and descriptive in discussing how feasible (or not feasible) geolocation using LoRa is
+
+## Concluding Thoughts
+
+Yes, it looks as though this is possible. However, no examples exists, only theories. Various techniques are discuses that are fairly complex. To implement this method would in itself be a large project with undetermined possibility of success.
+
+
+
+# Can LoRa transmit underwater?
+* Why is this a concern in the first place? If underwater, GPS cannot get a fix so LoRa need not bother transmitting)
+* LoRa is just high-frequency radio waves. So, the question is, can high-frequency radio waves effectively transmit underwater? In addition, could the properties that makes LoRa different (chirp spread spectrum and such) influence this?
+* https://www.thethingsnetwork.org/forum/t/underwater-range-of-lora/599
+    * A forum discussing LoRa underwater (saltwater). The gist of it is that it doesn’t seem capable.
+* https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4934316/
+    * A very technical paper titles “RF Path and Absorption Loss Estimation for Underwater Wireless Sensor Networks in Different Water Environments”
+    * Taken from the paper
+        * “for absorption losses to be less than 3 dBs at water conductivity of 0.001 S, the radios ranging from 1 × 108 Hz or greater can be used”
+
+## Concluding Thoughts
+
+I believe it to be possible, but it depends. (I believe) as long as the volume of water is not too great, the signal can pass through it. Once free of the water, the signal can travel normally, but it’s power may be significantly reduced.
+
+
+
+# What approach did the original paper take in optimizing battery life?
+
+This was not the focus of the paper. Its main concern was the GPS accuracy and ability to log the data. It does not go into detail describing power consumption or acquiring GPS fixes at specific times.
+
+# LoRa is high frequency, which makes it good at propagation, but bad at penetration. Will this be an issue when waterproofing the Tracker
+* Initial thoughts, I would say yes. Depending on how the Tracker is waterproofed will most likely reduce the range of the Tracker
+
