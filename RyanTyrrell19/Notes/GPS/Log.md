@@ -34,6 +34,12 @@
 [1]: https://ava.upuaut.net/?p=757  
 [2]: https://www.pjrc.com/teensy/td_libs_AltSoftSerial.html
 
+# Does the GPS have an RTC?
+
+* Theory: Yes, it does have an RTC. For it to work, it requires
+    * a GPS fix so it knows what to set the time to
+    * a constant supply of power to contineu running (i.e. a cell battery)
+
 
 # If looking into noise again, start here (may be useful for figuring out what antenna to use)
 
