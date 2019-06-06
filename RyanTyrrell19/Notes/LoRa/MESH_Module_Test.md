@@ -45,11 +45,11 @@
 
 ### Pinout
 
-LoRa       Arduino
-GND    ->   GND
-VCC    ->   5V
-RX     ->   D2
-TX     ->   D3
+LoRa   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D2  
+TX     ->   D3  
 
 
 ## Gateway
@@ -61,16 +61,16 @@ TX     ->   D3
 
 ### Pinout
 
-LoRa       Arduino
-GND    ->   GND
-VCC    ->   5V
-RX     ->   D2
-TX     ->   D3
+LoRa   |    Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D2  
+TX     ->   D3  
 
 # Test 1: Line-of-Sight
 
-General Location:
-Gatway Location:
-Node Locations: 
+General Location:  
+Gatway Location:  
+Node Locations:  
 
 
