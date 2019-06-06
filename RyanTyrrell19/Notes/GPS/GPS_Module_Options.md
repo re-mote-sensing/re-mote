@@ -1,4 +1,8 @@
-
+* Price range?
+* Probably better off buying a pre-made board rather than design our own PCB. A lot of things that need to be considered when designing your own board
+ 
+ 
+ 
  [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
  * 56-Channel Receiver (22 Channel All-in-View)
  * Sensitivity : -162dBm
@@ -7,7 +11,6 @@
  * 40mA @ 3.3V
 
  [This site][9] contains an extensive list of various GPS reciever and their highlights. A few have been summarized above.
- * 
 
 [NEO-6M GPS Chip][NEO-6M GPS Chip Data Sheet]:
 This GPS module continues to appear as an excellent choice for low-power, low-cost projects. A few f the key features are:

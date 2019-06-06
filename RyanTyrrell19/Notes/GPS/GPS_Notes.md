@@ -171,6 +171,16 @@ On the other hand, the ephemerides takes 6 seconds/subframe x 5 subframes = **30
 
 * In the NMEA standard there are no commands to indicate that the gps should do something different. Instead each receiver just sends all of the data and expects much of it to be ignored. There is no way to indicate anything back to the unit as to whether the sentence is being read correctly or to request a re-send of some data you didn't get[[10]]
 
+### NMEA messages
+
+* GGA - Global Positioning System Fix Data 
+* GLL – Latitude/Longitude
+* GSA – GNSS DOP and Active Satellites
+* GSV – GNSS Satellites in View
+* RMC – Recommended Minimum Specific GNSS Data 
+* VTG – Course Over Ground and Ground Speed 
+
+
 ## [UBX (UBLOX) protocol][22]
 * From what I can gather, this protocol is more sophisticated than NMEA. It allows the GPS to send data pertaining to other aspects of the GPS modules, rather than just the actual GPS data. Additionally, you can send commands to the GPS module, allowing you to configure it.
 

@@ -9,10 +9,14 @@
 * Use either LoRa or GPs, check the noise level
 
 
-* Look at different GPS modules 
 * Watchdog accuracy test
+    * Done see notes and data
 * RTC on GPS?
+    * Yes. See notes
 * Read RTC without fix (and if it's reliable)
+    * Yes. See Notes
+
+* Look at different GPS modules 
 * antennas (what would be good for our application)
 * Bounce back to LoRa every so often
 

@@ -1,3 +1,17 @@
+# Outline
+    * Read/write UBX commands to/from Arduino
+    * Connecting GPS to Hardware Serial, and still viewing debugging data
+    * Does the GPS have an RTC?
+    * Evidence that the Watchdog Timer (used when the Arduino enters LowPower.Sleep() mode) is indeed inaccurate
+    *
+    * Rather then use GPS, setup up an abundant supply of Gateways and use them to triangulate the location of the Nodes
+    * Can LoRa transmit underwater?
+    * What approach did the original paper take in optimizing battery life?
+    * LoRa is high frequency, which makes it good at propagation, but bad at penetration. Will this be an issue when waterproofing the Tracker
+    *
+    *
+
+
 # Read/write UBX commands to/from Arduino
 
 * The GPS reciever can output NMEA, PUBX or the binary UBX protocol
@@ -40,6 +54,12 @@
     * a GPS fix so it knows what to set the time to
     * a constant supply of power to contineu running (i.e. a cell battery)
 
+* https://www.u-blox.com/sites/default/files/products/documents/LEA-NEO-MAX-6_HIM_%28UBX-14054794%29_1.pdf
+    * "In case of a power failure on pin VCC, the real-time clock and backup RAM are supplied through pin V_BCKP.
+This enables the u-blox 6 receiver to recover from a power failure with either a Hotstart or a Warmstart
+(depending on the duration of VCC outage) and to maintain the configuration settings saved in the backup
+RAM. If no backup battery is connected, the receiver performs a Coldstart at power up." 
+    * **For the NEO-6M, backup battery current is 22µA (from the datasheet)**
 
 # Evidence that the Watchdog Timer (used when the Arduino enters LowPower.Sleep() mode) is indeed inaccurate
 * https://forum.arduino.cc/index.php?topic=425222.0
