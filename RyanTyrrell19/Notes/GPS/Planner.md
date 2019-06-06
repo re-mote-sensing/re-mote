@@ -16,6 +16,8 @@
 * antennas (what would be good for our application)
 * Bounce back to LoRa every so often
 
+* Send/recieve messages using UBX via the Arduino
+
 
 * Lora test
     * Go to Cootes
