@@ -9,10 +9,17 @@
 
 * UHF cable runs of less than 50 feet do not require active antennas or in-line amplification to compensate for loss [[1]]
 
+# General Notes
+* Most GPS antennas are designed with a characteristic impedance of 50 ohms
+* If one places an antenna inside an enclosure, its impedance and resonant frequency may change. 
+    * A microstrip patch antenna placed in a plastic enclosure, for example, can have its resonant frequency shifted downward by several megahertz, depending on the thickenss of the plastic and its dielectric constant
+    * Antenna manufacturers therefore, purposely design thei patch antennas to resonate at a higher frequency than the actual operating value
+
 # Antenna Types
 
-* Coaxial, Helical, etc
-
+* Coaxial, Helical, dipole, etc
+* monpole, dipole, quadrifilar helices (volutes), sprial helices, slots, microstrips
+* ceramic patch antenn
 
 # Other Notes
 
@@ -30,3 +37,4 @@
 
 [1]: https://www.rfvenue.com/blog/2014/12/15/active-v-passive-anntennas
 [2]: https://techship.com/faq/difference-active-and-passive-antenna/
+[3]: http://www2.unb.ca/gge/Resources/gpsworld.july98.pdf
