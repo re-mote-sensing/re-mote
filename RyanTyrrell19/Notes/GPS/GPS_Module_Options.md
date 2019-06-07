@@ -1,7 +1,18 @@
 * Price range?
 * Probably better off buying a pre-made board rather than design our own PCB. A lot of things that need to be considered when designing your own board
  * Include key, important feature relevant to the project, and provide a link to the datasheets
- 
+ # What we're looking for
+    * Cheap
+        * < $50
+    * Capable of backing up RTC and aided data
+    * Various mode of operation for altering power consumption
+    * Configurable
+    * Low Current consumption
+        * < 50mA
+    * Quick fix
+        * < 30 sec
+    * pass
+
  # [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
 
  * 56-Channel Receiver (22 Channel All-in-View)
