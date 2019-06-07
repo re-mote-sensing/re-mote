@@ -2,23 +2,33 @@
 * Probably better off buying a pre-made board rather than design our own PCB. A lot of things that need to be considered when designing your own board
  
  
- 
- [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
+ # [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
+ ## Specs
  * 56-Channel Receiver (22 Channel All-in-View)
  * Sensitivity : -162dBm
  * 2.5m Positional Accuracy
  * Cold Start : 29s (Open Sky)
  * 40mA @ 3.3V
 
- [This site][9] contains an extensive list of various GPS reciever and their highlights. A few have been summarized above.
+## Additional Notes
 
-[NEO-6M GPS Chip][NEO-6M GPS Chip Data Sheet]:
-This GPS module continues to appear as an excellent choice for low-power, low-cost projects. A few f the key features are:
+* Does contain a RX header so that commands can be sent to it (although it's been covered by tape and a ire would need to be soldered to it)
+* Despite having a battery, it does not appear as though config or aided data is saved.
+
+# [NEO-6M GPS Chip][NEO-6M GPS Chip Data Sheet]:
+
+## Specs
+
+## Additional Notes
+
+This GPS module continues to appear as an excellent choice for low-power, low-cost projects. A few of the key features are:
+
 * _Power Save Mode(PSM)_: It allows a reduction in system power consumption by selectively switching parts of the receiver ON and OFF. This dramatically reduces power consumption of the module to **just 11mA** making it suitable for power sensitive applications like GPS wristwatch [[4]]
 
-* The breakout board include a battery and EEPROM for memory storage. Utilizing these retains clock and last position, causing **time to first fix (TTFF) to reduce to 1s**.[[14]]
-    * Without the battery the GPS always cold-start so the initial GPS lock takes more time [[14]]
-    * The battery is automatically charged when power is applied and maintains data for up to **two weeks without power.** [[14]]
+* The breakout board include a battery and EEPROM for memory storage. Utilizing these retains clock and last position, causing **time to first fix (TTFF) to reduce to 1s**.[[3]]
+    * Without the battery the GPS always cold-start so the initial GPS lock takes more time [[3]]
+    * The battery is automatically charged when power is applied and maintains data for up to **two weeks without power.** [[3]]
+        * **Battery is not a reliable source. Too many unknowns, such as lifespan, recharge time, etc.**
 
 * Both modules support UBX and so are compatible with **U-center from u-blox** for evaluation, performance analysis and configuration of u-blox GPS receivers including NEO-6M
 
@@ -26,3 +36,26 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * To save data (such as Assit Offline) an external memory (Flash) must be connected to the chips SPI header.
 
 ![alt text][NEO-6M GPS Board Schematic]
+
+
+# [VK2828U7G5LF GPS][VK2828U7G5LF GPS]
+## Specs
+
+## Additional Notes
+
+
+
+[GPS Receiver - GP-20U7 Specs]: https://cdn.sparkfun.com/datasheets/GPS/GP-20U7.pdf
+[NEO-6M GPS Chip Data Sheet]:https://lastminuteengineers.com/datasheets/NEO-6M-GPS-DataSheet.pdf
+[NEO-6M GPS Chip]: https://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
+[NEO-6M GPS Breakout Board]: https://www.amazon.com/DIYmall-AeroQuad-Antenna-Arduino-Aircraft/dp/B01H5FNA4K#customerReviewshttps://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
+[VK2828U7G5LF GPS]: https://abra-electronics.com/wireless/gps/modules/vk2828u7g5lf-ttl-ublox-gps-module-with-antenna.html
+
+
+[1]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
+[2]: https://www.sparkfun.com/pages/GPS_Guide
+[3]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
+[4]: https://learn.sparkfun.com/tutorials/gps-basics/all
+
+
+[NEO-6M GPS Board Schematic]: http://wiki.sunfounder.cc/images/f/f1/Gsdg.png
