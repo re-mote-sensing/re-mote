@@ -1,19 +1,24 @@
 * Price range?
 * Probably better off buying a pre-made board rather than design our own PCB. A lot of things that need to be considered when designing your own board
  * Include key, important feature relevant to the project, and provide a link to the datasheets
+
  # What we're looking for
-    * Cheap
-        * < $50
-    * Capable of backing up RTC and aided data
-    * Various mode of operation for altering power consumption
-    * Configurable
-    * Low Current consumption
-        * < 50mA
-    * Quick fix
-        * < 30 sec
-    * pass
+* Cheap
+    * < $50
+* Capable of backing up RTC and aided data
+* Various mode of operation for altering power consumption
+* Configurable
+* Low Current consumption
+    * < 50mA
+* Quick fix
+    * < 30 sec
+* pass
 
  # [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
+
+* Dimensions: 18.4mm x 18.4mm x 4mm
+* Weight:  
+
 
  * 56-Channel Receiver (22 Channel All-in-View)
  * Sensitivity : -162dBm
@@ -25,7 +30,18 @@
 * Does contain a RX header so that commands can be sent to it (although it's been covered by tape and a ire would need to be soldered to it)
 * Despite having a battery, it does not appear as though config or aided data is saved.
 
-# [NEO-6M GPS Chip][NEO-6M GPS Chip Data Sheet]:
+# NEO-6M GPS Chip:
+
+* Dimensions: 28mm x 28mm x 8.6mm
+* Weight:
+    * Chip: 
+    * Board:
+
+* [NEO-6M GPS Chip][NEO-6M GPS Chip]
+* [NEO-6M GPS Board][NEO-6M GPS Board]
+
+![alt text][NEO-6M GPS Board Schematic]
+
 
 This GPS module continues to appear as an excellent choice for low-power, low-cost projects. A few of the key features are:
 
@@ -41,16 +57,25 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * The EEPROM on the Board communicates with the NEO-6M chip using I2C
 * To save data (such as Assit Offline) an external memory (Flash) must be connected to the chips SPI header.
 
-![alt text][NEO-6M GPS Board Schematic]
 
+# VK2828U7G5LF GPS
 
-# [VK2828U7G5LF GPS][VK2828U7G5LF GPS]
+* Dimensions: 28mm x 28mm x 8.6mm
+* Weight:
+    * Chip: 
+    * Board:
+
+* [VK2828U7G5LF GPS Chip][VK2828U7G5LF GPS Chip]
+* [VK2828U7G5LF GPS Board][VK2828U7G5LF GPS Board]
 
 * This GPS contains an EN pin
 * Supports UBLOX (So it is configurable)
-* AN RTC is built into the module, with an endurance of 2 hours
+* An RTC is built into the module, with an endurance of 2 hours
 
 # [Adafruit Ultimate GPS][Adafruit Ultimate GPS]
+
+* [Adafruit Ultimate Pinout][Adafruit Ultimate Pinout]
+* [Adafruit Ultimate Battery Backup][Adafruit Ultimate Battery Backup]
 
 * RTC battery-compatible
 * Built-in **datalogging**
@@ -59,9 +84,6 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
     * ultra-low dropout 3.3V regulator so you can power it with 3.3-5VDC in, 5V level safe inputs
     * ENABLE pin so you can turn off the module using any microcontroller pin or switch
     * footprint for optional CR1220 coin cell to keep the RTC running and allow warm starts
-
-* [Adafruit Ultimate Pinout]
-* [Adafruit Ultimate Battery Backup]
 
 * Supports **PMTK command packet** 
     * Custom commands created by Adafruit (I believe)
@@ -91,8 +113,6 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * VBACKUP - Backup Power Input for RTC & Navigation Data Retention
 
 
-
-
 # Notes about to GPS Units in General
 
 * **EN Pin** - When this pin is connected to GND, the GPS is powerd down (even if the VCC pin is connected to power.) This method can allow us to connect the GPS directly to a power line, avoiding the need for a transistor. Simply connect the EN pin to a digital pin, and set the output accordingly (LOW Poer mode may automatically set all pins to LOW, so it may not even be necessary to set the output of the pin)
@@ -100,10 +120,13 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 
 
 [GPS Receiver - GP-20U7 Specs]: https://cdn.sparkfun.com/datasheets/GPS/GP-20U7.pdf
-[NEO-6M GPS Chip Data Sheet]:https://lastminuteengineers.com/datasheets/NEO-6M-GPS-DataSheet.pdf
+
 [NEO-6M GPS Chip]: https://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
-[NEO-6M GPS Breakout Board]: https://www.amazon.com/DIYmall-AeroQuad-Antenna-Arduino-Aircraft/dp/B01H5FNA4K#customerReviewshttps://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
-[VK2828U7G5LF GPS]: https://abra-electronics.com/wireless/gps/modules/vk2828u7g5lf-ttl-ublox-gps-module-with-antenna.html
+[NEO-6M GPS Board]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
+[NEO-6M GPS Board Schematic]: http://wiki.sunfounder.cc/images/f/f1/Gsdg.png
+
+[VK2828U7G5LF GPS Chip]: https://www.u-blox.com/en/product/ubx-m8030-series#tab-document-resources
+[VK2828U7G5LF GPS Board]: https://abra-electronics.com/wireless/gps/modules/vk2828u7g5lf-ttl-ublox-gps-module-with-antenna.html
 
 [Adafruit Ultimate GPS]: https://learn.adafruit.com/adafruit-ultimate-gps/overview
 [Adafruit Ultimate Pinout]: https://learn.adafruit.com/adafruit-ultimate-gps/pinouts
@@ -116,5 +139,3 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 [3]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
 [4]: https://learn.sparkfun.com/tutorials/gps-basics/all
 
-
-[NEO-6M GPS Board Schematic]: http://wiki.sunfounder.cc/images/f/f1/Gsdg.png
