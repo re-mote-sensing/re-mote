@@ -1,25 +1,20 @@
 * Price range?
 * Probably better off buying a pre-made board rather than design our own PCB. A lot of things that need to be considered when designing your own board
- 
+ * Include key, important feature relevant to the project, and provide a link to the datasheets
  
  # [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
- ## Specs
+
  * 56-Channel Receiver (22 Channel All-in-View)
  * Sensitivity : -162dBm
  * 2.5m Positional Accuracy
  * Cold Start : 29s (Open Sky)
  * 40mA @ 3.3V
 
-## Additional Notes
 
 * Does contain a RX header so that commands can be sent to it (although it's been covered by tape and a ire would need to be soldered to it)
 * Despite having a battery, it does not appear as though config or aided data is saved.
 
 # [NEO-6M GPS Chip][NEO-6M GPS Chip Data Sheet]:
-
-## Specs
-
-## Additional Notes
 
 This GPS module continues to appear as an excellent choice for low-power, low-cost projects. A few of the key features are:
 
@@ -39,9 +34,57 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 
 
 # [VK2828U7G5LF GPS][VK2828U7G5LF GPS]
-## Specs
 
-## Additional Notes
+* This GPS contains an EN pin
+* Supports UBLOX (So it is configurable)
+* AN RTC is built into the module, with an endurance of 2 hours
+
+# [Adafruit Ultimate GPS][Adafruit Ultimate GPS]
+
+* RTC battery-compatible
+* Built-in **datalogging**
+* Internal patch antenna + u.FL connector for external active antenna
+* Contains:
+    * ultra-low dropout 3.3V regulator so you can power it with 3.3-5VDC in, 5V level safe inputs
+    * ENABLE pin so you can turn off the module using any microcontroller pin or switch
+    * footprint for optional CR1220 coin cell to keep the RTC running and allow warm starts
+
+* [Adafruit Ultimate Pinout]
+* [Adafruit Ultimate Battery Backup]
+
+* Supports **PMTK command packet** 
+    * Custom commands created by Adafruit (I believe)
+    * Although it does not support UBLOX, it does still support many of the features that UBLOX provides (just given a different name)
+
+* [Commands][Adafruit Ultimate Commands]
+    * Looks like custom commands (similar to UBLOX) for configuring
+    * Seems to be capable of storing aided data, such as position, almanac data, etc
+    * Supports:
+        * Hot, Warm, & Cold Forced Resets
+        * SBAS & DGPS Correction
+        * Standby mode for power saving
+        *  PMTK_SET_AL_DEE_CFG
+            * "It means the module needs to extend the time for ephemeris data receiving under what situation."
+            * Coulod be used to monitor emphemeris download status?
+        * PMTK_CMD_PERIODIC_MODE 
+            * Enter Standby or Backup mode for power saving
+            *  operation mode
+                * ‘0’ = go back to normal mode
+                 * ‘1’ = Periodic backup mode
+                 * ‘2’ = Periodic standby mode
+                 * ‘4’ = Perpetual backup mode
+                 * ‘8’ = AlwaysLocateTM standby mode
+                 * ‘9’ = AlwaysLocateTM backup mode 
+* Looks like you can force it into Backup mode, alonmg with some other power saving options
+* Supports a variation of Assit Autonomous to extrapolat ephemeris data
+* VBACKUP - Backup Power Input for RTC & Navigation Data Retention
+
+
+
+
+# Notes about to GPS Units in General
+
+* **EN Pin** - When this pin is connected to GND, the GPS is powerd down (even if the VCC pin is connected to power.) This method can allow us to connect the GPS directly to a power line, avoiding the need for a transistor. Simply connect the EN pin to a digital pin, and set the output accordingly (LOW Poer mode may automatically set all pins to LOW, so it may not even be necessary to set the output of the pin)
 
 
 
@@ -50,6 +93,11 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 [NEO-6M GPS Chip]: https://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
 [NEO-6M GPS Breakout Board]: https://www.amazon.com/DIYmall-AeroQuad-Antenna-Arduino-Aircraft/dp/B01H5FNA4K#customerReviewshttps://www.u-blox.com/en/product/neo-6-series#tab-documentation-resources
 [VK2828U7G5LF GPS]: https://abra-electronics.com/wireless/gps/modules/vk2828u7g5lf-ttl-ublox-gps-module-with-antenna.html
+
+[Adafruit Ultimate GPS]: https://learn.adafruit.com/adafruit-ultimate-gps/overview
+[Adafruit Ultimate Pinout]: https://learn.adafruit.com/adafruit-ultimate-gps/pinouts
+[Adafruit Ultimate Battery Backup]: https://learn.adafruit.com/adafruit-ultimate-gps/battery-backup
+[Adafruit Ultimate Commands]: https://cdn-shop.adafruit.com/datasheets/PMTK+command+packet-Complete-C39-A01.pdf
 
 
 [1]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
