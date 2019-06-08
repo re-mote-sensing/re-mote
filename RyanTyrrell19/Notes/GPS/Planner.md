@@ -18,6 +18,8 @@
 
 * Look at different GPS modules 
 * antennas (what would be good for our application)
+    * Look into the various parameters to change (size, shape, type)
+    * Not to detailed. Look around, see what people have used
 * Bounce back to LoRa every so often
 
 * Send/recieve messages using UBX via the Arduino
@@ -27,6 +29,17 @@
 
 * Other GPS, have periodically wake up, power GS for a few seconds, go back to sleep. See if this will keep the RTC around. Again,  Unpug in moring plug into computer, and see what it's outputting
     * Need to plug GPS into digital pin, and need a transistor to do that
+
+
+
+
+
+
+
+
+
+
+
 
 
 * Lora test

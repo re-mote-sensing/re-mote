@@ -21,6 +21,10 @@
 * monpole, dipole, quadrifilar helices (volutes), sprial helices, slots, microstrips
 * ceramic patch antenn
 
+# GPS Antenna
+
+# LoRa Antenna
+
 # Other Notes
 
 * Design and optimize the antenna 
