@@ -54,7 +54,7 @@ void setup() {
     Serial.print(F("1.1: "));
     Serial.println(freeMemory());
     
-    while (!Serial.available()) ;
+    //while (!Serial.available()) ;
 
     Serial.print(F("2: "));
     Serial.println(freeMemory());
@@ -114,7 +114,6 @@ void loop() {
     Serial.print(F("8: "));
     Serial.println(freeMemory());
     
-    dataGood = true;
     lastPost = millis();
     postData();
 }
