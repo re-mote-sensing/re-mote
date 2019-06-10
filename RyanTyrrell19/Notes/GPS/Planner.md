@@ -7,6 +7,11 @@
 4. Brefly mention the Tracker outline breaking down each component. Start formulating a plan for building the Tracker
 
 
+
+
+
+
+
 # Future Plans
 
 * Create a breakdown for the Trackers

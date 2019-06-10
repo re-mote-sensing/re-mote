@@ -171,7 +171,7 @@ not actually exist
 [5]: https://en.wikipedia.org/wiki/Antenna_gain
 [6]: https://lorawantester.com/2019/01/09/5-simple-rules-to-guarantee-a-successful-lorawan-coverage-test/
 
-[DIY Helical 1]: https://github.com/OpenHR20/OpenHR20/wiki/2.1)--433-MHz-and-868-MHz--Antenna-Design-Examples
+[DIY Helical 1]: https://github.com/OpenHR20/OpenHR20/wiki
 [DIY Helical 2]: http://e.pavlin.si/2018/06/29/small-normal-mode-antenna-for-868mhz/
 
 [DIY RSSI Test]: http://www.ph2lb.nl/blog/index.php?page=lora-measuring-antennas
