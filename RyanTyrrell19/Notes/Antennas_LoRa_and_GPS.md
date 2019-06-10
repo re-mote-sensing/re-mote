@@ -100,7 +100,7 @@ not actually exist
 * On the other hand, the power gain takes into account the poorer efficiency by comparing the radiated power in a given direction to the actual power that the antenna receives from the transmitter, which makes it a more useful figure of merit for the antenna's contribution to the ability of a transmitter in sending a radio wave toward a receiver. 
 	* In every direction, the power gain of an isotropic antenna is equal to the efficiency, and hence is always at most 1, though it can and ideally should exceed 1 for a directional antenna
 
-## Antenna Types & Tests
+# Antenna Types & Tests
 * The go-to DIY antenna used when space constraints exist is the Helical Antenna.
 	* [DIY Helical 1][DIY Helical 1]  
 	* [DIY Helical 2][DIY Helical 2]
@@ -109,10 +109,9 @@ not actually exist
 	* [Site 2][Antenna Test 2]
 
 ## Final Thoughts
-* To difficult to test/verify many of the characteristics of the antenna (radiation pattern, impedance, gain). Requires equipment we don't have
-* Best bet is to just reproduce an antenna that others have developed & tested that have been used in applications similar to ours
-	* Only thing in control here is the wire length (to match the frequency we're using)
-
+* Too difficult to test/verify many of the characteristics of the antenna (radiation pattern, impedance, gain). Requires equipment we don't have
+* Best bet is to just reproduce an antenna that others have developed & tested and have been used in applications similar to ours
+	* Only thing we're in control of is the wire length (to match the frequency we're using)
 * Fairly certain the SMA connector can be removed and a wire antenna soldered on. It looks like this is what was done for one of the DIY Helical antenna Examples
 
 # Testing
@@ -129,7 +128,6 @@ not actually exist
 
 ## Test Values
 **RSSI**: indication of the radio power level being received by the device [[6]]
-
 *  In general you can say, the higher the RSSI number, the stronger the signal
 	* But the number does not linearly correspond to the distance between transmitter and receiver. 
 	* RSSI won’t tell you much about the bigger picture, especially if you only measure some spots and for a short period of time. 

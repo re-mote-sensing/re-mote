@@ -1,0 +1,135 @@
+# Outline
+
+1. Construct a Helical Antenna using a guide below
+2. Configure MESH Module to match antenna attached to it
+	* Big one here is frequency
+2. Test to determine which antenna to use for Trackers.
+    * Gateway antenna does not matter too much. Use one with good receiver sensitivity
+    * Do RSSI test to see how Tracker antenna performs
+        * Set Modules and antenna up at set distance. Send data, compare RSSi values. Do this for different orientations and distances 
+            * Must be specific with set-up. Distance, elevation, weather conditions, etc.
+        * NOTE: to try DIY Helic Antenna, SMA connector of MESH module must be removed 
+2. Determine which antenna will be used
+    * NOTE: Gateways are not limited to the weight or space constraint the Trackers are, so a different antenna may be used. The antenna used by the Gateway cannot improve the distance the turtles can travel, but it can improve the separation distance between other Gateways. Only requirement is good receiver sensitivity
+3. Take Tracker for a walk
+	* gateway is static at a known location
+	* Trackers will continuously transmit GPS data, while also saving the GPS data to file
+	* The data successfully transmitted can be compared against all the points taken by the Tracker
+
+# Testing
+## Testing Environment
+![alt-text][Testing Environment] [[6]]
+
+* For tests that yield usable data, you should be testing your network at several locations. In addition, the the following metadata should be recorded, [[6]]
+	* You should be testing your network at several locations
+	* Location (lat, lon)
+	* Height (above/below ground)
+	* Surrounding (building inside/outside, forest, street etc.)
+	* Weather conditions
+
+
+## Test Values
+**RSSI**: indication of the radio power level being received by the device [[6]]
+
+*  In general you can say, the higher the RSSI number, the stronger the signal
+	* But the number does not linearly correspond to the distance between transmitter and receiver. 
+	* RSSI won’t tell you much about the bigger picture, especially if you only measure some spots and for a short period of time. 
+	* In addition the signal strength (in dBm) is subject to a logarithmic loss dependent on the distance.
+* The lower you get (less than -100), the less linear correlation you will have between the distance (in free space) and the RSSI value. The lower the value, the less valuable information you get out of the RSSI value alone.
+
+ 
+## Test Procedures
+
+[DIY Test using RSSI values][DIY RSSI Test]  
+* A simple test to compare the performance of different antennas using the RSSI value
+
+[DIY LoRa Range Test][DIY LoRa Range Test]
+* Travel the area with a LoRa device that transmits GPS coordiantes. In addition, track where you've travelled using GPS. Compare what GPS data was recieved with the GPS data that tracked where you've travelled to see what was recieved and what was not
+
+
+
+# Test Outline
+
+1) Four tests will be conducted, each in a different environmental setting. 
+2) For each setting, tests will be conducted over several distances. 
+3) For each distance, elevation and the antenna used will be changed
+
+* Distances will be measured out using a GPS watch (Forerunner 235)
+
+# Changeable Parameters (Of the Node)
+
+* Distance
+    * Increase distance over set intervals
+    * When no longer recieving, slowly move back until it does again
+* Environment
+    * Line-of-sight (no obstructions)
+    * Rural (Tress & hills)
+    * Urban (City)
+
+* Antenna
+    * Powerful, large antenna
+    * no antenna
+    * Any other antenna I can find?
+* Elevation
+    * On the ground
+    * Waist height
+    * Head height
+
+* LoRa Settings?
+
+* Gateway elevation?
+
+# Record
+
+* If data was recieved
+* Signal strength
+
+# Test Set-Up
+
+## Node
+### General
+
+* LoRa MESH Module Connected to Arduino Nano
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Node.ino'
+* LoRa MESH communicates with Arduino via SoftwareSerial
+
+### Pinout
+
+LoRa   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D2  
+TX     ->   D3  
+
+
+## Gateway
+### General
+
+* LoRa MESH Module Connected to Arduino Uno
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Gateway.ino'
+* LoRa MESH communicates with Arduino via SoftwareSerial
+
+### Pinout
+
+LoRa   |    Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D2  
+TX     ->   D3  
+
+# Test 1: Line-of-Sight
+
+General Location:  
+Gatway Location:  
+Node Locations:  
+
+
+
+[6]: https://lorawantester.com/2019/01/09/5-simple-rules-to-guarantee-a-successful-lorawan-coverage-test/
+
+[DIY RSSI Test]: http://www.ph2lb.nl/blog/index.php?page=lora-measuring-antennas
+[DIY LoRa Range Test]: https://reibot.org/2017/04/23/lora-range-test/
+
+[Antenna Test 1]: https://www.coredump.ch/2017/04/30/lorawan-868mhz-antenna-test-part-2/
+[Antenna Test 2]: https://medium.com/home-wireless/testing-lora-antennas-at-915mhz-6d6b41ac8f1d
+[Testing Environment]: https://i.ibb.co/VVbH171/6.png

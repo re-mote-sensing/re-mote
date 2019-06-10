@@ -1,3 +1,12 @@
+# Meeting Outline
+
+1. Talk about antennas
+    * Don't need to go too much into it. Just mention the final thoughts
+2. Discuss the testing section after Antennas
+3. Go over new test outline
+4. Brefly mention the Tracker outline breaking down each component. Start formulating a plan for building the Tracker
+
+
 # Future Plans
 
 * Create a breakdown for the Trackers
