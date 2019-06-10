@@ -54,7 +54,7 @@ void setup() {
     Serial.print(F("1.1: "));
     Serial.println(freeMemory());
     
-    //while (!Serial.available()) ;
+    while (!Serial.available()) ;
 
     Serial.print(F("2: "));
     Serial.println(freeMemory());
@@ -114,6 +114,7 @@ void loop() {
     Serial.print(F("8: "));
     Serial.println(freeMemory());
     
+    dataGood = true;
     lastPost = millis();
     postData();
 }
@@ -527,7 +528,7 @@ uint8_t* getAllData() {
     Serial.print(F("11.12: "));
     Serial.println(freeMemory());
     
-    unsigned int totalLen = 2; //2 for # of nodes
+    unsigned int totalLen = 3; //2 for data size (just used in converting to string), 1 for # of nodes
     
     for (uint8_t i = 0; i < sendInfo[0]; i++) {
         int currId;
@@ -553,10 +554,12 @@ uint8_t* getAllData() {
     
     uint8_t* ans = malloc(sizeof(uint8_t) * totalLen);
     
+    ans[2] = sendInfo[0];
+    
     Serial.print(F("11.14: "));
     Serial.println(freeMemory());
     
-    unsigned int curr = 2;
+    unsigned int curr = 3;
     for (uint8_t i = 0; i < sendInfo[0]; i++) {
         int currId;
         memcpy(&currId, &sendInfo[1 + (7 * i)], sizeof(uint8_t) * 2);
@@ -711,6 +714,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, unsigned long pos)
     file.seekSet(pos);
     numPos = *ansCurr;
     currNum = 0;
+    (*ansCurr)++;
     
     while (file.available()) {
         char dataStr[13];
@@ -743,9 +747,12 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, unsigned long pos)
         memcpy(&ans[*ansCurr], &currData, sizeof(uint8_t) * 4);
         (*ansCurr) += 4;
         file.read();
+        currNum++;
     }
     
     file.close();
+    
+    ans[numPos] = currNum;
     
     Serial.print(F("11.14203: "));
     Serial.println(freeMemory());
