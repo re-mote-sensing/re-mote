@@ -14,6 +14,7 @@
 * If one places an antenna inside an enclosure, its impedance and resonant frequency may change. 
     * A microstrip patch antenna placed in a plastic enclosure, for example, can have its resonant frequency shifted downward by several megahertz, depending on the thickenss of the plastic and its dielectric constant
     * Antenna manufacturers therefore, purposely design their patch antennas to resonate at a higher frequency than the actual operating value
+* Orientation matters
 
 
 # LoRa Antenna

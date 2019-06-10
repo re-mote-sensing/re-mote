@@ -1,5 +1,9 @@
 # Future Plans
 
+* Create a breakdown for the Trackers
+* Create new test procedure for LoRa Range
+
+
 * Look at which ephemeris data has been downloaed for each sateliites
 * Use Watchdog timer to sleep during specific time - get GPS time when available to self-correct
 * Look through UBX protocol to see what data can be read from GPS
