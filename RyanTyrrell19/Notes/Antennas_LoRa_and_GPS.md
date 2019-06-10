@@ -24,7 +24,8 @@
 * Want omnidirectional (radiate signals uniformly in one plane in all directions.)
 * An antenna cannot put energy into the system, so it is a passive device
 * * **receiver sensitivity**: This is the lowest dB level at which the receiver is able to successfully receive the signal
-* Don't own any tools to test the various specs, such as VSWR (to check impedance match, and which frequency the impedance has the best match), 
+* Don't own any tools to test the various specs, such as VSWR (to check impedance match, and which frequency the impedance has the best match),
+* FCC Certified? 
 
 
 ## Antenna Fundamentals [[4]]
@@ -42,7 +43,7 @@
 * Industry convention for RF is an impedance of 50-ohms.
 
 ### Voltage Standing Wave Ratio (VSWR) [[4]]
-* **VSWR**is a measurement of how well an antenna is matched to a source impedance, typically 50-ohms
+* **VSWR** is a measurement of how well an antenna is matched to a source impedance, typically 50-ohms
 * It is calculated by measuring the voltage wave that is headed toward the load versus the voltage wave that is reflected back from the load
 * A perfect match will have a VSWR of 1:1.
 	* The higher the first number, the worse the match and the more inefficient the system. Since a perfect match cannot ever be obtained, some benchmark for performance needs to be set. (Usually 2:1)
@@ -78,6 +79,7 @@ not actually exist
 	* It is the **ratio of the power density in the pattern maximum to the average power density at a uniform distance from the antenna.**  
 		* In short, it is a comparison of the shape of the radiation pattern of the antenna under test to a reference radiation pattern (e.g. the perfect spherical pattern of the isotropic model)
 	* The units of this measurement are _decibels relative to isotropic, or dBi._
+	* **A dipole has a gain of 2.15dB over isotropic or dBi = dBd + 2.15dB. When comparing gains, it is important to note whether the gain is being expressed in dBd or dBi and convert appropriately.**
 * **Gain**, not to be confused with that of an amplifier, _is the directivity of the antenna reduced by the losses on the antenna, such as dielectric, resistance and VSWR._
 	* it is the **product of directivity and efficiency**
 	* **Gain is the most direct measurement of an antenna’s real performance. As such, it is one of the most important specifications**
@@ -97,14 +99,35 @@ not actually exist
 * On the other hand, the power gain takes into account the poorer efficiency by comparing the radiated power in a given direction to the actual power that the antenna receives from the transmitter, which makes it a more useful figure of merit for the antenna's contribution to the ability of a transmitter in sending a radio wave toward a receiver. 
 	* In every direction, the power gain of an isotropic antenna is equal to the efficiency, and hence is always at most 1, though it can and ideally should exceed 1 for a directional antenna
 
+## Antenna Types & Tests
+* The go-to DIY antenna used when space constraints exist is the Helical Antenna.
+	* [DIY Helical 1][DIY Helical 1]  
+	* [DIY Helical 2][DIY Helical 2]
+* The following sites discuss test results for variosu antenna types
+	* [Site 1][Antenna Test 1]  
+	* [Site 2][Antenna Test 2]
+
+## Final Thoughts
+* To difficult to test/verify many of the characteristics of the antenna (radiation pattern, impedance, gain). Requires equipment we don't have
+* Best bet is to just reproduce an antenna that others have developed & tested that have been used in applications similar to ours
+	* Only thing in control here is the wire length (to match the frequency we're using)
+
+* Fairly certain the SMA connector can be removed and a wire antenna soldered on. It looks like this is what was done for one of the DIY Helical antenna Examples
 
 # Testing
 ## Testing Environment
 ![alt-text][Testing Environment] [[6]]
 
+* For tests that yield usable data, you should be testing your network at several locations. In addition, the the following metadata should be recorded, [[6]]
+	* You should be testing your network at several locations
+	* Location (lat, lon)
+	* Height (above/below ground)
+	* Surrounding (building inside/outside, forest, street etc.)
+	* Weather conditions
+
+
 ## Test Values
-### RSSI Value [[6]]
-**RSSI**: indication of the radio power level being received by the device
+**RSSI**: indication of the radio power level being received by the device [[6]]
 
 *  In general you can say, the higher the RSSI number, the stronger the signal
 	* But the number does not linearly correspond to the distance between transmitter and receiver. 
@@ -113,12 +136,14 @@ not actually exist
 * The lower you get (less than -100), the less linear correlation you will have between the distance (in free space) and the RSSI value. The lower the value, the less valuable information you get out of the RSSI value alone.
 
  
-## Takeaway Points
+## Test Procedures
 
-DIY Test using RSSI values:
-http://www.ph2lb.nl/blog/index.php?page=lora-measuring-antennas
+[DIY Test using RSSI values][DIY RSSI Test]  
+* A simple test to compare the performance of different antennas using the RSSI value
 
-RSSI: Received Signal Strength Indicator. It is an estimated measure of power level that a RF client device is receiving from an access point or router.
+[DIY LoRa Range Test][DIY LoRa Range Test]
+* Travel the area with a LoRa device that transmits GPS coordiantes. In addition, track where you've travelled using GPS. Compare what GPS data was recieved with the GPS data that tracked where you;ve travelled to see what was recieved and what was not
+
 
 
 
@@ -132,10 +157,6 @@ RSSI: Received Signal Strength Indicator. It is an estimated measure of power le
 
 # Other Notes
 
-* Design and optimize the antenna 
-    * Antenna shape, size, length
-        * https://github.com/OpenHR20/OpenHR20/wiki/2.1)--433-MHz-and-868-MHz--Antenna-Design-Examples
-        * http://e.pavlin.si/2018/06/29/small-normal-mode-antenna-for-868mhz/
     * Antenna connection
         * In regard to connecting to the LoRa MESH Module, I believe the connector can be desoldered from the board, and an antenna can simply be soldered on. Using a coaxial wire as the antenna, there shouldn’t be an issue with attaching it to the modules since, despite the extra hardware used to connect the original antenna, all it does in the end is connect the coaxial wire to the board.
         * https://en.wikipedia.org/wiki/SMA_connector
@@ -150,6 +171,15 @@ RSSI: Received Signal Strength Indicator. It is an estimated measure of power le
 [4]: https://www.linxtechnologies.com/wp/wp-content/uploads/an-00501.pdf
 [5]: https://en.wikipedia.org/wiki/Antenna_gain
 [6]: https://lorawantester.com/2019/01/09/5-simple-rules-to-guarantee-a-successful-lorawan-coverage-test/
+
+[DIY Helical 1]: https://github.com/OpenHR20/OpenHR20/wiki/2.1)--433-MHz-and-868-MHz--Antenna-Design-Examples
+[DIY Helical 2]: http://e.pavlin.si/2018/06/29/small-normal-mode-antenna-for-868mhz/
+
+[DIY RSSI Test]: http://www.ph2lb.nl/blog/index.php?page=lora-measuring-antennas
+[DIY LoRa Range Test]: https://reibot.org/2017/04/23/lora-range-test/
+
+[Antenna Test 1]: https://www.coredump.ch/2017/04/30/lorawan-868mhz-antenna-test-part-2/
+[Antenna Test 2]: https://medium.com/home-wireless/testing-lora-antennas-at-915mhz-6d6b41ac8f1d
 
 [VSWR Graph]: https://i.ibb.co/pXx3BPV/1.png
 [Directivity and Gain]: https://i.ibb.co/mH7xMhh/2.png
