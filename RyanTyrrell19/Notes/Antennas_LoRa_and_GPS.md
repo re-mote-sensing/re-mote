@@ -1,4 +1,5 @@
-# Active and Passive Antennas
+# GPS Antenna
+## Active and Passive Antennas
 
 **Active antennas**: are any antennas with integrated signal amplifiers built right into the unit [[1]]
 **Passive antennas**: are antennas that have no amplification stages [[1]]
@@ -9,21 +10,37 @@
 
 * UHF cable runs of less than 50 feet do not require active antennas or in-line amplification to compensate for loss [[1]]
 
-# General Notes
+## General Notes (GPS)
 * Most GPS antennas are designed with a characteristic impedance of 50 ohms
 * If one places an antenna inside an enclosure, its impedance and resonant frequency may change. 
     * A microstrip patch antenna placed in a plastic enclosure, for example, can have its resonant frequency shifted downward by several megahertz, depending on the thickenss of the plastic and its dielectric constant
-    * Antenna manufacturers therefore, purposely design thei patch antennas to resonate at a higher frequency than the actual operating value
+    * Antenna manufacturers therefore, purposely design their patch antennas to resonate at a higher frequency than the actual operating value
 
-# Antenna Types
+
+# LoRa Antenna
+## General Notes
+* Need to know frequency of LoRa so wavelngth can be computed and the length of the antenna can match it
+
+
+## Antenna Fundamentals
+* Wavelength is computed as λ = c/f (c = speed of light, f = frequncy) The length of the antenna must be the same as the wavelength, because this is when resonance occurs. Since resonance will occur at whole number fractions (½, 1/3, ¼, etc.) of the fundamental frequency, shorter antennas can be used to send and recover the signal [[4]]
+    * Reducing the antenna’s size will have some impact on the efficiency and impedance of the antenna, which can affect the final performance of the system. [[4]]
+
+* Another way to reduce the size of the antenna is to coil the element. [[4]]
+    * This has the advantage of making the overall length shorter, but it will also reduce the antenna’s bandwidth. [[4]]
+
+## Antenna Specifications
+### Impedance
+* The impedance of an antenna is the **real resistance and imaginary reactance that appears at the terminals of the antenna**
+* It will be affected by objects that are nearby, such as other antennas, the components on a circuit board, and even the user of the device
+* maximum power transfer will occur when the source and load impedances match
+
+
+## Antenna Types (GPS)
 
 * Coaxial, Helical, dipole, etc
 * monpole, dipole, quadrifilar helices (volutes), sprial helices, slots, microstrips
-* ceramic patch antenn
-
-# GPS Antenna
-
-# LoRa Antenna
+* ceramic patch antenna
 
 # Other Notes
 
@@ -42,3 +59,4 @@
 [1]: https://www.rfvenue.com/blog/2014/12/15/active-v-passive-anntennas
 [2]: https://techship.com/faq/difference-active-and-passive-antenna/
 [3]: http://www2.unb.ca/gge/Resources/gpsworld.july98.pdf
+[4]: https://www.linxtechnologies.com/wp/wp-content/uploads/an-00501.pdf
