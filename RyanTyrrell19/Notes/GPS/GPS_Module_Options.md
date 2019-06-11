@@ -77,6 +77,7 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * [Adafruit Ultimate Pinout][Adafruit Ultimate Pinout]
 * [Adafruit Ultimate Battery Backup][Adafruit Ultimate Battery Backup]
 
+* Draws 20mA
 * RTC battery-compatible
 * Built-in **datalogging**
 * Internal patch antenna + u.FL connector for external active antenna

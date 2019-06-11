@@ -1,6 +1,7 @@
 # Outline
 
 1. Construct a Helical Antenna using a guide below
+    * Will need to remove SMA connector of MESH modules to connect the antenna
 2. Configure MESH Module to match antenna attached to it
 	* Big one here is frequency
 2. Test to determine which antenna to use for Trackers.
