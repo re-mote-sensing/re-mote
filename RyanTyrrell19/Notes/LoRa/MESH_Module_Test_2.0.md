@@ -77,7 +77,7 @@ TX     ->   D3
 
 The Gateway will be set up at a static location, preferably at a location higher than where the nodes will be. Two nodes will be taken on a walk around cootes. One will use the DIY Helical antenna, the other will use a more heavy duty antenna (one that a Gateway may use). The antennas to use will be determined from the previous test done. The nodes will aquire a GPS fix and, every 5 seconds, transmit the coordinates to the Gateway. The nodes will also save the coordinates on the Arduino's EEPROM. Upon completion, the GPS coordiante recieved by the Gateway can be compared with that of the GPS coordinates stored to see which ones were sent successfully. The Gatway will also save the RSSI values.
 
-
+The Gateway will save the received data and RSSI values to the EEPROM also. SOmeone watching over the Gateway can report if data has stopped being received.
 
 
 
