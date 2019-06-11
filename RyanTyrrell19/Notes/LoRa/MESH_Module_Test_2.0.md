@@ -1,4 +1,4 @@
-# Outline
+# Test Outline
 
 1. Construct a Helical Antenna using a guide below
     * Will need to remove SMA connector of MESH modules to connect the antenna
@@ -17,7 +17,7 @@
 	* Trackers will continuously transmit GPS data, while also saving the GPS data to file
 	* The data successfully transmitted can be compared against all the points taken by the Tracker
 
-# Testing
+# Testing Info
 ## Testing Environment
 ![alt-text][Testing Environment] [[6]]
 
@@ -37,7 +37,6 @@
 	* RSSI won’t tell you much about the bigger picture, especially if you only measure some spots and for a short period of time. 
 	* In addition the signal strength (in dBm) is subject to a logarithmic loss dependent on the distance.
 * The lower you get (less than -100), the less linear correlation you will have between the distance (in free space) and the RSSI value. The lower the value, the less valuable information you get out of the RSSI value alone.
-
  
 ## Test Procedures
 
@@ -47,47 +46,14 @@
 [DIY LoRa Range Test][DIY LoRa Range Test]
 * Travel the area with a LoRa device that transmits GPS coordiantes. In addition, track where you've travelled using GPS. Compare what GPS data was recieved with the GPS data that tracked where you've travelled to see what was recieved and what was not
 
+# Test 1: RSSI Test
+
+## Test Procedure
+
+Two nodes will be placed 50m apart, at waist height. One node (host) will transmit dummy data to the other node (client). The client node will then send back the recorded RSSi value associated with that dummy load. The host node will receive this data (the first RSSI value), along with the associated RSSI value. This will de done 10 times, the two RSSI values will be averaged and displayed. This will be done with various antennas to get a general idea of their performance.
 
 
-# Test Outline
-
-1) Four tests will be conducted, each in a different environmental setting. 
-2) For each setting, tests will be conducted over several distances. 
-3) For each distance, elevation and the antenna used will be changed
-
-* Distances will be measured out using a GPS watch (Forerunner 235)
-
-# Changeable Parameters (Of the Node)
-
-* Distance
-    * Increase distance over set intervals
-    * When no longer recieving, slowly move back until it does again
-* Environment
-    * Line-of-sight (no obstructions)
-    * Rural (Tress & hills)
-    * Urban (City)
-
-* Antenna
-    * Powerful, large antenna
-    * no antenna
-    * Any other antenna I can find?
-* Elevation
-    * On the ground
-    * Waist height
-    * Head height
-
-* LoRa Settings?
-
-* Gateway elevation?
-
-# Record
-
-* If data was recieved
-* Signal strength
-
-# Test Set-Up
-
-## Node
+## Node Setup
 ### General
 
 * LoRa MESH Module Connected to Arduino Nano
@@ -102,27 +68,17 @@ VCC    ->   5V
 RX     ->   D2  
 TX     ->   D3  
 
+## 
 
-## Gateway
-### General
+# Test 2: Cootes Walk-around Test
 
-* LoRa MESH Module Connected to Arduino Uno
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Gateway.ino'
-* LoRa MESH communicates with Arduino via SoftwareSerial
+## Test Procedure
+* Do the Nodes and Gateways need to use the same antenna??? (same frequnecy but I don't think need be the same type)
 
-### Pinout
+The Gateway will be set up at a static location, preferably at a location higher than where the nodes will be. Two nodes will be taken on a walk around cootes. One will use the DIY Helical antenna, the other will use a more heavy duty antenna (one that a Gateway may use). The antennas to use will be determined from the previous test done. The nodes will aquire a GPS fix and, every 5 seconds, transmit the coordinates to the Gateway. The nodes will also save the coordinates on the Arduino's EEPROM. Upon completion, the GPS coordiante recieved by the Gateway can be compared with that of the GPS coordinates stored to see which ones were sent successfully. The Gatway will also save the RSSI values.
 
-LoRa   |    Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   D2  
-TX     ->   D3  
 
-# Test 1: Line-of-Sight
 
-General Location:  
-Gatway Location:  
-Node Locations:  
 
 
 
