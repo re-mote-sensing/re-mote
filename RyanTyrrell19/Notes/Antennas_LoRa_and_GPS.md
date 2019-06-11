@@ -131,7 +131,7 @@ not actually exist
 *  In general you can say, the higher the RSSI number, the stronger the signal
 	* But the number does not linearly correspond to the distance between transmitter and receiver. 
 	* RSSI won’t tell you much about the bigger picture, especially if you only measure some spots and for a short period of time. 
-	* In addition the signal strength (in dBm) is subject to a logarithmic loss dependent on the distance.
+	* In addition, the signal strength (in dBm) is subject to a logarithmic loss dependent on the distance.
 * The lower you get (less than -100), the less linear correlation you will have between the distance (in free space) and the RSSI value. The lower the value, the less valuable information you get out of the RSSI value alone.
 
  

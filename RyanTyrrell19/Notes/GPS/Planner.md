@@ -7,7 +7,7 @@
 4. Brefly mention the Tracker outline breaking down each component. Start formulating a plan for building the Tracker
 
 
-
+* Use plastic enclosre to see impact on signal stength
 
 
 
