@@ -48,7 +48,7 @@
 
 # Test 1: RSSI Test
 
-## Test Procedure
+## Test Outline
 
 Two nodes will be placed 50m apart, at waist height. One node (host) will transmit dummy data to the other node (client). The client node will then send back the recorded RSSi value associated with that dummy load. The host node will receive this data (the first RSSI value), along with the associated RSSI value. This will de done 10 times, the two RSSI values will be averaged and displayed. This will be done with various antennas to get a general idea of their performance.
 
@@ -68,7 +68,28 @@ VCC    ->   5V
 RX     ->   D2  
 TX     ->   D3  
 
-## 
+## Test Procedure & Results
+
+The following antenna will be used for the Gateway:
+
+![alt-text][Gateway Antenna]
+
+The following antennas will be tested with the node:
+
+![alt-text][Test Antennas]
+
+The antennas will be tested from right to left, with the first one representing no antenna.
+
+
+
+
+
+
+
+
+
+
+
 
 # Test 2: Cootes Walk-around Test
 
@@ -90,3 +111,6 @@ The Gateway will save the received data and RSSI values to the EEPROM also. SOme
 [Antenna Test 1]: https://www.coredump.ch/2017/04/30/lorawan-868mhz-antenna-test-part-2/
 [Antenna Test 2]: https://medium.com/home-wireless/testing-lora-antennas-at-915mhz-6d6b41ac8f1d
 [Testing Environment]: https://i.ibb.co/VVbH171/6.png
+
+[Gateway Antenna]: https://i.ibb.co/x2M60vc/Gateway-Antennas.jpg
+[Test Antennas]: https://i.ibb.co/VBMqhqq/Test-Antennas.jpg
