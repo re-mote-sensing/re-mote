@@ -3,8 +3,8 @@
 // You have to press the power button on the 3G shield when you power the Arduino
 
 // Change the following parameters to accommodate your specific setup
-#define NETWORK_ID 0x1   //LoRa network ID, has to be the same on every LoRa module in your network
-#define NODE_ID 0x1000   //LoRa ID of this node, you then need to put this into the end nodes that are sending to this gateway
+#define NETWORK_ID 0x0   //LoRa network ID, has to be the same on every LoRa module in your network
+#define NODE_ID 0x1234   //LoRa ID of this node, you then need to put this into the end nodes that are sending to this gateway
 #define LORA_RX 6      //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
 #define LORA_TX 7      //Pin that the LoRa RXD pin is connected to
 
@@ -17,6 +17,7 @@
 
 #include <SPI.h>
 #include <SoftwareSerial.h>
+#include "Adafruit_FONA.h"
 #include <SdFat.h>
 
 #include <MemoryFree.h>
@@ -25,11 +26,12 @@
 
 #define FONA_TX 4
 #define FONA_RX 5
-//#define FONA_RST 9
+#define FONA_RST 9
 
 /*-------------------------GLOBALS------------------------------*/
 
 unsigned long lastPost;
+bool dataGood = false;
 
 /*------------------------CONSTRUCTORS--------------------------*/
 
@@ -99,10 +101,6 @@ void loop() {
                 case 1:
                     saveData(loraData);
                     break;
-                    
-                case 2:
-                    sendLocation(loraData);
-                    break;
 
                 default:
                     Serial.println(F("Unknown Message Type Received"));
@@ -120,196 +118,7 @@ void loop() {
     postData();
 }
 
-
-
-
-
-
-
-
-bool sendCheckReply(Stream& port, __FlashStringHelper* command, char* reply, int timeout) {
-    Serial.print(F("Sending to fona: "));
-    Serial.println(command);
-    
-    port.println(command);
-    
-    unsigned long start = millis();
-    
-    char response[20];
-    uint8_t curr = 0;
-    
-    while ((millis() >= start) ? ((millis() - start) < timeout) : ((millis() + (4294967295 - start)) < timeout)) {
-        while (port.available() && curr < 19) {
-            delay(250);
-            char c = port.read();
-            if (c == '+') {
-                break;
-            }
-            if (c != '\n' && c != '\r') {
-                response[curr++] = c;
-            }
-        }
-        
-        if (curr != 0) {
-            response[curr] = 0;
-
-            Serial.println(response);
-
-            if (strcmp(response, reply) == 0) {
-                return true;
-            } else {
-                response[0] = 0;
-                curr = 0;
-                continue;
-            }
-        }
-    }
-    
-    return false;
-}
-
-
-bool sendCheckReply(Stream& port, char* command, char* reply, int timeout) {
-    Serial.print(F("Sending to fona: "));
-    Serial.println(command);
-    
-    port.println(command);
-    
-    unsigned long start = millis();
-    
-    char response[20];
-    uint8_t curr = 0;
-    
-    while ((millis() >= start) ? ((millis() - start) < timeout) : ((millis() + (4294967295 - start)) < timeout)) {
-        while (port.available() && curr < 19) {
-            delay(250);
-            char c = port.read();
-            if (c == '+') {
-                break;
-            }
-            if (c != '\n' && c != '\r') {
-                response[curr++] = c;
-            }
-        }
-        
-        if (curr != 0) {
-            response[curr] = 0;
-
-            Serial.println(response);
-
-            if (strcmp(response, reply) == 0) {
-                return true;
-            } else {
-                response[0] = 0;
-                curr = 0;
-                continue;
-            }
-        }
-    }
-    
-    return false;
-}
-
-
-bool fonaPost(char* reqArr) {
-    SoftwareSerial fonaSS(FONA_TX, FONA_RX);
-    
-    fonaSS.begin(4800);
-    delay(250);
-    
-    bool err = false;
-    for (uint8_t i = 0; !err && i < 20; i++) {
-        if (!sendCheckReply(fonaSS, F("AT"), "OK", 1000)) {
-            if (i == 19) {
-                err = true;
-            }
-        } else {
-            break;
-        }
-    }
-    
-    for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, F("AT+CHTTPSSTART"), "OK", 10000)) {
-            if (i == 2) {
-                err = true;
-            }
-        } else {
-            break;
-        }
-    }
-    
-    for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, F("AT+CHTTPSOPSE=\"www.cas.mcmaster.ca\",80,1"), "OK", 5000)) {
-            if (i == 2) {
-                err = true;
-            }
-        } else {
-            break;
-        }
-    }
-    
-    char* httpssendArr = malloc(sizeof(char) * 20);
-    sprintf(httpssendArr, "AT+CHTTPSSEND=%d", strlen(reqArr)+20);
-    
-    for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, httpssendArr, ">", 5000)) {
-            if (i == 2) {
-                err = true;
-            }
-        } else {
-            break;
-        }
-    }
-    
-    free(httpssendArr);
-    
-    for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, reqArr, "OK", 10000)) {
-            if (i == 2) {
-                err = true;
-            }
-        } else {
-            break;
-        }
-    }
-    
-    sendCheckReply(fonaSS, F("AT+CHTTPSCLSE"), "OK", 1000);
-    sendCheckReply(fonaSS, F("AT+CHTTPSSTOP"), "OK", 1000);
-    fonaSS.end();
-    
-    return err;
-}
-
-
-void TestFona() {
-    SoftwareSerial fonaSS(FONA_TX, FONA_RX);
-    
-    fonaSS.begin(4800);
-    delay(250);
-    
-    while (true) {
-        while (Serial.available()) {
-            char c = Serial.read();
-            fonaSS.write(c);
-            Serial.write(c);
-        }
-        while (fonaSS.available()) {
-            Serial.write(fonaSS.read());
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
 /*-------------------------FUNCTIONS----------------------------*/
-
 
 //Create "ToSend.csv" if it doesn't already exist
 void createToSend() {
@@ -350,8 +159,7 @@ void parseRegistration(uint8_t* data) {
         return;
     }
 
-    uint16_t add;
-    memcpy(&add, data, sizeof(uint8_t) * 2);
+    uint16_t add = data[0] << 8 | data[1];
     char* fileName = malloc(sizeof(char) * 13);
     sprintf(fileName, "node%u.csv", add);
 
@@ -412,8 +220,7 @@ void saveData(uint8_t* data) {
         return;
     }
 
-    uint16_t add;
-    memcpy(&add, data, sizeof(uint8_t) * 2);
+    uint16_t add = data[0] << 8 | data[1];
     char* fileName = malloc(sizeof(char) * 13);
     sprintf(fileName, "node%u.csv", add);
     
@@ -429,6 +236,8 @@ void saveData(uint8_t* data) {
             Serial.print(F("Received bad sensor data from node "));
             Serial.println(add);
         } else {
+            dataGood = true;
+            
             File toSendFile = sd.open("ToSend.csv", FILE_WRITE);
             toSendFile.seekSet(31);
             uint32_t position = file.curPosition();
@@ -537,111 +346,116 @@ bool checkSensorData(File file, uint8_t numSensors) {
     }
 }
 
-//Sends the location of an end node to the server
-void sendLocation(uint8_t* data) {
-    uint16_t address;
-    memcpy(&address, data, sizeof(uint8_t) * 2);
-    
-    //Send first acknowledgement to show that it's being worked on
-    uint8_t* ackData = malloc(sizeof(uint8_t));
-    ackData[0] = 1;
-    sendData(loraPort, address, 1, ackData);
-    free(ackData);
-    
-    uint32_t time;
-    float lat;
-    float lon;
-    
-    memcpy(&time, &data[4], sizeof(uint8_t) * 4);
-    memcpy(&lat, &data[8], sizeof(uint8_t) * 4);
-    memcpy(&lon, &data[12], sizeof(uint8_t) * 4);
-    
-    char* latStr = malloc(sizeof(char) * 11);
-    dtostrf(lat, 8, 6, latStr);
-    char* lonStr = malloc(sizeof(char) * 12);
-    dtostrf(lon, 8, 6, lonStr);
-    
-    uint8_t nameLen = data[16];
-    char* name = malloc(sizeof(char) * (nameLen + 1));
-
-    Serial.print(F("11: "));
-    Serial.println(freeMemory());
-    
-    for (uint8_t i = 0; i < nameLen; i++) {
-        name[i] = data[17 + i];
-    }
-    name[nameLen] = 0;
-    
-    char* request = malloc(sizeof(char) * (127 + nameLen));
-
-    Serial.print(F("12: "));
-    Serial.println(freeMemory());
-    
-    sprintf(request, "POST /ollie/sensor/info?id=%d&name=%s&coords=%s,%s&time=%lu HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n", address, name, latStr, lonStr, time);
-
-    free(latStr);
-    free(lonStr);
-    free(name);
-    
-    Serial.print(F("Time: "));
-    Serial.println(time);
-    
-    Serial.print(F("13: "));
-    Serial.println(freeMemory());
-    
-    bool error = fonaPost(request);
-
-    Serial.print(F("14: "));
-    Serial.println(freeMemory());
-    
-    free(request);
-    
-    loraPort.listen();
-    
-    ackData = malloc(sizeof(uint8_t));
-
-    Serial.print(F("15: "));
-    Serial.println(freeMemory());
-    
-    if (!error) {
-        ackData[0] = 0;
-    } else {
-        ackData[0] = 0xFF;
-    }
-
-    Serial.print(F("16: "));
-    Serial.println(freeMemory());
-    
-    sendData(loraPort, address, 1, ackData);
-    
-    free(ackData);
-
-    Serial.print(F("17: "));
-    Serial.println(freeMemory());
-}
-
 //Post collected data to webserver
 void postData() {
+    if (!dataGood) {
+        return;
+    }
+
     Serial.print(F("10: "));
     Serial.println(freeMemory());
 
     //Build HTTP request
     char* reqArr = buildRequest();
     
-    if (reqArr == NULL) {
-        return;
-    }
-    
     Serial.print(F("12: "));
     Serial.println(freeMemory());
 
-    bool error = fonaPost(reqArr);
+    /*
+    Serial.print(F("-------------------------------------\n\n\n"));
+    Serial.print(reqArr);
+    Serial.println(F("\n\n\n-------------------------------------"));
+    */
+
+    fonaPost(reqArr);
+}
+
+//Post a request through the fona
+void fonaPost(char* reqArr) {
+    //Initialising the FONA:
+    SoftwareSerial fonaSS(FONA_TX, FONA_RX);
+    Adafruit_FONA_3G fona = Adafruit_FONA_3G(FONA_RST);
     
+    delay(500);
+    
+    fonaSS.begin(4800);
+    if (!fona.begin(fonaSS)) {
+        Serial.println(F("Error initialising FONA"));
+        while (true);
+    }
+
+    delay(500);
+
+    fona.setGPRSNetworkSettings(F("pda.bell.ca"));
+    fona.setHTTPSRedirect(true);
+
+    delay(2000);
+    
+    Serial.print(F("12.5: "));
+    Serial.println(freeMemory());
+    
+    bool err = false;
+    for (uint8_t i = 0; !err && i < 3; i++) {
+        if (!fona.sendCheckReply(F("AT+CHTTPSSTART"), F("OK"), 30000)) {
+            if (i == 2) {
+                err = true;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    for (uint8_t i = 0; !err && i < 3; i++) {
+        if (!fona.sendCheckReply(F("AT+CHTTPSOPSE=\"www.cas.mcmaster.ca\",80,1"), F("OK"), 10000)) {
+            if (i == 2) {
+                err = true;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    for (uint8_t i = 0; !err && i < 3; i++) {
+        if (!fona.sendCheckReply(F("AT+CHTTPSSEND=120"), F(">"), 10000)) {
+            if (i == 2) {
+                err = true;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    for (uint8_t i = 0; !err && i < 3; i++) {
+        if (!fona.sendCheckReply(reqArr, F("OK"), 10000)) {
+            if (i == 2) {
+                err = true;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    for (uint8_t i = 0; !err && i < 3; i++) {
+        if (!fona.sendCheckReply(F("AT+CHTTPSCLSE"), F("OK"), 10000)) {
+            if (i == 2) {
+                err = true;
+            }
+        } else {
+            break;
+        }
+    }
+
     free(reqArr);
     
-    if (!error) {
+    if (!err) {
         truncateToSend();
+        dataGood = false;
     }
+
+    Serial.print(F("13: "));
+    Serial.println(freeMemory());
+
+    fonaSS.end();
 }
 
 //Build HTTP request to send through fona
@@ -650,10 +464,6 @@ char* buildRequest() {
     Serial.println(freeMemory());
     
     uint8_t* data = getAllData();
-    
-    if (data == NULL) {
-        return NULL;
-    }
     
     Serial.print(F("11.2: "));
     Serial.println(freeMemory());
@@ -665,9 +475,7 @@ char* buildRequest() {
     Serial.print(F("Data size: "));
     Serial.println(dataSize);
     
-    uint8_t size = 70;
-    
-    char* request = malloc(sizeof(char) * (size + (2 * dataSize) + 1));
+    char* request = malloc(sizeof(char) * (64 + (2 * dataSize) + 1));
     
     if (request == NULL) {
         Serial.println(F("Ran out of memory while building request"));
@@ -676,22 +484,22 @@ char* buildRequest() {
     Serial.print(F("11.3: "));
     Serial.println(freeMemory());
     
-    strcpy(request, "POST /ollie/sensor/data?data=");
+    strcpy(request, "POST /ollie/sensor/data HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n");
     
     Serial.print(F("11.4: "));
     Serial.println(freeMemory());
     
-    for (unsigned int i = 0; i < dataSize; i++) {
+    for (uint8_t i = 0; i < dataSize; i++) {
         char* curr = byteToHexStr(data[i + 2]);
-        request[(2 * i) + 29] = curr[0];
-        request[(2 * i) + 29 + 1] = curr[1];
+        request[(2 * i) + 64] = curr[0];
+        request[(2 * i) + 65] = curr[1];
         free(curr);
     }
     
     Serial.print(F("11.5: "));
     Serial.println(freeMemory());
     
-    strcpy(&request[29 + (2 * dataSize)], " HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n\0");
+    request[64 + (2 * dataSize)] = 0;
     
     free(data);
     
@@ -703,7 +511,7 @@ char* buildRequest() {
 
 //Converts a uint8_t (byte) into a char* representing the hexadecimal form of the byte
 char* byteToHexStr(uint8_t data) {
-    char* ans = malloc(sizeof(char) * 2);
+    char* ans = malloc(sizeof(char) * 2);;
     sprintf(ans, "%02X", data);
     return ans;
 }
@@ -715,11 +523,6 @@ uint8_t* getAllData() {
     
     uint8_t* sendInfo = getSendInfo();
     //#nodes(1) id1(2) #points1(1) pos1(4) id2(2) ...
-    
-    if (sendInfo[0] == 0) {
-        free(sendInfo);
-        return NULL;
-    }
     
     Serial.print(F("11.12: "));
     Serial.println(freeMemory());

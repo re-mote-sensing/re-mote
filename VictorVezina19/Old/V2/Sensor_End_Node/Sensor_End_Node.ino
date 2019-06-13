@@ -1,16 +1,11 @@
 /*----------IMPORTANT INFORMATION AND CONFIG PARAMETERS---------*/
 
 // Change the following parameters to accommodate your specific setup
-#define NAME "TESTING"           //Name to associate with this node
-
-#define NETWORK_ID 0x1           //LoRa network ID, has to be the same on every LoRa module in your network
-#define NODE_ID 0x4              //LoRa ID of this node, must be unique to all nodes in a network
-#define GATEWAY_ADDRESS 0x1000   //ID of the gateway node to send data to
-
+#define NETWORK_ID 0x0             //LoRa network ID, has to be the same on every LoRa module in your network
+#define NODE_ID 0x0                //LoRa ID of this node, must be unique to all nodes in a network
+#define GATEWAY_ADDRESS 0x1234   //ID of the gateway node to send data to
 #define LORA_RX 3                //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
 #define LORA_TX 2                //Pin that the LoRa RXD pin is connected to
-#define GPS_RX 10                //Pin that the GPS TXD pin is connected to
-#define GPS_TX 9                 //Pin that the GPS RXD pin is connected to
 
 // The following paramaters have to do with the sensors you're using on this end node
 // Look on our GitLab (LINK!) for more information on sensor setup and how to edit these values
@@ -28,21 +23,10 @@ uint8_t sensorPorts[NUMBER_SENSORS][2] = { {7, 6}, {5, 4}, {8, 14} };
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <EEPROM.h>
-#include <Time.h>
-#include <TinyGPS++.h>
 
-/*-------------------------CONSTRUCTORS-------------------------*/
+/*----------------------LORA CONSTRUCTOR------------------------*/
 
 SoftwareSerial loraPort(LORA_RX, LORA_TX);
-
-TinyGPSPlus gps;
-SoftwareSerial gpsPort(GPS_RX, GPS_TX);
-
-/*-----------------------GLOBAL VARIABLES-----------------------*/
-
-unsigned long currTime;
-unsigned long timeLastUpdated;
-uint8_t timesRead = 0;
 
 /*---------------------------SETUP------------------------------*/
 
@@ -56,15 +40,7 @@ void setup() {
     writeConfig(loraPort, NETWORK_ID, NODE_ID);
     delay(750);
     
-    //while (!Serial.available()) ;
-    
     registerNode();
-    
-    gpsPort.begin(9600);
-    
-    delay(250);
-    
-    sendLocation(true);
 
     //Check if EEPROM has ever been used
     unsigned int initialCheck = 0;
@@ -84,12 +60,6 @@ void setup() {
 /*----------------------------LOOP------------------------------*/
 
 void loop() {
-    if (timesRead++ >= 10) {
-        if (sendLocation(false)) {
-            timesRead = 0;
-        }
-    }
-        
     unsigned long start = millis();
     
     saveData(readSensors());
@@ -161,84 +131,6 @@ void initialiseTB(uint8_t i) {
 }
 
 
-/*-------------------GPS Time Functions--------------------*/
-
-//Gets current Unix time based on last time update and current system time
-uint32_t gpsGetTime() {
-    return currTime + ((millis() >= timeLastUpdated) ? (millis() - timeLastUpdated) : (millis() + (4294967295 - timeLastUpdated)))/1000;
-}
-
-//Sets current Unix time from GPS
-bool gpsSetTime(bool force) {
-    unsigned long timeout = 30000;
-    unsigned long before = millis();
-    bool worked = false;
-    
-    bool timeBool = false;
-    bool dateBool = false;
-    
-    while (force || ((millis() >= before) ? ((millis() - before) < timeout) : ((millis() + (4294967295 - before)) < timeout))) {
-        //break;
-        if (!force) {
-            Serial.print(F("GPS time loop time passed: "));
-            Serial.println(millis() - before);
-        }
-        
-        gpsFeedInfo();
-        
-        bool dateUpdated = gps.date.isUpdated();
-        bool timeUpdated = gps.time.isUpdated();
-        timeBool = timeBool || timeUpdated;
-        dateBool = dateBool || dateUpdated;
-        
-        /*
-        Serial.println(timeBool);
-        Serial.println(dateBool);
-        Serial.println(gps.time.value());
-        Serial.println(gps.date.value());
-        */
-        
-        if (gps.time.isValid() && gps.date.isValid() && (timeUpdated || dateUpdated)) {
-            worked = true;
-            uint32_t time = gps.time.value();
-            uint32_t date = gps.date.value();
-            
-            setTime(time/1000000, (time/10000)%100, (time/100)%100, date/10000, (date/100)%100, (date%100) + 2000);
-            currTime = now();
-            timeLastUpdated = millis();
-            
-            Serial.print(F("Updating time to: "));
-            Serial.println(currTime);
-        
-            if (timeBool && dateBool) {
-                break;
-            }
-        } else {
-            Serial.println(F("Failed to get GPS time and date"));
-        }
-    }
-    
-    if (!worked) {
-        Serial.println(F("Aborting GPS time and date"));
-        return false;
-    }
-    
-    return true;
-}
-
-//Feed data from the gps module into the software gps data formatter
-bool gpsFeedInfo() {
-    gpsPort.listen();
-    delay(2500);
-	while (gpsPort.available()) {			 //Checks if data is available on those pins
-		if (gps.encode(gpsPort.read())) {		 //Repeatedly feed it characters from your GPS device:
-			return true;
-        }
-	}
-	return false;
-}
-
-
 /*---------------Node Registration Function----------------*/
 
 //Registers this end node with the gateway
@@ -286,105 +178,6 @@ void registerNode() {
 }
 
 
-/*---------------GPS Location Functions----------------*/
-
-//Registers this end node with the gateway
-bool sendLocation(bool force) {
-    float lat;
-    float lon;
-    
-    unsigned long timeout = 60000;
-    unsigned long before = millis();
-    bool worked = false;
-    
-    while (force || ((millis() >= before) ? ((millis() - before) < timeout) : ((millis() + (4294967295 - before)) < timeout))) {
-        gpsFeedInfo();
-        
-        if (gps.location.isUpdated()) {
-            lat = gps.location.lat();
-            lon = gps.location.lng();
-            
-            if (lat != 0 && lon != 0) {
-                Serial.println(F("Got Location"));
-                worked = true;
-                break;
-            }
-        }
-        
-        Serial.println(F("Failed to get GPS location"));
-    }
-    
-    if (!worked) {
-        Serial.println(F("Error reading from GPS, aborting location send"));
-        return false;
-    }
-    
-    gpsSetTime(force);
-    uint32_t time = gpsGetTime();
-    
-    uint8_t nameLen = strlen(NAME);
-    
-    uint8_t arrLength = 1 + (3 * 4) + 1 + nameLen;
-    
-    if (arrLength > 111) {
-        Serial.println(F("ERROR: Name too long to be combined with co-ordinates for LoRa message"));
-        while (true) ;
-    }
-    
-    Serial.println(F("Inside location send:"));
-    Serial.print(F("Time: "));
-    Serial.println(time);
-    Serial.print(F("Lat: "));
-    Serial.println(lat);
-    Serial.print(F("Lon: "));
-    Serial.println(lon);
-
-    uint8_t* dataArr = malloc(sizeof(uint8_t) * arrLength);
-
-    dataArr[0] = 0b00100000 | (((uint8_t) NUMBER_SENSORS) & 0b00001111);
-    
-    memcpy(&dataArr[1], &time, sizeof(uint8_t) * 4);
-    memcpy(&dataArr[5], &lat, sizeof(uint8_t) * 4);
-    memcpy(&dataArr[9], &lon, sizeof(uint8_t) * 4);
-    
-    dataArr[13] = nameLen;
-    
-    char* name = NAME;
-    for (uint8_t i = 0; i < nameLen; i++) {
-        dataArr[i + 14] = name[i];
-    }
-    
-    loraPort.listen();
-    bool received = false;
-    uint8_t tries = 0;
-    while (!received && (force || (tries++) < 3)) {
-        Serial.println(F("Sending Location"));
-        sendData(loraPort, GATEWAY_ADDRESS, arrLength, dataArr);
-        
-        uint8_t ack = ackWait(loraPort, GATEWAY_ADDRESS, 5000);
-        
-        if (ack == 1) {
-            Serial.println(F("Received initial ack"));
-        
-            ack = ackWait(loraPort, GATEWAY_ADDRESS, 150000);
-        
-            if (ack == 0) {
-                received = true;
-                Serial.println(F("Received final ack"));
-            } else {
-                Serial.println(F("Didn't receive final ack"));
-            }
-        } else {
-            Serial.println(F("Didn't receive initial ack"));
-        }
-    }
-    
-    free(dataArr);
-    
-    return true;
-}
-
-
 /*-----------------Data Save Function------------------*/
 
 //Save data to EEPROM
@@ -414,12 +207,8 @@ void saveData(uint32_t* data) {
 //Read data from all sensors based on their types
 uint32_t* readSensors() {
     Serial.println(F("\nReading Sensors"));
-    
     uint32_t* ans= malloc(sizeof(uint32_t) * (NUMBER_SENSORS + 1));
-    
-    gpsSetTime(false);
-    ans[0] = gpsGetTime();
-    
+    ans[0] = millis();
     for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
         uint32_t data;
         if (strcmp(sensorTypes[i], "Dissolved_Oxygen") == 0) { //DO
@@ -434,10 +223,8 @@ uint32_t* readSensors() {
         } else {
             data = -1;
         }
-        
         memcpy(&ans[i+1], &data, sizeof(uint32_t));
     }
-    
     return ans;
 }
 
@@ -484,8 +271,7 @@ float readEC(uint8_t i) {
     float data = 0.0;
     
     char buf[40];
-    uint8_t tries = 0;
-    while (!data && (tries++ < 3)) { //Makes sure to get a non-zero number, for some reason the EC sensors like to read as 0.00 sometimes
+    while (!data) { //Makes sure to get a non-zero number, for some reason the EC sensors like to read as 0.00 sometimes
         do {
             delay(1000);
             sensor.print(F("R\r"));
@@ -517,20 +303,12 @@ float readTB(uint8_t i) {
     
     float data = analogRead(sensorPorts[i][0]);
     
-    float ans;
-    if (data < 775.0) {
-        ans = 775.0 - data;
-    } else {
-        int factor = data / 5;
-        ans = data - (5.0 * factor);
-    }
-    
     digitalWrite(8, LOW);
     
     Serial.print(F("Read TB sensor: "));
-    Serial.println(ans);
+    Serial.println(data);
     
-    return ans;
+    return data;
 }
 
 
@@ -620,15 +398,10 @@ uint8_t ackWait(Stream& port, uint16_t address, unsigned long time) {
 
 //Delay for an amount of time but accounts for start time and overflow
 void delayOverflow(unsigned long time, unsigned long start) {
-    long delayTime;
     if (millis() < start) { //Overflow check
-        delayTime = time - (millis() + (4294967295-start));
+        delay(time - (millis() + (4294967295-start)));
     } else {
-        delayTime = time - (millis() - start);
-    }
-    
-    if (delayTime > 0) {
-        delay(delayTime);
+        delay(time - (millis() - start));
     }
 }
 
