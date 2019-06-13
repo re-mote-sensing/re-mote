@@ -51,6 +51,7 @@
 
 Two nodes will be placed 50m apart, at waist height. One node (host) will transmit dummy data to the other node (client). The client node will then send back the recorded RSSi value associated with that dummy load. The host node will receive this data (the first RSSI value), along with the associated RSSI value. This will de done 10 times, the two RSSI values will be averaged and displayed. This will be done with various antennas to get a general idea of their performance.
 
+An additional test will be done where the node is enclosed in a casing similar to what will be used to protect/waterproof the tracker. THis will enable us to see how much the enclosure limits the range of Trackers LoRa.
 
 ## Node (Client) Setup
 ### General
