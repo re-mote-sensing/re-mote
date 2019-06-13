@@ -50,3 +50,19 @@ This outline provides a condensed overview of all the research that has been don
 
 
 # Software Breakdown
+
+# Library Choices
+
+* SoftwareSerial
+* AltSoftSerial
+* LowPower
+* NMEAGPS
+
+
+## Setup
+
+* Initilize Serial Connections
+* 
+
+## Loop
+
