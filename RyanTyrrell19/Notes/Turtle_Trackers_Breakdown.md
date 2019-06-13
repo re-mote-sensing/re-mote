@@ -6,7 +6,7 @@ This outline provides a condensed overview of all the research that has been don
 *  The requirements of each component. A sort of checklist to use when deciding what to purchase
 
 * Keep in mind the following constraints
-	* weight
+	* Weight
 	* Size
 	* Power consumption
 	
@@ -19,7 +19,6 @@ This outline provides a condensed overview of all the research that has been don
 * Cheap - less than $50
 * Low Current consumption - max of 50mA in Acquisition mode. 40mA is ideal
 * Quick fix - 30 sec. is ideal (i.e. a Warm start)
-
 
 
 ### Specifics
@@ -45,6 +44,9 @@ This outline provides a condensed overview of all the research that has been don
 
 ### LoRa settings
 
+## Other
+
+* Battery
 
 
 # Software Breakdown
