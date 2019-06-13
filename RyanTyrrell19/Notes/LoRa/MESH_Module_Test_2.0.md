@@ -38,7 +38,7 @@
 	* In addition the signal strength (in dBm) is subject to a logarithmic loss dependent on the distance.
 * The lower you get (less than -100), the less linear correlation you will have between the distance (in free space) and the RSSI value. The lower the value, the less valuable information you get out of the RSSI value alone.
  
-## Test Procedures
+## Test Procedures Available
 
 [DIY Test using RSSI values][DIY RSSI Test]  
 * A simple test to compare the performance of different antennas using the RSSI value
@@ -47,7 +47,6 @@
 * Travel the area with a LoRa device that transmits GPS coordiantes. In addition, track where you've travelled using GPS. Compare what GPS data was recieved with the GPS data that tracked where you've travelled to see what was recieved and what was not
 
 # Test 1: RSSI Test
-
 ## Test Outline
 
 Two nodes will be placed 50m apart, at waist height. One node (host) will transmit dummy data to the other node (client). The client node will then send back the recorded RSSi value associated with that dummy load. The host node will receive this data (the first RSSI value), along with the associated RSSI value. This will de done 10 times, the two RSSI values will be averaged and displayed. This will be done with various antennas to get a general idea of their performance.
@@ -57,7 +56,7 @@ Two nodes will be placed 50m apart, at waist height. One node (host) will transm
 ### General
 
 * LoRa MESH Module Connected to Arduino Nano
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Client'
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Client.ino'
 * LoRa MESH communicates with Arduino via SoftwareSerial
 
 ### Pinout
@@ -72,7 +71,7 @@ TX     ->   D3
 ## Gateway (Host) Setup
 ### General
 * LoRa MESH Module Connected to Arduino Uno
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Host'
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Host.ino'
 * LoRa MESH communicates with Arduino via SoftwareSerial
 
 ### Pinout
@@ -98,24 +97,71 @@ The antennas will be tested from right to left, with the first one representing 
 
 
 
-
-
-
-
-
-
-
-
 # Test 2: Cootes Walk-around Test
-
 ## Test Procedure
 * Do the Nodes and Gateways need to use the same antenna??? (same frequnecy but I don't think need be the same type)
 
-The Gateway will be set up at a static location, preferably at a location higher than where the nodes will be. Two nodes will be taken on a walk around cootes. One will use the DIY Helical antenna, the other will use a more heavy duty antenna (one that a Gateway may use). The antennas to use will be determined from the previous test done. The nodes will aquire a GPS fix and, every 5 seconds, transmit the coordinates to the Gateway. The nodes will also save the coordinates on the Arduino's EEPROM. Upon completion, the GPS coordiante recieved by the Gateway can be compared with that of the GPS coordinates stored to see which ones were sent successfully. The Gatway will also save the RSSI values.
+The Gateway will be set up at a static location, preferably at a location higher than where the nodes will be. Two nodes will be taken on a walk around cootes. One will use the DIY Helical antenna, the other will use a more heavy duty antenna (one that a Gateway may use). The antennas to use will be determined from the previous test done (RSSI Test). The nodes will aquire a GPS fix and, every 15 seconds, transmit the coordinates to the Gateway. The nodes will save any coordinates that were sent unsuccessfully on the Arduino's EEPROM. Upon completion, the GPS coordiante recieved by the Gateway can be compared with that of the GPS coordinates stored to see at what locations the transmission failed.  
+The Gateway will save the received data and RSSI values to the EEPROM. Someone watching over the Gateway can report if data has stopped being received.
 
-The Gateway will save the received data and RSSI values to the EEPROM also. SOmeone watching over the Gateway can report if data has stopped being received.
+## Node Setup
+### General
+
+* LoRa MESH Module Connected to Arduino Nano
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/MESH_and_Antenna_Test/MESH_and_Antenna_Test_Node.ino'
+* LoRa MESH communicates with Arduino via AltSoftSerial
+* GPS communicates with Arduino via HardwareSerial
+* Debugging is done via SoftwareSerial using Putty (an adapter must be used to power the Arduino rather than the USB cord provided)
+
+### Pinout
+
+LoRa   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D8  
+TX     ->   D8  
+
+GPS   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   TX  
+TX     ->   RX
+
+PC    |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D3  
+TX     ->   D2
 
 
+## Gateway Setup
+### General
+
+* LoRa MESH Module Connected to Arduino Uno
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/MESH_and_Antenna_Test/MESH_and_Antenna_Test_Gateway.ino'
+* LoRa MESH communicates with Arduino via AltSoftSerial
+* GPS communicates with Arduino via HardwareSerial
+* Debugging is done via SoftwareSerial using Putty (an adapter must be used to power the Arduino rather than the USB cord provided)
+
+### Pinout
+
+LoRa   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D8  
+TX     ->   D8  
+
+GPS   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   TX  
+TX     ->   RX
+
+PC    |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D3  
+TX     ->   D2
 
 
 [6]: https://lorawantester.com/2019/01/09/5-simple-rules-to-guarantee-a-successful-lorawan-coverage-test/
