@@ -53,11 +53,11 @@
 Two nodes will be placed 50m apart, at waist height. One node (host) will transmit dummy data to the other node (client). The client node will then send back the recorded RSSi value associated with that dummy load. The host node will receive this data (the first RSSI value), along with the associated RSSI value. This will de done 10 times, the two RSSI values will be averaged and displayed. This will be done with various antennas to get a general idea of their performance.
 
 
-## Node Setup
+## Node (Client) Setup
 ### General
 
 * LoRa MESH Module Connected to Arduino Nano
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/LoRa/LoRa_MESH_Test_Node.ino'
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Client'
 * LoRa MESH communicates with Arduino via SoftwareSerial
 
 ### Pinout
@@ -67,6 +67,21 @@ GND    ->   GND
 VCC    ->   5V  
 RX     ->   D2  
 TX     ->   D3  
+
+
+## Gateway (Host) Setup
+### General
+* LoRa MESH Module Connected to Arduino Uno
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Host'
+* LoRa MESH communicates with Arduino via SoftwareSerial
+
+### Pinout
+LoRa   |   Arduino  
+GND    ->   GND  
+VCC    ->   5V  
+RX     ->   D2  
+TX     ->   D3  
+
 
 ## Test Procedure & Results
 
