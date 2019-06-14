@@ -51,8 +51,27 @@ This outline provides a condensed overview of all the research that has been don
 
 # Software Breakdown
 
-# Library Choices
+# Code Overview
 
+* Run Setup
+	* Serial Setup
+	* NeoGPS Setup
+	* Configure GPS
+	* Configure LoRa
+* Loop
+	* Sleep
+		* If RTC, have Tracker run 30min intervals from Time A to Time B, sleeping for the rest
+		* No RTC, run at 1 hour intervals
+	* Power on
+	* Send LoRa transmission with dummy load
+		* No ACK, underwater or out of range - Power back down
+		* ACK - continue operation
+	* Power GPS on and let it get a fix
+		* If RTC - GPS will Warm Start, should take 30sec
+		* No RTC - Always cold start, should take 1min
+
+# Library Choices
+ 
 * SoftwareSerial
 * AltSoftSerial
 * LowPower
