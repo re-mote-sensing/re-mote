@@ -66,9 +66,11 @@ This outline provides a condensed overview of all the research that has been don
 	* Send LoRa transmission with dummy load
 		* No ACK, underwater or out of range - Power back down
 		* ACK - continue operation
-	* Power GPS on and let it get a fix
+	* Power GPS on and let it get a fix (algoithm to determine time to get a fix?)
 		* If RTC - GPS will Warm Start, should take 30sec
 		* No RTC - Always cold start, should take 1min
+	* Self-correct time using RTC (if available)
+	
 
 # Library Choices
  
@@ -85,3 +87,39 @@ This outline provides a condensed overview of all the research that has been don
 
 ## Loop
 
+
+## RTC and Low Power
+
+Assuming the Tracker has an RTC, and the RTC is **guaranteed** to always be running, the Tracker can run and sleep during specific time intervals, for specific periods of time.  
+For example, the Tracker can be programmed to wake at 10am, run every 30min, and sleep from 4pm to 10am.  
+It would even be possible to program 3 or more different running time intervals
+
+The following variables must be defined:  
+* Time A  
+* Time B  
+* Short Interval Time  
+* Long Interval Time  
+* 
+The following explains how this may be implemented:
+
+* The Arduino sleeps using the LowPower Library and uses the (inaccurate) Watchdog Timer
+* Every so often (every 30min?), the Arduino wakes up, checks the RTC (and converts it to the correct time zone), 
+	* Keep in mind the GPS must be turned on briefly to read the RTC
+	* It's been said that the Watchdog timer is +-10% off. A time could be computed and 10% of that time b
+
+
+# GPS Fix Time
+
+With the ability to store aiding data such as almanac, ephemeris, position, RTC, etc. the TTFF can be reduced significantly. However,knowing how long to keep the GPS running to collect this data while also not wasting power is difficult.  
+The following is a possible implementation to optimize TTFF and current consumption:
+
+* The GPS originally runs for 12.5 minutes to collect all almanac data (this is assuming this data can be stored and **guaranteed** to not be deleted. 
+
+* The allowable fix time of the GPS can be computed 3 different ways:
+	* Knowing the probability of when TTFF is likely to be acquired, average download time of ephemeris data, and computation time of Assist Autonomous feature; a rough idea of the turnaround time can be computed and used to determine the allowable run time of the GPS.
+	* Alternatively, data can be read from the GPS that can indicate the status of certain components. Based on what is read, a time may be predicted for when the necessary data will be downloaded
+	* Lastly, a good chunk of the time the Tracker is deployed will be spent underwater where the GPS cannot get a fix. For every time this occurs, increment a counter. This counter can be used to alter the allowable fix time, at no extra cost to power consumed
+
+Final Thoughts:
+* It takes 30sec to download ephemeris data. If the GPS module is advertised to get a TTFF from warm start in 30sec, downlaoding ephemeris data is not worth it
+* As long as a warm start is possible (i.e. RTC and position data is saved), TTFF should be fine (30sec or less)
