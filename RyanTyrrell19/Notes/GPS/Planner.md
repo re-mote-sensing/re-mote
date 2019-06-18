@@ -1,13 +1,14 @@
 # Meeting Outline
 
-1. Talk about antennas
-    * Don't need to go too much into it. Just mention the final thoughts
-2. Discuss the testing section after Antennas
-3. Go over new test outline
-4. Brefly mention the Tracker outline breaking down each component. Start formulating a plan for building the Tracker
-
-
-* Use plastic enclosure to see impact on signal stength
+1. Configuring GPS via Arduino
+    * Sendign commands is easy. Just copy Binary commands produced by U-center and paste into Arduino code. Easy to add more commands
+    * Reading also farily easy, somewhat tedious to organize what's been read. Not very beneficial for Trackers. More useful for Gateways
+    * List of useful data to read from GPS
+2. Go over current Tracker code
+    * Disucss RTC algorithm
+    * Discuss GPS algorithm
+3. What to focus on at the moment?
+    * continue making Tracker code, keeping it as generic as possible with code dependent on the hardware being used
 
 
 
