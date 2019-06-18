@@ -7,7 +7,7 @@
 4. Brefly mention the Tracker outline breaking down each component. Start formulating a plan for building the Tracker
 
 
-* Use plastic enclosre to see impact on signal stength
+* Use plastic enclosure to see impact on signal stength
 
 
 
@@ -24,7 +24,6 @@
 * Use the LoRa Module to check if Tracker is underwater. If no acknowledgment is recieved, GPS is underwater
     * Issues - Gateway breaks at some point, Gateway is out of range
     * Pros - Much cheaper on power
-* Use either LoRa or GPs, check the noise level
 
 
 * Watchdog accuracy test

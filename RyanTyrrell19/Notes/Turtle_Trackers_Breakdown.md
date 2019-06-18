@@ -58,6 +58,7 @@ This outline provides a condensed overview of all the research that has been don
 	* NeoGPS Setup
 	* Configure GPS
 	* Configure LoRa
+
 * Loop
 	* Sleep
 		* If RTC, have Tracker run 30min intervals from Time A to Time B, sleeping for the rest
@@ -78,6 +79,8 @@ This outline provides a condensed overview of all the research that has been don
 * AltSoftSerial
 * LowPower
 * NMEAGPS
+* NeoGPS
+	* will maintan GPS accuracy by saving data in long type rather than float type
 
 
 ## Setup
@@ -103,9 +106,10 @@ The following variables must be defined:
 The following explains how this may be implemented:
 
 * The Arduino sleeps using the LowPower Library and uses the (inaccurate) Watchdog Timer
-* Every so often (every 30min?), the Arduino wakes up, checks the RTC (and converts it to the correct time zone), 
-	* Keep in mind the GPS must be turned on briefly to read the RTC
-	* It's been said that the Watchdog timer is +-10% off. A time could be computed and 10% of that time b
+* The RTC time is updated by briefly powering on and reading from the GPS
+* Before sleeping, compute time Arduino will sleep for, subtract 15% from it
+	* The Watchdog timer is said to be 10% off. Subtract 15% to ensure the target wake up time is not overshot
+* If the RTC time is +-5min of target time, start short interval sleep sequence
 
 
 # GPS Fix Time
@@ -118,8 +122,21 @@ The following is a possible implementation to optimize TTFF and current consumpt
 * The allowable fix time of the GPS can be computed 3 different ways:
 	* Knowing the probability of when TTFF is likely to be acquired, average download time of ephemeris data, and computation time of Assist Autonomous feature; a rough idea of the turnaround time can be computed and used to determine the allowable run time of the GPS.
 	* Alternatively, data can be read from the GPS that can indicate the status of certain components. Based on what is read, a time may be predicted for when the necessary data will be downloaded
-	* Lastly, a good chunk of the time the Tracker is deployed will be spent underwater where the GPS cannot get a fix. For every time this occurs, increment a counter. This counter can be used to alter the allowable fix time, at no extra cost to power consumed
+	* Lastly, a good chunk of the time the Tracker is deployed will be spent underwater where the GPS cannot get a fix. For every time this occur, increment a counter. This counter can be used to alter the allowable fix time, at no extra cost to power consumed
 
-Final Thoughts:
+* Additionally, certain things can be monitored to guage the progress of gettng a GPS fix (such as # of satellites in view). THis can be used to provide more/less time to get a fix  
+**Final Thoughts:**
 * It takes 30sec to download ephemeris data. If the GPS module is advertised to get a TTFF from warm start in 30sec, downlaoding ephemeris data is not worth it
 * As long as a warm start is possible (i.e. RTC and position data is saved), TTFF should be fine (30sec or less)
+
+# Reading/Writing UBX Messages
+
+* Usefful data to read from GPS
+	* TTFF
+	* Real Time Clock Status
+	* DOP (Dilution of Precision)
+	* Position Fix Type
+	* Power Saving Mode State
+	* 
+
+* Configuring will be much more relavent for Gateways (since thye'll most likley use PSM)
