@@ -641,15 +641,12 @@ bool sendSensorData() {
 
 //Wait timeout for an acknoledgement from address, returns first byte of acknoledgement
 uint8_t ackWait(Stream& port, uint16_t address, unsigned long timeout) {
-    unsigned long beforeAck = millis(); //Time before waiting for the acknowledgement
+    unsigned long before = millis(); //Time before waiting for the acknowledgement
     
     uint8_t ans = 0xFF; //The acknowledgement code received, oxFF will be returned if nothing is received
     
-    unsigned long currTime = 0; //The current that has passed while waiting for the acknowledgement
-    
     //Loop until an ackonwledgement is received or timeout time has passed
-    //Should change this loop to mimick the other timeout loops
-    do {
+    while ((millis() >= before) ? ((millis() - before) < timeout) : ((millis() + (4294967295 - before)) < timeout)) { //Accounts for overflow
         if (port.available()) { //If a LoRa message was received
             uint8_t* data = readData(port); //Get the LoRa message data
             uint16_t dataAdd; //The address the message was received from
@@ -665,15 +662,7 @@ uint8_t ackWait(Stream& port, uint16_t address, unsigned long timeout) {
                 break;
             }
         }
-        
-        //Get the current time passed in this loop, accounted for overflow
-        if (millis() < beforeAck) {
-            currTime = millis() + (4294967295 - beforeAck);
-        } else {
-            currTime = millis() - beforeAck;
-        }
-        
-    } while (currTime < timeout); //While timeout time hasn't yet passed
+    }
     
     return ans;
 }
