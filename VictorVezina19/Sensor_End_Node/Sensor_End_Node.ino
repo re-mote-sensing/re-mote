@@ -454,21 +454,17 @@ uint32_t* readSensors() {
     ans[0] = gpsGetTime();
     
     //Go through each sensor and get the data, then add it to the data array
-    //Don't like how I did it, kinda ugly
     //All sensors need to return a float, or else the go server won't interpret it correctly
     for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
-        uint32_t data;
+        float data; //Data from this sensor
         
-        if (strcmp(sensorTypes[i], "Dissolved_Oxygen") == 0) { //DO
-            float tmp = readDO(i);
-            memcpy(&data, &tmp, sizeof(uint32_t));
-        } else if (strcmp(sensorTypes[i], "Conductivity") == 0) { //EC
-            float tmp = readEC(i);
-            memcpy(&data, &tmp, sizeof(uint32_t));
-        } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //TB
-            float tmp = readTB(i);
-            memcpy(&data, &tmp, sizeof(uint32_t));
-        } else {
+        if (strcmp(sensorTypes[i], "Dissolved_Oxygen") == 0) { //Atlas Scientific Dissolved Oxygen
+            data = readAS(i);
+        } else if (strcmp(sensorTypes[i], "Conductivity") == 0) { //Atlas Scientific Electrical Conductivity
+            data = readAS(i);
+        } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //DFRobot Turbidity
+            data = readTB(i);
+        } else { //Should probably handle this better
             data = -1;
         }
         
@@ -478,9 +474,8 @@ uint32_t* readSensors() {
     return ans;
 }
 
-//Read data from an Atlas Scientific dissolved oxygen sensor at index i
-//This and the EC sensor function could be combined into one
-float readDO(uint8_t i) {
+//Read data from an Atlas Scientific sensor at index i
+float readAS(uint8_t i) {
     //Initialise the sensor's software serial
     SoftwareSerial sensor(sensorPorts[i][0], sensorPorts[i][1]);
     sensor.begin(9600);
@@ -488,61 +483,28 @@ float readDO(uint8_t i) {
     //Wake the sensor up
     sensor.print(F("R\r"));
     
-    char buf[16]; //Char buffer for the sensor's response
+    float data = 0.0; //Data for this sensor
     
-    //Make the sensor read until it returns a number
-    do {
-        delay(1000);
-        sensor.print(F("R\r")); //Send the read command to the sensor
-        while (sensor.available() <= 0); //Wait for it's response
-        delay(100);
-        
-        int dataIndex = sensor.readBytesUntil('\r', buf, 16); //Read the response
-        buf[dataIndex] = 0; //Add terminating character
-    } while ((buf[0]<48) || (buf[0]>57)); //While the buffer isn't a number
+    char buf[40]; //Char buffer for the sensor's response
     
-    float data = atof(buf); //Convert the character array response to a float
+    uint8_t tries = 0; //How many times the sensor has been read
+    while (!data && (tries++ < 1)) { //If a 0 is read the first time, will try again just to make sure (have had trouble with EC sensor returning 0 first try for no reason)
+        //Make the sensor read until it returns a number
+        do {
+            delay(1000);
+            sensor.print(F("R\r")); //Send the read command to the sensor
+            while (sensor.available() <= 0); //Wait for it's response
+            delay(100);
+
+            int dataIndex = sensor.readBytesUntil('\r', buf, 16); //Read the response
+            buf[dataIndex] = 0; //Add terminating character
+        } while ((buf[0]<48) || (buf[0]>57)); //While the buffer isn't a number
+
+        data = atof(buf); //Convert the character array response to a float
+    }
     
     //Debugging print statements
     Serial.print(F("Read DO sensor: "));
-    Serial.println(data);
-    
-    //Put sensor to sleep
-    sensor.print(F("Sleep\r"));
-    
-    sensor.end();
-    
-    return data;
-}
-
-//Read data from an Atlas Scientific conductivity sensor at index i
-//This and the DO sensor function could be combined into one, so I won't comment this one
-float readEC(uint8_t i) {
-    SoftwareSerial sensor(sensorPorts[i][0], sensorPorts[i][1]);
-    sensor.begin(9600);
-    
-    //Wake the sensor up
-    sensor.print(F("R\r"));
-    
-    float data = 0.0;
-    
-    char buf[40];
-    uint8_t tries = 0;
-    while (!data && (tries++ < 3)) { //Makes sure to get a non-zero number, for some reason the EC sensors like to read as 0.00 sometimes
-        do {
-            delay(1000);
-            sensor.print(F("R\r"));
-            while (sensor.available() <= 0);
-            delay(100);
-
-            int dataIndex = sensor.readBytesUntil('\r', buf, 40);
-            buf[dataIndex] = 0;
-        } while ((buf[0]<48) || (buf[0]>57));
-
-        data = atof(buf);
-    }
-    
-    Serial.print(F("Read EC sensor: "));
     Serial.println(data);
     
     //Put sensor to sleep
