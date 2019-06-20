@@ -14,6 +14,7 @@ This outline provides a condensed overview of all the research that has been don
 ## GPS
 ## Description
 
+* Summarize what was discussed in "GPS_Notes"
 
 ### General
 * Cheap - less than $50
@@ -36,6 +37,7 @@ This outline provides a condensed overview of all the research that has been don
 ### Antenna
 * This component is by far the heaviest. Choosing a smaller size will reduce weight, but may increase TTFF, thereby reducing battery life
 * Orientation matters
+* Most modules come with a ceramic patch antenna already attached, so more often than not, you do not get to choose the GPS Antenna to use
 
 ## LoRa
 ### LoRa MESH Modules
@@ -51,8 +53,18 @@ This outline provides a condensed overview of all the research that has been don
 
 # Software Breakdown
 
-# Code Overview
+## Code Operation Scenarios
+Depending on the Hardware available, the code will be altered. The following will determine what code is used:  
+* RTC always available
+	* Will alter sleep interval of Arduino
+* Ability to always perform a warm start (i.e. has V Backup)
+	* Will alter time the GPS is running for
+* EN pin available (otherwise a transistor will need to be used)
+	* Will alter Hardware setup and powering of digital I/O pin
+* GPS Protocol used
+	* Will alter how GPS is configured, and how the data is read from it
 
+## Code Overview
 * Run Setup
 	* Serial Setup
 	* NeoGPS Setup
@@ -85,8 +97,6 @@ This outline provides a condensed overview of all the research that has been don
 
 ## Setup
 
-* Initilize Serial Connections
-* 
 
 ## Loop
 
@@ -100,7 +110,7 @@ It would even be possible to program 3 or more different running time intervals
 The following variables must be defined:  
 * Time A  
 * Time B  
-* Short Interval Time  
+* # of fixes per day  
 * Long Interval Time  
 * 
 The following explains how this may be implemented:
@@ -114,7 +124,7 @@ The following explains how this may be implemented:
 
 # GPS Fix Time
 
-With the ability to store aiding data such as almanac, ephemeris, position, RTC, etc. the TTFF can be reduced significantly. However,knowing how long to keep the GPS running to collect this data while also not wasting power is difficult.  
+With the ability to store aiding data such as almanac, ephemeris, position, RTC, etc., the TTFF can be reduced significantly. However, knowing how long to keep the GPS running to collect this data while also not wasting power is difficult.  
 The following is a possible implementation to optimize TTFF and current consumption:
 
 * The GPS originally runs for 12.5 minutes to collect all almanac data (this is assuming this data can be stored and **guaranteed** to not be deleted. 
@@ -124,19 +134,19 @@ The following is a possible implementation to optimize TTFF and current consumpt
 	* Alternatively, data can be read from the GPS that can indicate the status of certain components. Based on what is read, a time may be predicted for when the necessary data will be downloaded
 	* Lastly, a good chunk of the time the Tracker is deployed will be spent underwater where the GPS cannot get a fix. For every time this occur, increment a counter. This counter can be used to alter the allowable fix time, at no extra cost to power consumed
 
-* Additionally, certain things can be monitored to guage the progress of gettng a GPS fix (such as # of satellites in view). THis can be used to provide more/less time to get a fix  
+* Additionally, certain things can be monitored to guage the progress of gettng a GPS fix (such as # of satellites in view). This can be used to provide more/less time to get a fix  
 **Final Thoughts:**
 * It takes 30sec to download ephemeris data. If the GPS module is advertised to get a TTFF from warm start in 30sec, downlaoding ephemeris data is not worth it
 * As long as a warm start is possible (i.e. RTC and position data is saved), TTFF should be fine (30sec or less)
 
 # Reading/Writing UBX Messages
 
-* Usefful data to read from GPS
+* Useful data to read from GPS
 	* TTFF
 	* Real Time Clock Status
 	* DOP (Dilution of Precision)
 	* Position Fix Type
 	* Power Saving Mode State
-	* 
+	*
 
 * Configuring will be much more relavent for Gateways (since thye'll most likley use PSM)

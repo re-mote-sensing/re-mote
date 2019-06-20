@@ -53,11 +53,13 @@ Two nodes will be placed 50m apart, at waist height. One node (host) will transm
 
 An additional test will be done where the node is enclosed in a casing similar to what will be used to protect/waterproof the tracker. THis will enable us to see how much the enclosure limits the range of Trackers LoRa.
 
-## Node (Client) Setup
+The Client will be the Node with the same Antenna for all Tests
+
+## Host Setup
 ### General
 
 * LoRa MESH Module Connected to Arduino Nano
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Client.ino'
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Host.ino'
 * LoRa MESH communicates with Arduino via SoftwareSerial
 
 ### Pinout
@@ -69,10 +71,10 @@ RX     ->   D2
 TX     ->   D3  
 
 
-## Gateway (Host) Setup
+## CLient Setup
 ### General
 * LoRa MESH Module Connected to Arduino Uno
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Host.ino'
+* Arduino Code -> found in 'Ryan Tyrrell19/Code/Antenna_RSSI_Test/LoRa_RSSI_Test_Client.ino'
 * LoRa MESH communicates with Arduino via SoftwareSerial
 
 ### Pinout
@@ -85,17 +87,19 @@ TX     ->   D3
 
 ## Test Procedure & Results
 
-The following antenna will be used for the Gateway:
+The following antenna will be used for the Client:
 
 ![alt-text][Gateway Antenna]
 
-The following antennas will be tested with the node:
+The following antennas will be tested with the Host:
 
 ![alt-text][Test Antennas]
 
-The antennas will be tested from right to left, with the first one representing no antenna.
+The antennas will be tested from left to right, with the last one representing no antenna.
 
+The following location is where the test will be conducted:
 
+![alt-text][RSSI Test Area]
 
 
 # Test 2: Cootes Walk-around Test
@@ -176,3 +180,5 @@ TX     ->   D2
 
 [Gateway Antenna]: https://i.ibb.co/x2M60vc/Gateway-Antennas.jpg
 [Test Antennas]: https://i.ibb.co/VBMqhqq/Test-Antennas.jpg
+
+[RSSI Test Area]: https://i.ibb.co/bQqkWgL/7.png
