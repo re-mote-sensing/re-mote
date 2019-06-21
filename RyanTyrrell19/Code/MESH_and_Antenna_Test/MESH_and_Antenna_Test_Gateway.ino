@@ -56,8 +56,14 @@ void setup() {
 	else {
 		Serial.println("SD Card Initilized");
 	}
+	Serial.println();
+	Serial.println("Reading File...");
+	Serial.println("________________");
+	readSdCard();
+	Serial.println("________________");
+	Serial.println();
+
 	Serial.println("Delete File?");
-	
 	while (!Serial.available()) {
 		SysCall::yield();
 	}
@@ -77,7 +83,6 @@ void setup() {
 	}
 	// Prevents the file from being overwritten
 //	if (!SD.exists("data.txt")) {
-	Serial.println(F("Creating data.txt"));
 	myFile = SD.open("data.txt", FILE_WRITE);
 	myFile.println();
 	myFile.print(F("Node ID\t RSSI\t Lat/Lng \n"));
@@ -124,6 +129,26 @@ void loop() {
 	Serial.println();
 	Serial.println();
 	delay(10);
+}
+
+void readSdCard() {
+
+	myFile = SD.open("data.txt");
+	if (myFile) {
+		Serial.println("data.txt:");
+
+		// read from the file until there's nothing else in it:
+		while (myFile.available()) {
+			Serial.write(myFile.read());
+		}
+		// close the file:
+		myFile.close();
+	}
+	else {
+		// if the file didn't open, print an error:
+		Serial.println("error opening data.txt");
+	}
+
 }
 
 void writeSdCard() {
