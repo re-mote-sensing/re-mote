@@ -39,8 +39,9 @@ The gateway node sends an acknowledgement containing one byte of data, the codes
 | Ack  | Description                                                                      |
 |------|----------------------------------------------------------------------------------|
 | 0x00 | Success; the data was logged                                                     |
-| 0x01 | Fail; the data sent doesn't correspond to the registration data for this node id |
-| 0x02 | Fail; unknown gateway error                                                      |
+| 0x01 | Fail; this node hasn't been registered                                           |
+| 0x02 | Fail; the data sent doesn't correspond to the registration data for this node id |
+| 0x03 | Fail; unknown gateway error                                                      |
 
 
 
