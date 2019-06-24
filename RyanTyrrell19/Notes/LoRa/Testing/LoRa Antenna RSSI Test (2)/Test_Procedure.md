@@ -96,3 +96,19 @@ The antennas will be tested from left to right, with the last one representing n
 The following location is where the test will be conducted:
 
 ![alt-text][RSSI Test Area]
+
+
+[6]: https://lorawantester.com/2019/01/09/5-simple-rules-to-guarantee-a-successful-lorawan-coverage-test/
+
+[DIY RSSI Test]: http://www.ph2lb.nl/blog/index.php?page=lora-measuring-antennas
+[DIY LoRa Range Test]: https://reibot.org/2017/04/23/lora-range-test/
+
+[Antenna Test 1]: https://www.coredump.ch/2017/04/30/lorawan-868mhz-antenna-test-part-2/
+[Antenna Test 2]: https://medium.com/home-wireless/testing-lora-antennas-at-915mhz-6d6b41ac8f1d
+[Testing Environment]: https://i.ibb.co/VVbH171/6.png
+
+[Gateway Antenna]: https://i.ibb.co/x2M60vc/Gateway-Antennas.jpg
+[Test Antennas]: https://i.ibb.co/VBMqhqq/Test-Antennas.jpg
+
+[RSSI Test Area]: https://i.ibb.co/bQqkWgL/7.png
+
