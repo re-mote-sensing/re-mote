@@ -14,9 +14,9 @@
 
 # Read/write UBX commands to/from Arduino
 
-* The GPS reciever can output NMEA, PUBX or the binary UBX protocol
+* The GPS receiver can output NMEA, PUBX or the binary UBX protocol
     * NMEA is the standard protocol with basic GPS data
-    * PUBX (Proprietary UBX Messages) is essentailly the same as NMEA (in terms of data available). The only difference is how the data is formatetd for quicker transmission
+    * PUBX (Proprietary UBX Messages) is essentially the same as NMEA (in terms of data available). The only difference is how the data is formatted for quicker transmission
     * Binary UBX protocol relates to all the various commands you can send, and the multitude of data you may recieve. T
 
 * There are limited resources on how to read and write UBX commands using the Arduino. Most sites limit themselves to reading only the GPS data using UBX.
@@ -33,11 +33,11 @@
 
 # Connecting GPS to Hardware Serial, and still viewing debugging data [[1]] [[2]]
 
-* It is recommended to connect the GPS reciever to the Hardware Serial pins of the Arduino. Unfortunetly, the Arduino Uno, Nano, and Pro Mini only have one, and it is used for viewing debugging data via the Serial Monitor
+* It is recommended to connect the GPS receiver to the Hardware Serial pins of the Arduino. Unfortunately, the Arduino Uno, Nano, and Pro Mini only have one, and it is used for viewing debugging data via the Serial Monitor
 * To remedy this,
     * The GPS will use the Hardware Serial Pins
     * Using an FTDI-to-USB adapter, connect the Arduino to the computer.
-    * AltSoftware Serial is the next best library to Hardware Serial, and so it will be used for recieving debugging infor
+    * AltSoftware Serial is the next best library to Hardware Serial, and so it will be used for receiving debugging info
         * on the UNO, Nano, and Mini, the RX/TX are Pins D8/D9, respectively
     * Open putty, select the correct COM port, and read the debugging messages
 * UPDATE: As of right now, the GPS is connected to the Hardware pins, the debug messages are being output through the standard connector, and no issues are arising
@@ -52,7 +52,7 @@
 
 * Theory: Yes, it does have an RTC. For it to work, it requires
     * a GPS fix so it knows what to set the time to
-    * a constant supply of power to contineu running (i.e. a cell battery)
+    * a constant supply of power to continue running (i.e. a cell battery)
 
 * https://www.u-blox.com/sites/default/files/products/documents/LEA-NEO-MAX-6_HIM_%28UBX-14054794%29_1.pdf
     * "In case of a power failure on pin VCC, the real-time clock and backup RAM are supplied through pin V_BCKP.
@@ -71,8 +71,12 @@ RAM. If no backup battery is connected, the receiver performs a Coldstart at pow
     * "The watchdog rate changes based on the power passing through the chip.  Going from idle to power down, the watchdog will run at a different rate.  Turn on a few digital outputs; different rate.  The watchdog timer is also sensitive to the ambient temperature and the supply voltage.  Even changing the watchdog timer settings alters the rate.
 In addition, the watchdog timer has a lot of jitter.  Under the exact same conditions, the timer will expire at slightly different times"
 
-* Timer used while the Arduino is in Low Power Mode. This timer is know to be very inaccurate, with it flucuating depending on the input voltage and temperature.
+* Timer used while the Arduino is in Low Power Mode. This timer is know to be very inaccurate, with it fluctuating depending on the input voltage and temperature.
 
+
+# GPS Module VK2828U7G5LF comes with an RTC with a lifespan of 2 hours. If the GP were to turn on every hour for 10 seconds, would it extend the lifespan of the RTC?
+* Unfortunately, no. Can try extending the time the GPS run-time or shorten the interval where it's powered off.
+* Theory is that the RTC is powered via a capacitor, and so the capacitor needs time to recharge when connected to a power source. This in not included in the data sheet, so little can be done about proving/testing this.
 
 # If looking into noise again, start here (may be useful for figuring out what antenna to use)
 https://ava.upuaut.net/?p=836

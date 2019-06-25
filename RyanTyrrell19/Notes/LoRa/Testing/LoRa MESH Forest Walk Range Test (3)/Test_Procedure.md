@@ -1,6 +1,5 @@
 # Test 2: Forest Walk  Test
 ## Test Procedure
-* Do the Nodes and Gateways need to use the same antenna??? (same frequency but I don't think need be the same type)
 
 The Gateway will be set up at a static location, preferably at a location higher than where the nodes will be. Two nodes will be taken on a walk In the forest near the track. One will use the DIY Helical antenna, the other will use a more heavy duty antenna (one that a Gateway may use). The antennas to use will be determined from the previous test done (RSSI Test). The nodes will acquire a GPS fix and, every 15 seconds, transmit the coordinates to the Gateway. The nodes will save any coordinates that were sent unsuccessfully on the Arduino's EEPROM. Upon completion, the GPS coordinates received by the Gateway can be compared with that of the GPS coordinates stored to see at what locations the transmission failed.  
 The Gateway will save the received data and RSSI values to an SD card. Someone watching over the Gateway can report if data has stopped being received.
@@ -9,7 +8,6 @@ The Gateway will save the received data and RSSI values to an SD card. Someone w
 ### General
 
 * LoRa MESH Module Connected to Arduino Nano
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/MESH_and_Antenna_Test/MESH_and_Antenna_Test_Node.ino'
 * LoRa MESH communicates with Arduino via AltSoftSerial
 * GPS communicates with Arduino via HardwareSerial
 * Debugging is done via SoftwareSerial using Putty (an adapter must be used to power the Arduino rather than the USB cord provided)
@@ -17,60 +15,69 @@ The Gateway will save the received data and RSSI values to an SD card. Someone w
 
 ### Pinout
 
-LoRa   |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   D8  
-TX     ->   D8  
+| LoRa   |   Arduino  |
+|:------:|:----------:|
+| GND    |  GND  	  |
+| VCC    |   5V  	  |  
+| RX     |   D9  	  |  
+| TX     |   D8  	  |  
 
-GPS   |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   TX  
-TX     ->   RX
 
-PC    |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   D3  
-TX     ->   D2
+| GPS   |   Arduino  |
+|:------:|:----------:|
+| GND    |  GND  	  |
+| VCC    |   5V  	  |  
+| RX     |   TX  	  |  
+| TX     |   RX  	  |  
+
+| PC   |   Arduino  |
+|:------:|:----------:|
+| GND    |  GND  	  |
+| VCC    |   5V  	  |  
+| RX     |   D3  	  |  
+| TX     |   D2  	  |  
+
+### Hardware
+
+![alt-text][Node Setup 1]
+![alt-text][Node Setup 2]
 
 
 ## Gateway Setup
 ### General
 
 * LoRa MESH Module Connected to Arduino Uno
-* Arduino Code -> found in 'Ryan Tyrrell19/Code/MESH_and_Antenna_Test/MESH_and_Antenna_Test_Gateway.ino'
 * LoRa MESH communicates with Arduino via AltSoftSerial
 * GPS communicates with Arduino via HardwareSerial
-* Debugging is done via SoftwareSerial using Putty (an adapter must be used to power the Arduino rather than the USB cord provided)
-* Data read/write to SD card via Arduino's dedicated SPI pins
+* Debugging is done via SoftwareSerial using the Arduino Serial Monitor
+* Data read/write to SD card via Arduino's **dedicated SPI pins**
 
 ### Pinout
 
-LoRa   |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   D8  
-TX     ->   D8  
+| LoRa   |   Arduino  |
+|:------:|:----------:|
+| GND    |  GND  	  |
+| VCC    |   5V  	  |  
+| RX     |   D9  	  |  
+| TX     |   D8  	  |  
 
-GPS   |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   TX  
-TX     ->   RX
+| PC   |   Arduino  |
+|:------:|:----------:|
+| GND    |  GND  	  |
+| VCC    |   5V  	  |  
+| RX     |   D3  	  |  
+| TX     |   D2  	  | 
 
-PC    |   Arduino  
-GND    ->   GND  
-VCC    ->   5V  
-RX     ->   D3  
-TX     ->   D2
+### Hardware
+
+![alt-text][Gateway Setup 1]
+
 
 # Result & Notes
 ## Results
-* A Preliminary Test was done at ITB to ensure the test was working properly
+* A Preliminary Test was done at ITB to ensure the test was working properly. The results can be found in the excel file, in the heading labelled "Preliminary Test"
 * Data can be viewed in the Excel file "Forest Walk Data.xlsv"
-* The Gateway was moved at one point during the test. This can be seen from where the black lines start/stop.
+* The Gateway was moved at one point during the test. This can be seen from where the black lines starts.
 
 That data can be view and  examined [here][Map Site]. It has been summarized below in case the link no longer works:  
 
@@ -97,3 +104,6 @@ Dark Blue - Data not received
 [Node 2 (Gateway)]: https://i.ibb.co/ZGHZ3zh/Node-2-Node-2-Gateway.png
 [Node 2 & Node 2 (Gateway)]: https://i.ibb.co/k6mWMtR/Node-2.png
 
+[Node Setup 1]: https://i.ibb.co/x6nd0kT/Node-Setup-1.jpg
+[Node Setup 2]: https://i.ibb.co/8MD8q6L/Node-Setup-2.jpg
+[Gateway Setup 1]: https://i.ibb.co/MBP10c6/Gateway-Setup-2.jpg
