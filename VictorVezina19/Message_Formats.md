@@ -47,7 +47,7 @@ The main message sent from an end node to the gateway, contains read sensor data
 
 |**Description**|Message type and number of sensors|Number of Locations|Locations|Data Points|
 |-|-|-|-|-|
-| **Size in bytes** | 1 | 1 | 1 x Number of locations | 4 x (Number of sensors + 1) x Number of data points + 2 x Number of locations |
+| **Size in bytes** | 1 | 1 | 1 x Number of locations | 4 x (Number of sensors + 1) x Number of data points + 8 x Number of locations |
 | **Contents** | First 4 bits are 0001, as 1 is the message type, next 4 bits is the number of sensors for this end node | Byte representing how many locations are being sent with this data | A series of bytes, each one represents the number of a data point that has an associated location | The data collected by the end node's sensors and GPS |
 
 **NOTE:** Location data is only sent when either the latitude or longitude of the end node changes by more than 0.00005 degrees [(~5.57 m)](https://en.wikipedia.org/wiki/Decimal_degrees#Precision) due to inaccuracies possible in the gps module.
