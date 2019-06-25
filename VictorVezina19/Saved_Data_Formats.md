@@ -78,12 +78,22 @@ As can be seen, saving space is much less important when dealing with the SD car
 
 ## Raspberry Pi Sever
 
-The format that the Raspberry Pi server uses to save the time, location, and sensor data from multiple nodes in its InfluxDB database (default name is MacWater). The database has one measurement (table) named sensorData, which contains the following columns:
+The format that the Raspberry Pi server uses to save the time, location, and sensor data from multiple nodes in its InfluxDB database (default name is MacWater). The database has two measurements (tables) named sensorInfo and sensorMeasurements. sensorInfo looks like: 
 
-| **time** | **id** | **name** | **latitude** | **longitude** | **sensortype** | **value** |
-|----------|--------|----------|--------------|---------------|----------------|-----------|
+| **time** | **id** | **name** | **value** |
+|----------|--------|----------|-----------|
 
-Each entry in the database represents a sensor reading, and must contains at least a time, id, sensortype, and value. The other columns (name, latitude, and longitude) can be blank, but must be present for each individual node id at least once. The id, name, latitude, longitude, and sensortype columns are all represented as strings, whereas the value column is represented as a float.
+In this case, value is a string representing the latitude and longitude of the node (ex: "43.258506,-79.920547"). This table is used to keep tack of the nodes' names and locations, their "info". Every entry in the table represents a location change, and must contain a time, id, and value. The name column only needs to be filled once per node id. Every column in this table is represented as a string
+
+<br/>
+
+sensorMeasurements looks like: 
+
+| **time** | **id** | **sensortype** | **value** |
+|----------|--------|----------------|-----------|
+
+
+This entry is used to log the actual sensor data from the nodes. Each entry in this table represents a sensor reading, and must contains a time, id, sensortype, and value. The id and sensortype columns are represented as strings, whereas value is a float.
 
 
 
