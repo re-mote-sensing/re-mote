@@ -1,3 +1,24 @@
+# TODO List
+
+1. Solder pins on water sensor
+7. Use the rfm_95 modules to check range
+
+3. Use GPS signal for testing underwater; have LoRa transmisison as a backup (since packets may be lost, not reliable method)
+
+3. Try RTC test again, this time let GPS run for 20sec every hour
+    * Just have a check for if any satellites have been aquired in X amount of time 
+
+4. Brainstorm ideas on how to locate the turtle
+    * What if the Tracker battery dies?
+    * Arduino is completely powered off. How are you suppose to locate it?
+    * MESH module fraw 10ma in IDLE so it cannot be left on. How about the other LoRa modules in IDEL? If they don't draw a lot pf power, they can be left on, and maybe used as an interupt.
+8. Unify the code with Victor
+9. Issues with MESH moduels conflicting issue. Try using Victos Acknowledgement code?
+2. Put together an order list for the Turtle Trackers
+
+
+
+
 # Meeting Outline
 
 1. Configuring GPS via Arduino
