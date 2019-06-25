@@ -3,6 +3,7 @@
     * Connecting GPS to Hardware Serial, and still viewing debugging data
     * Does the GPS have an RTC?
     * Evidence that the Watchdog Timer (used when the Arduino enters LowPower.Sleep() mode) is indeed inaccurate
+    * PS Module VK2828U7G5LF comes with an RTC with a lifespan of 2 hours. If the GP were to turn on every hour for 10 seconds, would it extend the lifespan of the RTC?
     *
     * Rather then use GPS, setup up an abundant supply of Gateways and use them to triangulate the location of the Nodes
     * Can LoRa transmit underwater?
