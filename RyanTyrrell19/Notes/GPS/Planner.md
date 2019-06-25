@@ -5,6 +5,8 @@
 
 3. Use GPS signal for testing underwater; have LoRa transmisison as a backup (since packets may be lost, not reliable method)
 
+4. Check out the Datasheet of the LoRa MESH Modules provided by Spencer
+
 3. Try RTC test again, this time let GPS run for 20sec every hour
     * Just have a check for if any satellites have been aquired in X amount of time 
 
@@ -16,7 +18,17 @@
 9. Issues with MESH moduels conflicting issue. Try using Victos Acknowledgement code?
 2. Put together an order list for the Turtle Trackers
 
+# Ideas for the Above Stuff
+* Locate Turtle
+    * Have a check for battery voltage. When it drops below a certain level, an leternate mode is activated. For example, the Tracker becomes a beacon, outputting it's GPS coordinates every 10min or so (assuming it is not underwater). The payloads in this mode could be marked differently so it is know that the Tracekrs have entered a low battery state.
 
+* The Trackers are not configurable, but the Gatways are, and they can communicate with the nodes
+    * When data is sent fron the node to the Gateway, the Gateway can send back the ACk along with some commands on what the Node should do, such as enter Beacon Mode for locating.
+
+* With the RFM95, try,
+    * Setting up a Mesh network
+    * Low power, always receiving mode?
+    * Wake up Arduino via Interupt pin?
 
 
 # Meeting Outline
