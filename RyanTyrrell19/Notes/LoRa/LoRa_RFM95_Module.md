@@ -153,6 +153,22 @@ In the receiver operating mode two states of functionality are defined. Upon ini
 
 The AGC feature allows receiver to handle a wide Rx input dynamic range from the sensitivity level up to maximum input level of 0dBm or more, whilst optimizing the system linearity.
 
+## RFMx series
+
+* RFM95 & RFM69HCW - Only difference is the frequency they are attuned for (The hardware related to the frequency setting)
+	* RFM96 is for 433MHz
+	* RFM95 is for 868/915 MHz
+	* Both have RF96 on the black chip - ignore it
+
+* RFM69HCW & RFM9x are pin compatible with each other. (i.e. same pin layout)
+	* * can be mounted on the same SMD footprint
+* RFM95/95 **not** compatible with the RFM69 Library
+
+![alt-text][Transceiver Compatibility Chart]
+
+[source][4]
+
+
 # [RadioHead Library][RadioHead Library]
 * Caution: Developing this type of software and using data radios successfully is challenging and requires a substantial knowledge base in software and radio and data transmission technologies and theory. It may not be an appropriate project for beginners. If you are a beginner, you will need to spend some time gaining knowledge in these areas first.
 
@@ -179,6 +195,8 @@ The AGC feature allows receiver to handle a wide Rx input dynamic range from the
 [LoRa Symbol Rate]: https://i.ibb.co/zRzPv2j/Lo-Ra-Symbol-Rate.png
 [Receiver Startup Time]: https://i.ibb.co/6BGvtqy/Receiver-Startup-Time.png
 
+[Transceiver Compatibility Chart]: https://ibb.co/KqgXR6f
+
 [Time on air 1]: https://i.ibb.co/TTP9VyK/Time-on-air-1.png
 [Time on air 2]: https://i.ibb.co/M9PMMGf/Time-on-air-2.png
 [Time on air 3]: https://i.ibb.co/jHSM57Q/Time-on-air-3.png
@@ -187,3 +205,4 @@ The AGC feature allows receiver to handle a wide Rx input dynamic range from the
 [1]: https://cdn.sparkfun.com/assets/learn_tutorials/8/0/4/RFM95_96_97_98W.pdf
 [2]: https://eprints.lancs.ac.uk/id/eprint/85515/4/lora_tps_r1342.pdf
 [3]: https://www.airspayce.com/mikem/arduino/RadioHead/classRH__RF95.html#a6f4fef2a1f40e704055bff09799f08cf
+[4]: https://lowpowerlab.com/guide/moteino/transceivers/
