@@ -17,6 +17,7 @@
 8. Unify the code with Victor
 9. Issues with MESH moduels conflicting issue. Try using Victos Acknowledgement code?
 2. Put together an order list for the Turtle Trackers
+5. Talk to Victor about RAM
 
 # Ideas for the Above Stuff
 * Locate Turtle
