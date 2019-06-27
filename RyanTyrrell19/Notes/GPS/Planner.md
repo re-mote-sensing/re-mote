@@ -1,3 +1,15 @@
+
+# Meeting/ToDO
+1. What I've been doing fo the past 3 days
+    * Reading about the LoRa modules and what they are capable of
+        * Much like the GPS's, these modules are packed with features, went through very slowly to learn about a lot of them
+    * Reading forums to see what people have done
+        * Wanted to see what was out there in regars to a low power listening mode
+2. Show the notes I took while reading
+3. Outline what I've come up with experimentally, the benefits, and how it could be applied to our projects
+
+
+
 # TODO List
 
 1. Solder pins on water sensor
@@ -31,6 +43,11 @@
     * Low power, always receiving mode?
     * Wake up Arduino via Interupt pin?
 
+* To prevent Arduino from running while CAD is on (CAD runs for very short period of time, but arduino will still draw decent current in that time)
+* Arduion wakes up, runs cad (does it block?)
+* Attach interupt to pin that CAD outputs to
+* Have arduino sleep untill woken by CAD
+* Proceed normally
 
 # Meeting Outline
 
