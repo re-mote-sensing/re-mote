@@ -59,18 +59,18 @@ The node can have any number of sensors (although the LoRa message formats limit
 
 There is then an additional .csv on the SD card named ToSend.csv, which contains data on what node data still needs to be posted to the server. Its format is as follows, again where things in brackets are replaced by actual data:
 
-Node ID, Data Points, Position  
-(Node 1 ID), (Number of data points node 1 has to send), (Position in the node 1 file where the data to be sent starts)  
+Node ID, Data Points, Locations, Position  
+(Node 1 ID), (Number of data points node 1 has to send), (Number of data points that have a location), (Position in the node 1 file where the data to be sent starts)  
 (Node 2)  
 ...
 
 **Example:**  
-Node ID, Data Points, Position  
-2,001,48  
-4,003,104  
-3,001,763
+Node ID, Data Points, Locations, Position  
+2,002,001,48  
+4,003,000,763  
+3,001,001,104
 
-Both the ID and position in the file are printed as whatever length, but the number of data points is always printed as a 3 digit number (using leading zeros if needed). Please note: Only nodes that have data to send to the server will have data in this file, and a node cannot have more than 255 data points waiting to be sent to the server.
+Both the ID and position in the file are printed as whatever length, but the number of data points and the number of locations are always printed as 3 digit numbers (using leading zeros if needed). Please note: Only nodes that have data to send to the server will have data in this file, and a node cannot have more than 255 data points or locations waiting to be sent to the server.
 
 <br/>
 
@@ -86,7 +86,7 @@ This gives us:
 <br/>
 
 **Rationale:**  
-As can be seen, saving space is much less important when dealing with the SD card on the gateway node. That is why I was able to take some liberties to make data reading, writing, and analizing easier. This includes using the .csv format, which can take extra overhead space with the commas, but allows for easy importing into excel, which could be very useful for daa analysis. It also allowed using strings for saving the data, making it much easier for humans to read it. It also allowed saving a bit of extra data in ToSend.csv (number of data points), which isn't strictly necessary, but allows the gateway Arduino to quickly get the size required for the data post to the server before constructing the post, which stops [heap fragmentation](https://cpp4arduino.com/2018/11/06/what-is-heap-fragmentation.html).
+As can be seen, saving space is much less important when dealing with the SD card on the gateway node. That is why I was able to take some liberties to make data reading, writing, and analizing easier. This includes using the .csv format, which can take extra overhead space with the commas, but allows for easy importing into excel, which could be very useful for daa analysis. It also allowed using strings for saving the data, making it much easier for humans to read it. It also allowed saving a bit of extra data in ToSend.csv (number of data points and number of locations), which aren't strictly necessary, but allows the gateway Arduino to quickly get the size required for the data post to the server before constructing the post, which stops [heap fragmentation](https://cpp4arduino.com/2018/11/06/what-is-heap-fragmentation.html).
 
 <br/>
 
