@@ -1,58 +1,82 @@
 
 # Meeting/ToDO
-1. What I've been doing fo the past 3 days
-    * Reading about the LoRa modules and what they are capable of
+1. What I've been doing for the past 3 days
+    * Reading about the LoRa rfm95 modules and what they are capable of
         * Much like the GPS's, these modules are packed with features, went through very slowly to learn about a lot of them
     * Reading forums to see what people have done
-        * Wanted to see what was out there in regars to a low power listening mode
+        * Wanted to see what was out there in regards to a low power listening mode
 2. Show the notes I took while reading
 3. Outline what I've come up with experimentally, the benefits, and how it could be applied to our projects
+
 
 
 
 # TODO List
 
 1. Solder pins on water sensor
-7. Use the rfm_95 modules to check range
+7. Use the rfm95 modules to check range
 
-3. Use GPS signal for testing underwater; have LoRa transmisison as a backup (since packets may be lost, not reliable method)
+3. Use GPS signal for testing underwater; have LoRa transmission as a backup (since packets may be lost, not reliable method)
 
 4. Check out the Datasheet of the LoRa MESH Modules provided by Spencer
 
 3. Try RTC test again, this time let GPS run for 20sec every hour
-    * Just have a check for if any satellites have been aquired in X amount of time 
+    * Just have a check for if any satellites have been acquired in X amount of time 
 
 4. Brainstorm ideas on how to locate the turtle
     * What if the Tracker battery dies?
     * Arduino is completely powered off. How are you suppose to locate it?
-    * MESH module fraw 10ma in IDLE so it cannot be left on. How about the other LoRa modules in IDEL? If they don't draw a lot pf power, they can be left on, and maybe used as an interupt.
+    * MESH module from 10ma in IDLE so it cannot be left on. How about the other LoRa modules in IDE? If they don't draw a lot pf power, they can be left on, and maybe used as an interrupt.
 8. Unify the code with Victor
-9. Issues with MESH moduels conflicting issue. Try using Victos Acknowledgement code?
+9. Issues with MESH modules conflicting issue. Try using Victors Acknowledgement code?
 2. Put together an order list for the Turtle Trackers
 5. Talk to Victor about RAM
 
 # Ideas for the Above Stuff
 * Locate Turtle
-    * Have a check for battery voltage. When it drops below a certain level, an leternate mode is activated. For example, the Tracker becomes a beacon, outputting it's GPS coordinates every 10min or so (assuming it is not underwater). The payloads in this mode could be marked differently so it is know that the Tracekrs have entered a low battery state.
+    * Have a check for battery voltage. When it drops below a certain level, an alternate mode is activated. For example, the Tracker becomes a beacon, outputting it's GPS coordinates every 10min or so (assuming it is not underwater). The payloads in this mode could be marked differently so it is know that the Trackers have entered a low battery state.
+        * The LoRa rfm95 modules apperently have a Low Battery Indicator that is set when the voltage goes below a certain threshold
 
-* The Trackers are not configurable, but the Gatways are, and they can communicate with the nodes
-    * When data is sent fron the node to the Gateway, the Gateway can send back the ACk along with some commands on what the Node should do, such as enter Beacon Mode for locating.
+* The rfm95
+    * Can be put to sleep (draw about 20 uC)
+
+
+* Always have the Trackers able to receive
+    * The rfm95 modules have a mode called Channel Activity Detection (CAD). This mode basically checks to see if there are any messages in the air. This mode runs for a very short period of time (it is based on the SF and bandwidth) and draws little current. The Trackers can be put in a loop where every X amount of time (500ms, 4 seconds, etc.), the Arduino wakes up, enters CAD mode, if it returns false, put the driver to sleep and then the Arduino to sleep. If it returns true, that means a message is in the air, turn on and wait to receive.
+    * Still working on getting it to run smoothly but
+        * Looks like current consumption is still very low. Will try connecting to Arduino Pro Mini and see what overall consumption is.
+        * Whatever is sendign the message must do so multiple times. the first message will be to wake the Tracker up, than it must be sent again for the Tracker to receive it. The Radiohead library already conmes equiped with the abilty to continuously resend unreceived messages so not a big deal
+        * In regards to a MESH network, have not tried yet. A library already exists to create one. I believe, if I can get the packets sending/receive smoothly without anything being missed, I could get this working.
+
+* The Trackers are not configurable, but the Gateways are, and they can communicate with the nodes
+    * When data is sent from the node to the Gateway, the Gateway can send back the ACk along with some commands on what the Node should do, such as enter Beacon Mode for locating.
 
 * With the RFM95, try,
     * Setting up a Mesh network
     * Low power, always receiving mode?
     * Wake up Arduino via Interupt pin?
 
-* To prevent Arduino from running while CAD is on (CAD runs for very short period of time, but arduino will still draw decent current in that time)
+* To prevent Arduino from running while CAD is on (CAD runs for very short period of time, but Arduino will still draw decent current in that time)
 * Arduion wakes up, runs cad (does it block?)
-* Attach interupt to pin that CAD outputs to
-* Have arduino sleep untill woken by CAD
+* Attach interrupt to pin that CAD outputs to
+* Have Arduino sleep until woken by CAD
 * Proceed normally
+
+
+
+
+
+
+
+
+
+
+
 
 # Meeting Outline
 
 1. Configuring GPS via Arduino
-    * Sendign commands is easy. Just copy Binary commands produced by U-center and paste into Arduino code. Easy to add more commands
+    * Sending commands is easy. Just copy Binary commands produced by U-center and paste into Arduino code. Easy to add more commands
     * Reading also farily easy, somewhat tedious to organize what's been read. Not very beneficial for Trackers. More useful for Gateways
     * List of useful data to read from GPS
 2. Go over current Tracker code

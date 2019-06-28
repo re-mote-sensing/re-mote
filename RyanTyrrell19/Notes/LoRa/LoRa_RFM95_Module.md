@@ -5,8 +5,7 @@
 * Low Battery Detector
 	* A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
 
-
-* Beacon Mode
+* Beacon Mode (only in FSK/OOK Mode)
 	* In some short range wireless network topologies a repetitive message, also known as beacon, is transmitted periodically by a transmitter. The Beacon Tx mode allows for the re-transmission of the same packet without having to fill the FIFO multiple times with the same data.
 
 * Built-in Temperature Sensor
@@ -16,8 +15,6 @@
 
 
 # Links with Key Notes Summarized
-
-
 
 
 * [Ultra low power listening mode for battery nodes][Site 3]
