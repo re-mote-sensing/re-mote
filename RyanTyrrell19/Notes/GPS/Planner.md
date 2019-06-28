@@ -10,11 +10,25 @@
 
 
 
+* Recorder EVERYTHIND read/attempted/done
+# TODO List (In order pf Priority)
 
-# TODO List
+1. Make up a doc about all the different components/sensors used (LoRa, arduino's, etc), write down the power consumed, whats good about it, why we didn't use it etc.
+    * LoRa Modules
+    * Different Microcontrollers
+        * Arduino
+        * Motenio
+        * Texas Intruments
+
+2. Make up 3 different tests for potential MESH setups
+    * MESH modules; always running
+    * MESH modules; synchronized using RTC to run 10min every hour
+    * RFM95 Modules; Need more research
+
+3. Unify Code between projects and get on the same page for the different setups (Trackers, nodes, Gateway, relyers)
 
 1. Solder pins on water sensor
-7. Use the rfm95 modules to check range
+7. Check range of RFM95 Modules
 
 3. Use GPS signal for testing underwater; have LoRa transmission as a backup (since packets may be lost, not reliable method)
 
@@ -26,11 +40,13 @@
 4. Brainstorm ideas on how to locate the turtle
     * What if the Tracker battery dies?
     * Arduino is completely powered off. How are you suppose to locate it?
-    * MESH module from 10ma in IDLE so it cannot be left on. How about the other LoRa modules in IDE? If they don't draw a lot pf power, they can be left on, and maybe used as an interrupt.
-8. Unify the code with Victor
+    * MESH module from 10ma in IDLE so it cannot be left on. How about the other LoRa modules in IDLE? If they don't draw a lot pf power, they can be left on, and maybe used as an interrupt.
 9. Issues with MESH modules conflicting issue. Try using Victors Acknowledgement code?
 2. Put together an order list for the Turtle Trackers
-5. Talk to Victor about RAM
+5.
+6. See if a MESH network with the RFM95 modules is possible and power consumer is low
+
+
 
 # Ideas for the Above Stuff
 * Locate Turtle
@@ -39,13 +55,13 @@
 
 * The rfm95
     * Can be put to sleep (draw about 20 uC)
-
+    * Apparently has a Low Battery Detector and Temp. Sensor
 
 * Always have the Trackers able to receive
     * The rfm95 modules have a mode called Channel Activity Detection (CAD). This mode basically checks to see if there are any messages in the air. This mode runs for a very short period of time (it is based on the SF and bandwidth) and draws little current. The Trackers can be put in a loop where every X amount of time (500ms, 4 seconds, etc.), the Arduino wakes up, enters CAD mode, if it returns false, put the driver to sleep and then the Arduino to sleep. If it returns true, that means a message is in the air, turn on and wait to receive.
     * Still working on getting it to run smoothly but
         * Looks like current consumption is still very low. Will try connecting to Arduino Pro Mini and see what overall consumption is.
-        * Whatever is sendign the message must do so multiple times. the first message will be to wake the Tracker up, than it must be sent again for the Tracker to receive it. The Radiohead library already conmes equiped with the abilty to continuously resend unreceived messages so not a big deal
+        * Whatever is sending the message must do so multiple times. the first message will be to wake the Tracker up, than it must be sent again for the Tracker to receive it. The Radiohead library already conmes equiped with the abilty to continuously resend unreceived messages so not a big deal
         * In regards to a MESH network, have not tried yet. A library already exists to create one. I believe, if I can get the packets sending/receive smoothly without anything being missed, I could get this working.
 
 * The Trackers are not configurable, but the Gateways are, and they can communicate with the nodes
