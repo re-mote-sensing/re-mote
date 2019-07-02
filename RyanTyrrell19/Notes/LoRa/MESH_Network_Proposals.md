@@ -83,19 +83,52 @@ Power consumed - of RFM95 + Arduino Pro Mini (3.3V)
 
 ## RFM95
 
-Sleep - approx. 1uA
-Receiving - 10 - 12mA (Depends on the settings used)
-Transmitting - 20 - 120mA (Depends on the settings used)
+Sleep - approx. 1uA  
+Receiving - 10 - 12mA (Depends on the settings used)  
+Transmitting - 20 - 120mA (Depends on the settings used)  
 
-CAD Duration:
+CAD:  
+* Taken from the Datasheet of the RFM95,
 
 LoRa Symbol Rate = BW / 2^SF, where BW = Bandwidth, SF = Spreading Factor
 
-CAD Duration,
+The time taken for the channel activity detection is dependent upon the LoRa modulation settings used. For a given configuration the typical CAD detection time is shown in the graph below, expressed as a multiple of the LoRa symbol period. Of this period the radio is in receiver mode for (2^SF + 32) / BW seconds. For the remainder of the CAD cycle the radio is in a reduced consumption state.
+
 ![alt-text][CAD as a Function of SF]
 
+To illustrate this process and the respective consumption in each mode, the CAD process follows the sequence of events outlined below:
+
+![alt-text][Consumption Profile of the LoRa CAD profile]
+
+The receiver is then in full receiver mode for just over half of the activity detection, followed by a reduced consumption processing phase where the consumption varies with the LoRa bandwidth as shown in the table below.
+
+![alt-text][LoRa CAD Consumption Figure]
+
+
+Example:
+
+Let SF = 7 (128 chips/symbol), BW = 125kHz  
+Symbol rate = BW / 2^SF = 125000 / 2^7 = 976.56 symbols/second
+
+With SF = 7, CAD runs for a total time of approx. 1.92 Symbols (according to the chart)
+
+Total CAD time = (1/976.56) * 1.92 = 1.966 milliseconds
+
+Of that time, Receiver mode is running for (2^SF + 32) / BW = (2^7 + 32) / 125000 = 1.28 milliseconds
+
+
+Remainder of the CAD process = 1.966 - 1.28 = 0.686 milliseconds
+
+At 125 kHz, power consumed during receiver mode is 10.8mA and power for the remainder of CAD is 5.6 mA.
+
+Therefore, total current consumed is (10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)
 
 
 
 
-[CAD as a Function of SF]: https://ibb.co/18mXZCy
+
+
+
+[CAD as a Function of SF]:https://i.ibb.co/J5spnY6/CAD-as-a-Function-of-SF.png
+[Consumption Profile of the LoRa CAD profile]: https://i.ibb.co/3fd2R2v/Consumption-Profile-of-the-Lo-Ra-CAD-profile.png 
+[LoRa CAD Consumption Figure]: https://i.ibb.co/FsSK3RP/Lo-Ra-CAD-Consumption-Figure.png
