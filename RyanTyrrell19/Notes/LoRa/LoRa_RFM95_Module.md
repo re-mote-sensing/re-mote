@@ -196,7 +196,7 @@ See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated
 [LoRa Symbol Rate]: https://i.ibb.co/zRzPv2j/Lo-Ra-Symbol-Rate.png
 [Receiver Startup Time]: https://i.ibb.co/6BGvtqy/Receiver-Startup-Time.png
 
-[Transceiver Compatibility Chart]: https://ibb.co/KqgXR6f
+[Transceiver Compatibility Chart]: https://i.ibb.co/cF91MJZ/Transceiver-Compatibility-Chart.png
 
 [Time on air 1]: https://i.ibb.co/TTP9VyK/Time-on-air-1.png
 [Time on air 2]: https://i.ibb.co/M9PMMGf/Time-on-air-2.png
