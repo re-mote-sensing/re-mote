@@ -11,7 +11,7 @@
 
 
 * Recorder EVERYTHIND read/attempted/done
-# TODO List (In order pf Priority)
+# TODO List (In order of Priority)
 
 1. Make up a doc about all the different components/sensors used (LoRa, arduino's, etc), write down the power consumed, whats good about it, why we didn't use it etc.
     * LoRa Modules
