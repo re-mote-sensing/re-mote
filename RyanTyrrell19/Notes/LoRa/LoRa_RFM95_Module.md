@@ -1,7 +1,6 @@
 # Overview
 
 # Neat Features
-
 * Low Battery Detector
 	* A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
 
@@ -175,6 +174,8 @@ The AGC feature allows receiver to handle a wide Rx input dynamic range from the
 ## RadioHead MESh Network
 
 See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated) example on a NESH network setup. This example has each node display it's routing table. Could be useful.
+
+* **Recall the RFM95 Moduels DO NOT g oto sleep when powered via USB**
 
 [Site 1]: https://lowpowerlab.com/forum/low-power-techniques/any-success-with-lora-low-power-listening/
 [Site 2]: https://lowpowerlab.com/forum/low-power-techniques/using-listenmode-as-wakeup-timer/15/
