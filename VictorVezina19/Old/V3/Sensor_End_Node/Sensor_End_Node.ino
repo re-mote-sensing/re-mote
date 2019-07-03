@@ -11,25 +11,22 @@
 #define LORA_TX 6                //Pin that the LoRa RXD pin is connected to
 #define GPS_RX 2                 //Pin that the GPS TXD pin is connected to
 #define GPS_TX 3                 //Pin that the GPS RXD pin is connected to
-#define GPS_EN 10                //Pin that the GPS EN pin is connected to
 
 // The following paramaters have to do with the sensors you're using on this end node
 // Look on our GitLab (LINK!) for more information on sensor setup and how to edit these values
-#define NUMBER_SENSORS 4 //Max is 15
-char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Conductivity", "Turbidity", "Temperature"};
-uint8_t sensorPorts[NUMBER_SENSORS][2] = { {12, 11}, {9, 8}, {5, 20}, {4, 0} };
+#define NUMBER_SENSORS 3 //Max is 15
+char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Conductivity", "Turbidity"};
+uint8_t sensorPorts[NUMBER_SENSORS][2] = { {12, 11}, {9, 8}, {5, 20} };
 
 
 /*
 Things to do:
+- Make location part of sensor data
+- Make name part of registration
 - Split functions into driver files
+- Change initialiseAtlas
 - Change code structure to use event loop
 - Change to NEOGPS
-- Add proper error ack handling
-- Change Atlas reading (add temp/salinity compensation)
-- Replace all delays with sleeps
-- Robustify
-- When fail wait random time to offset
 */
 
 /* Event loop general idea:
@@ -117,10 +114,6 @@ sleep {
 #include <EEPROM.h>
 #include <Time.h>
 #include <TinyGPS++.h>
-#include <OneWire.h>
-
-#include <avr/sleep.h>
-#include <avr/wdt.h>
 
 /*-------------------------CONSTRUCTORS-------------------------*/
 
@@ -134,15 +127,6 @@ SoftwareSerial gpsPort(GPS_RX, GPS_TX);
 unsigned long currTime; //The last updated unix time from the gps
 unsigned long timeLastUpdated; //The millis() value that the unix time was updated
 uint8_t timesRead = 0; //The amount of times the sensors have been read
-
-float latitude;
-float longitude;
-
-float lastLat;
-float lastLon;
-
-unsigned long gpsLocTime = 60000;
-unsigned long gpsTimeTime = 30000;
 
 /*---------------------------SETUP------------------------------*/
 
@@ -161,32 +145,12 @@ void setup() {
     
     registerNode(); //Register this node with the gateway
     
-    pinMode(GPS_EN, OUTPUT);
-    digitalWrite(GPS_EN, HIGH);
-    
     gpsPort.begin(9600); //Begin the gps software serial
     
     delay(250);
     
-    //For debugging where you can't get a GPS signal
-    bool bypassGPS = true;
-    
-    if (bypassGPS) {
-        latitude = 43;
-        longitude = -79;
-        lastLat = 0;
-        lastLon = 0;
-        currTime = 1561742241;
-        timeLastUpdated = 0;
-        gpsLocTime = 0;
-        gpsTimeTime = 0;
-    } else {
-        gpsSetLocation(true);
-        gpsSetTime(true);
-    }
-    
-    //readSensors(); //Throw away first read, sometimes it's wrong (especially for TB)
-    
+    sendLocation(true); //Send this node's location to the gateway. Force is set to true, so it will continue trying until it's successfull
+
     //Check if EEPROM has ever been used, if not initialise it correctly
     unsigned int initialCheck = 0;
     EEPROM.get(0, initialCheck);
@@ -199,9 +163,9 @@ void setup() {
     }
 
     //Used for resetting the saved data
-    unsigned int i = 4;
-    EEPROM.put(0, i);
-    EEPROM.put(2, i - 1);
+    //unsigned int i = 4;
+    //EEPROM.put(0, i);
+    //EEPROM.put(2, i - 1);
     
     delay(500);
 }
@@ -209,13 +173,16 @@ void setup() {
 /*----------------------------LOOP------------------------------*/
 
 void loop() {
+    //Tries to send this node's location every ten sensor reads
+    if (timesRead++ >= 10) {
+        if (sendLocation(false)) {
+            timesRead = 0;
+        }
+    }
+    
     unsigned long start = millis(); //The time this sensor read is starting
     
-    digitalWrite(GPS_EN, HIGH);
-    
     saveData(readSensors()); //Read the sensors and save the data to the EEPROM
-    
-    digitalWrite(GPS_EN, LOW);
     
     loraPort.listen();
     
@@ -224,18 +191,18 @@ void loop() {
     
     //Send data until either an acknowledgement isn't received or there's no data left to send
     while (received == 0) {
-        Serial.println(F("Sending"));
+        Serial.print(F("Sending again"));
         received = sendSensorData();
-        Serial.print(F("Received ack: "));
-        Serial.println(received);
-        delay(250);
     }
     
     //Delay the appropriate amount of time before the next sensor read
     if (received > 1) {
-        delayOverflow(90000, start); //If sending the data wasn't successful then wait 3/4 of the full time, to offset this node from the gateway
+        Serial.println(F("Didn't recieve ack"));
+        delayOverflow(45000, start); //If sending the data wasn't successful then wait 3/4 of the full time, to offset this node from the gateway
     } else {
-        delayOverflow(120000, start); //If sending tha data was successful then wait the full time
+        Serial.print(F("Received ack: "));
+        Serial.println(received);
+        delayOverflow(60000, start); //If sending tha data was successful then wait the full time
     }
 }
 
@@ -253,8 +220,6 @@ void initialiseSensors() {
             initialiseAtlas(i);
         } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //TB
             initialiseTB(i);
-        } else if (strcmp(sensorTypes[i], "Temperature") == 0) { //Temp
-            initialiseTemp(i);
         }
     }
     return;
@@ -269,93 +234,12 @@ void initialiseAtlas(uint8_t i) {
     SoftwareSerial sensor(sensorPorts[i][0], sensorPorts[i][1]);
     sensor.begin(9600);
     
-    //For some reason it seems you have to send a couple random commands at startup
-    //sensor.print(F("R\r"));
-    //delay(100);
+    //For some reason it seems you have to send a couple random commands before sending the sleep command
     sensor.print(F("R\r"));
-    
-    //Wait for response and get rid of it
-    while (!(sensor.available())) ;
     delay(100);
-    while (sensor.available()) sensor.read() ;
-    
-    sensor.print(F("OK,1\r")); //Turn on OK responses (does nothing on older firmware)
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-    
-    sensor.print(F("C,0\r")); //Turn off continous mode
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-    
-    sensor.print(F("Plock,1\r")); //Lock to UART mode
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-    
-    /*sensor.print(F("L,0\r")); //Turn off LEDs
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;*/
-    
-    sensor.print(F("i\r")); //Get device info for rest of initialisation
-    
-    char response[30];
-    
-    while (sensor.available() <= 0); //Wait for it's response
-    delay(100); //Delay to wait for the entire response to be ready
-
-    int dataIndex = sensor.readBytesUntil('\r', response, 30); //Read the response
-    
-    //Check for D.O. sensor (different firmwares return either DO or D.O.
-    if ((response[3] == 'D' && response[4] == 'O') || (response[3] == 'D' && response[4] == '.' && response[5] == 'O' && response[6] == '.')) {
-        //Set proper reading outputs
-        sensor.print(F("O,DO,1\r")); //For older firmware versions
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        sensor.print(F("O,mg,1\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        sensor.print(F("O,%,0\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-    } else if (response[3] == 'E' && response[4] == 'C') { //EC sensor
-        //Set proper probe type
-        sensor.print(F("K,1.0\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        
-        //Set proper reading outputs (Only needed for older firmware version)
-        sensor.print(F("O,EC,1\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        sensor.print(F("O,TDS,0\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        sensor.print(F("O,S,0\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-        
-        sensor.print(F("O,SG,0\r"));
-        while (!(sensor.available())) ;
-        delay(100);
-        while (sensor.available()) sensor.read() ;
-    }
-    
-    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    sensor.print(F("R\r"));
+    delay(1000);
+    sensor.print(F("Sleep\r"));
     
     sensor.end();
     return;
@@ -371,13 +255,6 @@ void initialiseTB(uint8_t i) {
     return;
 }
 
-//Initialise a DFRobot Turbidity sensor at index i
-void initialiseTemp(uint8_t i) {
-    //Maybe set settings?
-    
-    return;
-}
-
 
 /*-------------------GPS Time Functions--------------------*/
 
@@ -389,7 +266,7 @@ uint32_t gpsGetTime() {
 
 //Sets current Unix time from GPS
 bool gpsSetTime(bool force) {
-    unsigned long timeout = gpsTimeTime; //Time that the Arduino will try too get the time from the gps, should be parameter or define
+    unsigned long timeout = 30000; //Time that the Arduino will try too get the time from the gps, should be parameter or define
     unsigned long before = millis(); //millis() time before trying the gps
     bool worked = false; //If the time was updated
     
@@ -431,7 +308,7 @@ bool gpsSetTime(bool force) {
     }
     
     if (!worked) { //If the unix time wasn't updated
-        Serial.println(F("Aborting getting GPS time and date"));
+        Serial.println(F("Aborting GPS time and date"));
         return false;
     }
     
@@ -456,14 +333,14 @@ bool gpsFeedInfo() {
 //Registers this end node with the gateway
 void registerNode() {
     //Get the length of the registration message
-    uint8_t arrLength = 1 + 1 + strlen(NAME);
+    uint8_t arrLength = 1 + NUMBER_SENSORS;
     for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
-        arrLength += 1 + strlen(sensorTypes[i]);
+        arrLength += strlen(sensorTypes[i]);
     }
     
     //If the length is longer than one LoRa message
     if (arrLength > 111) {
-        Serial.println(F("ERROR: Name and sensor types too long for LoRa message"));
+        Serial.println(F("ERROR: Sensor types too long for LoRa message"));
         while (true) ;
     }
 
@@ -471,21 +348,11 @@ void registerNode() {
 
     dataArr[0] = ((uint8_t) NUMBER_SENSORS) & 0b00001111; //Set first byte of message; registration type and number of sensors
     
-    uint8_t curr = 1; //Current posistion in the LoRa message
-    
-    //Copy the length of the node name into the message
-    uint8_t currLen = strlen(NAME);
-    memcpy(&dataArr[curr++], &currLen, sizeof(uint8_t));
-    
-    //Copy the node name into the message
-    for (uint8_t i = 0; i < strlen(NAME); i++) {
-        memcpy(&dataArr[curr++], &NAME[i], sizeof(uint8_t));
-    }
-    
     //Go through each connected sensor and add it's name to the LoRa message
+    uint8_t curr = 1; //Current posistion in the LoRa message
     for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
         //Copy the length of this sensor type into the message
-        currLen = strlen(sensorTypes[i]);
+        uint8_t currLen = strlen(sensorTypes[i]);
         memcpy(&dataArr[curr++], &currLen, sizeof(uint8_t));
         
         //Go through the sensor name and copy it into the LoRa message
@@ -519,11 +386,13 @@ void registerNode() {
 
 
 /*---------------GPS Location Functions----------------*/
-bool gpsSetLocation(bool force) {
+
+//Registers this end node with the gateway
+bool sendLocation(bool force) {
     float lat; //Variable for latitude
     float lon; //Variable for longitude
     
-    unsigned long timeout = gpsLocTime; //Time to try the gps, should be parameter or define
+    unsigned long timeout = 60000; //Time to try the gps, should be parameter or define
     unsigned long before = millis(); //Time before trying the gps
     bool worked = false; //If the location was updated
     
@@ -543,27 +412,92 @@ bool gpsSetLocation(bool force) {
         }
         
         Serial.println(F("Failed to get GPS location"));
+        Serial.println(gps.time.value());
+        Serial.println(gps.date.value());
+        Serial.println(gps.location.lat());
+        Serial.println(gps.location.lat());
+        Serial.println();
         
     }
     
-    Serial.print(F("GPS location took: "));
-    Serial.println(millis() - before);
-    
     if (!worked) { //If the location wasn't updated
-        Serial.println(F("Aborting getting GPS location"));
+        Serial.println(F("Error reading from GPS, aborting location send"));
         return false;
-    } else { //If it was
-        latitude = lat;
-        longitude = lon;
-        return true;
     }
+    
+    //Update the current time based from the gps
+    gpsSetTime(force);
+    uint32_t time = gpsGetTime();
+    
+    uint8_t nameLen = strlen(NAME); //Length of this node's name
+    
+    //I stopped adding comments here cause most of the following will probably change
+    
+    uint8_t arrLength = 1 + (3 * 4) + 1 + nameLen;
+    
+    if (arrLength > 111) {
+        Serial.println(F("ERROR: Name too long to be combined with co-ordinates for LoRa message"));
+        while (true) ;
+    }
+    
+    Serial.println(F("Inside location send:"));
+    Serial.print(F("Time: "));
+    Serial.println(time);
+    Serial.print(F("Lat: "));
+    Serial.println(lat);
+    Serial.print(F("Lon: "));
+    Serial.println(lon);
+
+    uint8_t* dataArr = malloc(sizeof(uint8_t) * arrLength);
+
+    dataArr[0] = 0b00100000 | (((uint8_t) NUMBER_SENSORS) & 0b00001111);
+    
+    memcpy(&dataArr[1], &time, sizeof(uint8_t) * 4);
+    memcpy(&dataArr[5], &lat, sizeof(uint8_t) * 4);
+    memcpy(&dataArr[9], &lon, sizeof(uint8_t) * 4);
+    
+    dataArr[13] = nameLen;
+    
+    char* name = NAME;
+    for (uint8_t i = 0; i < nameLen; i++) {
+        dataArr[i + 14] = name[i];
+    }
+    
+    loraPort.listen();
+    bool received = false;
+    uint8_t tries = 0;
+    while (!received && (force || (tries++) < 3)) {
+        Serial.println(F("Sending Location"));
+        sendData(loraPort, GATEWAY_ADDRESS, arrLength, dataArr);
+        
+        uint8_t ack = ackWait(loraPort, GATEWAY_ADDRESS, 5000);
+        
+        if (ack == 1) {
+            Serial.println(F("Received initial ack"));
+        
+            ack = ackWait(loraPort, GATEWAY_ADDRESS, 150000);
+        
+            if (ack == 0) {
+                received = true;
+                Serial.println(F("Received final ack"));
+            } else {
+                Serial.println(F("Didn't receive final ack"));
+            }
+        } else {
+            Serial.println(F("Didn't receive initial ack"));
+        }
+    }
+    
+    free(dataArr);
+    
+    return true;
 }
 
 
 /*-----------------Data Save Function------------------*/
 
 //Save data to EEPROM
-void saveData(uint8_t* data) {
+void saveData(uint32_t* data) {
     Serial.println(F("Saving data"));
     
     unsigned int currAddress = 4;
@@ -579,21 +513,27 @@ void saveData(uint8_t* data) {
         validToAddress++;
     }
     
-    uint8_t size = 1 + (data[0] * 8) + (4 * (NUMBER_SENSORS + 1)); //Get the size of the data array
-    
-    //Loop through each byte of the current value
-    for (uint8_t i = 0; i < size; i++) {
-        EEPROM.update(currAddress++, data[i]); //Write current byte
-
-        //Check for looping/double looping in the EEPROM
-        if (currAddress == EEPROM.length()) {
-            currAddress = 4;
-            if (loop) {
-                doubleLoop = true;
-            } else {
-                loop = true;
+    //Checks for exceeding EEPROM length
+    for (uint8_t i = 0; i < (NUMBER_SENSORS + 1); i++) {
+        //Convert from a uint32_t to an array of uint8_t, to save ach byte individually
+        uint8_t* currValue = malloc(sizeof(uint8_t) * 4);
+        memcpy(currValue, &data[i], sizeof(uint8_t) * 4);
+        
+        for (uint8_t j = 0; j < 4; j++) { //Loop through each byte of the current value
+            EEPROM.update(currAddress++, currValue[j]); //Write the byte
+            
+            //Chack for looping/double looping in the EEPROM
+            if (currAddress == EEPROM.length()) {
+                currAddress = 4;
+                if (loop) {
+                    doubleLoop = true;
+                } else {
+                    loop = true;
+                }
             }
         }
+        
+        free(currValue); //Free allocated memory
     }
     
     EEPROM.put(0, currAddress); //Change address of last saved data point
@@ -612,47 +552,14 @@ void saveData(uint8_t* data) {
 /*-----------------Sensor Read Function------------------*/
 
 //Read data from all sensors based on their types
-uint8_t* readSensors() {
+uint32_t* readSensors() {
     Serial.println(F("\nReading Sensors"));
     
-    //Try to update time and location
-    gpsSetLocation(false);
+    uint32_t* ans = malloc(sizeof(uint32_t) * (NUMBER_SENSORS + 1)); //Allocate array for sensor data
+    
+    //Try to update time and put it into the data array
     gpsSetTime(false);
-    
-    uint8_t* ans; //Array that will be returned
-    uint8_t curr = 0; //Current position in the array
-    
-    //Check if latitude or longitude has changed enough since it was last sent
-    if (abs(latitude - lastLat) > 0.00005 || abs(longitude - lastLon) > 0.00005) {
-        //Update last sent latitude and longitude
-        lastLat = latitude;
-        lastLon = longitude;
-        
-        //Allocate memory for answer, including latitude and longitude
-        ans = malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSORS + 3))));
-        
-        ans[curr++] = 1; //Means that this data point has location data
-        
-        //Copy time into array
-        unsigned long time = gpsGetTime();
-        memcpy(&ans[curr], &time, sizeof(uint8_t) * 4);
-        curr +=4 ;
-        
-        //Copy location into array
-        memcpy(&ans[curr], &latitude, sizeof(uint8_t) * 4);
-        memcpy(&ans[curr + 4], &longitude, sizeof(uint8_t) * 4);
-        curr += 8;
-    } else {
-        //Allocate memory for answer, not including latitude and longitude
-        ans = malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSORS + 1))));
-        
-        ans[curr++] = 0; //Means that this data point doesn't have location data
-        
-        //Copy time into array
-        unsigned long time = gpsGetTime();
-        memcpy(&ans[curr], &time, sizeof(uint8_t) * 4);
-        curr +=4 ;
-    }
+    ans[0] = gpsGetTime();
     
     //Go through each sensor and get the data, then add it to the data array
     //All sensors need to return a float, or else the go server won't interpret it correctly
@@ -665,15 +572,11 @@ uint8_t* readSensors() {
             data = readAS(i);
         } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //DFRobot Turbidity
             data = readTB(i);
-        } else if (strcmp(sensorTypes[i], "Temperature") == 0) { //DFRobot Temperature
-            data = readTemp(i);
         } else { //Should probably handle this better
             data = -1;
         }
         
-        //Copy this sensor's data into the data array
-        memcpy(&ans[curr], &data, sizeof(uint8_t) * 4);
-        curr += 4;
+        memcpy(&ans[i+1], &data, sizeof(uint32_t)); //Copy this sensor's data into the data array
     }
     
     return ans;
@@ -681,8 +584,6 @@ uint8_t* readSensors() {
 
 //Read data from an Atlas Scientific sensor at index i
 float readAS(uint8_t i) {
-    //Compensate for temp(both) and salinity(DO)??
-    
     //Initialise the sensor's software serial
     SoftwareSerial sensor(sensorPorts[i][0], sensorPorts[i][1]);
     sensor.begin(9600);
@@ -712,7 +613,7 @@ float readAS(uint8_t i) {
     
     //Debugging print statements
     Serial.print(F("Read AS sensor: "));
-    Serial.println(buf);
+    Serial.println(data);
     
     //Put sensor to sleep
     sensor.print(F("Sleep\r"));
@@ -724,10 +625,10 @@ float readAS(uint8_t i) {
 
 //Read data from a DFRobot turbidity sensor at index i
 float readTB(uint8_t i) {
-    digitalWrite(sensorPorts[i][0], HIGH); //Turn on the sensor
-    delay(250);
+    digitalWrite(8, HIGH); //Turn on the sensor
+    delay(100);
     
-    float data = analogRead(sensorPorts[i][1]); //Read the sensor
+    float data = analogRead(sensorPorts[i][0]); //Read the sensor
     
     //Do some manipulation to the data to get a more "accurate" number (just something that looks more correct)
     float ans;
@@ -738,65 +639,10 @@ float readTB(uint8_t i) {
         ans = data - (5.0 * factor);
     }
     
-    digitalWrite(sensorPorts[i][0], LOW); //Turn off the sensor
+    digitalWrite(8, LOW); //Turn off the sensor
     
     //Debugging print statements
     Serial.print(F("Read TB sensor: "));
-    Serial.println(ans);
-    
-    return ans;
-}
-
-//Read data from a DFRobot turbidity sensor at index i
-float readTemp(uint8_t i) {
-    OneWire tempSensor(sensorPorts[i][0]); //Start One Wire interface
-    
-    uint8_t addr[8];
-    
-    //Get the address of the sensor
-    do {
-        if (!tempSensor.search(addr)) {
-            Serial.println(F("Didnt find temperature sensor"));
-            return -1;
-        }
-    } while (!(addr[0] == 16 || addr[0] == 40));
-    
-    //Make sure the CRC is valid
-    if (OneWire::crc8(addr, 7) != addr[7]) {
-        Serial.println(F("CRC not valid"));
-        return -1;
-    }
-    
-    //Read temperature command
-    tempSensor.reset();
-    tempSensor.select(addr);
-    tempSensor.write(0x44, 1);
-    
-    float ans;
-    
-    delay(750); //Temperature query time
-    
-    //Read the sensor's value until it's valid (conversion is done)
-    do {
-        //Read saved temperature value command
-        tempSensor.reset();
-        tempSensor.select(addr);
-        tempSensor.write(0xBE);
-        
-        uint8_t data[2];
-        
-        //Get sensor's value
-        for (uint8_t i = 0; i < 2; i++) {
-            data[i] = tempSensor.read();
-        }
-        
-        //Convert into deg C
-        float tmp = ((data[1] << 8) | data[0]);
-        ans = tmp / 16;
-    } while (ans == 85); //It returns 85 if the conversion isn't yet finished
-    
-    //Debugging print statements
-    Serial.print(F("Read Temp sensor: "));
     Serial.println(ans);
     
     return ans;
@@ -808,65 +654,63 @@ float readTemp(uint8_t i) {
 //Sends saved data from EEPROM through LoRa
 uint8_t sendSensorData() {
     //Get EEPROM address of last data point
-    unsigned int validToAddress = 4;
-    EEPROM.get(0, validToAddress);
+    unsigned int currAddress = 4;
+    EEPROM.get(0, currAddress);
     
     //Get EEPROM address of where valid data starts
-    unsigned int currAddress = 3;
-    EEPROM.get(2, currAddress);
+    unsigned int validToAddress = 3;
+    EEPROM.get(2, validToAddress);
     
-    if (currAddress == 3) { //Default state, means no data
+    if (validToAddress == 3) { //Default state, means no data
         return 1;
     }
     
-    uint8_t* dataInfo = getDataMessageInfo(validToAddress, currAddress); //Get info for making LoRa data message
-    
-    uint8_t* dataArr = malloc(sizeof(uint8_t) * dataInfo[0]); //Allocate the array for the LoRa message
-    
-    dataArr[0] = 0b00010000 | ((uint8_t) NUMBER_SENSORS & 0b00001111); //Set the first byte of the message; the message type and the number of sensors
-    dataArr[1] = dataInfo[1]; //Number of locations
-    
-    //Variables for keeping track of important message information
-    uint8_t currLocPtr = 2;
-    uint8_t currDataPtr = 2 + dataInfo[1];
-    uint8_t currDataNum = 0;
-    
-    //Read data from EEPROM into the LoRa message
-    while (currDataPtr < dataInfo[0]) {
-        currDataNum++; //Reading new data point
-        
-        uint8_t hasLoc = EEPROM.read(currAddress++); //Has location byte
-        
-        if (currAddress > EEPROM.length()) { //Check EEPROM loop
-            currAddress -= (EEPROM.length() - 4);
-        }
-        
-        readEEPROM(dataArr, &currDataPtr, &currAddress, 4); //Read time
-        
-        if (hasLoc) {
-            readEEPROM(dataArr, &currDataPtr, &currAddress, 8); //Read location
-            dataArr[currLocPtr++] = currDataNum; //Put data point number into locations part of message
-        }
-        
-        readEEPROM(dataArr, &currDataPtr, &currAddress, 4 * NUMBER_SENSORS); //Read sensor data
+    unsigned int numBytes; //How many bytes of data there is to send
+    if (currAddress > validToAddress) {
+        numBytes = currAddress - validToAddress;
+    } else {
+        numBytes = (currAddress - 4) + (EEPROM.length() - validToAddress); //If data was looped around EEPROM
     }
     
-    sendData(loraPort, GATEWAY_ADDRESS, dataInfo[0], dataArr); //Send data to the gateway
+    if (numBytes == 0) { //If there's no data to send
+        return 1;
+    }
     
-    //Free allocated memory
-    free(dataInfo);
-    free(dataArr);
+    if (numBytes > 110) { //If there's too much data to send in one LoRa message
+        numBytes = 110;
+    }
+    
+    numBytes -= numBytes % (4 * (NUMBER_SENSORS + 1)); //Makes sure the number of bytes to send is a multiple of (4 * (NUMBER_SENSORS + 1))
+    
+    uint8_t* dataArr = malloc(sizeof(uint8_t) * (numBytes + 1)); //Allocate the array for the LoRa message
+    
+    dataArr[0] = 0b00010000 | ((uint8_t) NUMBER_SENSORS & 0b00001111); //Set the first byte of the message; the message type and the number of sensors
+    
+    //Read data byte by byte into the LoRa message
+    for (uint8_t i = 0; i < numBytes; i++) {
+        dataArr[1 + i] = EEPROM.read(validToAddress++);
+        
+        if (validToAddress == EEPROM.length()) { //Have to loop around EEPROM
+            validToAddress = 4;
+        }
+    }
+    
+    Serial.println(F("Sending:")); //Debugging print statement
+    
+    sendData(loraPort, GATEWAY_ADDRESS, numBytes + 1, dataArr); //Send data to the gateway
+    
+    free(dataArr); //Free allocated memory
 
     uint8_t ack = ackWait(loraPort, GATEWAY_ADDRESS, 5000); //Wait for acknowledgement
     
     if (ack == 0) { //If it receives a success acknowledgement
         
-        if (currAddress == validToAddress) { //If all valid data has been read, reset the addresses
+        if (validToAddress == currAddress) { //If all valid data has been read, reset the addresses
             unsigned int address = 4;
             EEPROM.put(0, address);
             EEPROM.put(2, address - 1);
         } else {
-            EEPROM.put(2, currAddress); //Set the address of the last data point correctly
+            EEPROM.put(2, validToAddress); //Set the address of the last data point correctly
         }
         
         return 0;
@@ -876,60 +720,6 @@ uint8_t sendSensorData() {
     }
 }
 
-//Gets the info of a data LoRa message
-uint8_t* getDataMessageInfo(unsigned int validToAddress, unsigned int validFromAddress){
-    uint8_t* ans = calloc(2, sizeof(uint8_t));
-    unsigned int curr = validFromAddress;
-    uint8_t size = 2; //Size of message
-    uint8_t lastSize = 2; //Last valid size
-    
-    //Go through data to find max size that can be sent
-    while (size <= 111 && curr != validToAddress) {
-        lastSize = size;
-        
-        //Has location byte
-        uint8_t hasLocation = EEPROM.read(curr++);
-        
-        //Time
-        curr += 4;
-        size += 4;
-        
-        if (hasLocation) {
-            //Location
-            curr += 8;
-            size += 9;
-            
-            ans[1]++; //Number of locations counter
-        }
-        
-        //Sensor data
-        curr += 4 * NUMBER_SENSORS;
-        size += 4 * NUMBER_SENSORS;
-        
-        if (curr >= EEPROM.length()) { //EEPROM loop check
-            curr -= (EEPROM.length() - 4);
-        }
-    }
-    
-    if (size <= 111) { //Check what caused loop exit
-        ans[0] = size;
-    } else {
-        ans[0] = lastSize;
-    }
-    
-    return ans;
-}
-
-//Read numBytes from EEPROM starting at *memAddress into message starting at *messageIndex, incrementing everything accordingly and checking for EEPROM looping
-void readEEPROM(uint8_t* message, uint8_t* messageIndex, unsigned int* memAddress, uint8_t numBytes) {
-    for (uint8_t i = 0; i < numBytes; i++) {
-        message[(*messageIndex)++] = EEPROM.read((*memAddress)++);
-
-        if (*memAddress > EEPROM.length()) {
-            *memAddress -= (EEPROM.length() - 4);
-        }
-    }
-}
 
 /*-------------------Helper Functions-------------------*/
 
@@ -963,6 +753,8 @@ uint8_t ackWait(Stream& port, uint16_t address, unsigned long timeout) {
 
 //Delay for an amount of time but accounts for start time and overflow
 void delayOverflow(unsigned long time, unsigned long start) {
+    //This should actually sleep the Arduino
+    
     long delayTime; //The amount of time to delay
     
     //Get how long to delay, accounts for overflow
@@ -972,59 +764,10 @@ void delayOverflow(unsigned long time, unsigned long start) {
         delayTime = time - (millis() - start);
     }
     
-    //Don't try to sleep for a negative amount of time
-    if (delayTime < 0) {
-        return;
+    //Delay for delayTime as long as it's positive
+    if (delayTime > 0) {
+        delay(delayTime);
     }
-    
-    unsigned int sleepNum = delayTime/8000; //Amount of times to sleep
-    sleepNum += (delayTime - (8000 * sleepNum)) >= 4000; //Essentially just rounding
-    
-    //Sleep setup
-    byte prevADCSRA = ADCSRA;
-    ADCSRA = 0;
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-    sleep_enable();
-    
-    //Sleep loop
-    for (unsigned int i = 0; i < sleepNum; i++) {
-        // Turn of Brown Out Detection (low voltage). 
-        //This is automatically re-enabled upon timer interrupt
-        sleep_bod_disable();  //BOD is for Low Voltage Protection & resets the chip
-
-        // Ensures we can wake up again by first disabling interrupts (temporarily) so
-        // the wakeISR does not run before we are asleep and then prevent interrupts,
-        // and then defining the ISR (Interrupt Service Routine) to run -
-        // when poked awake by the timer
-        noInterrupts();
-
-        // clear various "reset" flags
-        MCUSR = 0;  // allow changes, disable reset
-        WDTCSR = bit (WDCE) | bit(WDE); // set interrupt mode and an interval
-        WDTCSR = bit (WDIE) | bit (WDP3) /*| bit(WDP2) | bit(WDP1) */| bit(WDP0);    
-        // now set to 8 seconds delay, increase the counter to elongate sleep time
-        wdt_reset();
-
-        // Allow interrupts now
-        interrupts();
-
-        // And enter sleep mode as set above
-        sleep_cpu();
-    }
-    
-    //Go back to normal
-    sleep_disable();
-    ADCSRA = prevADCSRA;
-    
-    //Because millis() isn't updated during sleeping, change the time the last GPS was updated
-    timeLastUpdated -= sleepNum * 8000;
-    
-    return;
-}
-
-// When WatchDog timer causes Arduino to wake it comes here
-ISR (WDT_vect) {
-  wdt_disable(); //Turn off watchdog
 }
 
 

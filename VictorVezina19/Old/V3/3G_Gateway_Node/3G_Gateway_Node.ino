@@ -11,17 +11,10 @@
 
 /*
 Things to do:
-- Hardcoded URL takes global memory, which is no bueno!!!!!!
-
-- Add location to main HTTP request
-- Change HTTP request to not include "Time"
+- Make location part of sensor data
+- Make name part of registration
+- Change data reuqest to not include "Time"
 - Change HTTP requests to not be hardcoded
-- Actually implement other acks
-- Don't just sit there waiting, sleep and check every second for lora
-- Check for SD card being full
-- Split functions into driver files
-- Change code structure to use event loop
-- Robustify
 */
 
 
@@ -44,7 +37,7 @@ Things to do:
 
 /*-------------------------GLOBALS------------------------------*/
 
-unsigned long lastPost; //The millis() value that the last data post happened at
+unsigned long lastPost;
 
 /*------------------------CONSTRUCTORS--------------------------*/
 
@@ -69,9 +62,7 @@ void setup() {
     Serial.print(F("1.1: "));
     Serial.println(freeMemory());
     
-    while (!Serial.available()) ; //Useful for testing
-    
-    while (loraPort.available()) loraPort.read(); //Delete data in loraPort, seems to mess gateway up once in a while
+    //while (!Serial.available()) ; //Useful for testing
 
     Serial.print(F("2: "));
     Serial.println(freeMemory());
@@ -79,7 +70,7 @@ void setup() {
     //Make sure ToSend.csv exists
     createToSend();
 
-    Serial.print(F("2.1: "));
+    Serial.print(F("2.6: "));
     Serial.println(freeMemory());
     
     //Pretend like the last post just happened
@@ -122,6 +113,10 @@ void loop() {
                 case 1: //Data message
                     saveData(loraData);
                     break;
+                    
+                case 2: //Location message
+                    sendLocation(loraData);
+                    break;
 
                 default: //Unknown message
                     Serial.println(F("Unknown Message Type Received"));
@@ -156,7 +151,7 @@ void createToSend() {
     if (!sd.exists("ToSend.csv")) {
         Serial.println(F("Creating ToSend.csv"));
         File file = sd.open("ToSend.csv", FILE_WRITE);
-        file.print(F("Node ID, Data Points, Locations, Position\n"));
+        file.print(F("Node ID, Data Points, Position\n"));
         file.close();
     }
 }
@@ -168,14 +163,6 @@ void parseRegistration(uint8_t* data) {
     uint8_t numSensors = data[3] & 0x0F; //Get number of sensors in registration
     uint8_t curr = 4; //Used for going through the registration message data
     char *types[numSensors]; //Create array of char arrays for the sensor types
-    
-    uint8_t nameLen = data[curr++];
-    char* name = malloc(sizeof(char) * (nameLen + 1));
-    
-    for (uint8_t i = 0; i < nameLen; i++) {
-        name[i] = data[curr++];
-    }
-    name[nameLen] = 0;
     
     for (uint8_t i = 0; i < numSensors; i++) { //Get the sensor types from the message
         uint8_t len = data[curr++]; //Get length of type
@@ -204,28 +191,14 @@ void parseRegistration(uint8_t* data) {
 
     if (sd.exists(fileName)) { //Receiving registration from already registered node, check to see if good or not
         File file = sd.open(fileName, FILE_READ);
-        
-        bool err = false;
-        
-        //Check that name is correct
-        for (uint8_t i = 0; i < nameLen; i++) {
-            if (!(file.read() == name[i])) {
-                err = true;
-                break;
-            }
-        }
-        
-        file.seekCur(25); //Skip new line and default types (time, lat, lon)
-        
-        //Go through sensor types and make sure they match the registration message
+        file.seekSet(5);
         uint8_t currTypeNum = 0;
-        for (uint8_t i = 0; err == false; i++) {
+        bool err = false;
+        for (uint8_t i = 0; i < numSensors; i++) { //Go through sensor types and make sure they match the registration message
             uint8_t currByte = file.read();
             if (currByte == 44) {
                 currTypeNum++;
                 i = -1;
-            } else if (currByte == 10) {
-                break;
             } else if (currByte != types[currTypeNum][i]) {
                 err = true;
                 break;
@@ -246,12 +219,7 @@ void parseRegistration(uint8_t* data) {
         }
     } else { //Registering new node
         File file = sd.open(fileName, FILE_WRITE);
-        
-        file.print(name); //Print the node name
-        file.print(F("\n"));
-        
-        file.print(F("Time,Latitude,Longitude,")); //The first column is always time
-        
+        file.print(F("Time,")); //The first column is always time
         for (uint8_t i = 0; i < numSensors; i++) { //Print the sensor types into the file
             file.print(types[i]);
             if ((i+1) != numSensors) {
@@ -272,7 +240,6 @@ void parseRegistration(uint8_t* data) {
     for (uint8_t i = 0; i < numSensors; i++) {
         free(types[i]);
     }
-    free(name);
     free(fileName);
 }
 
@@ -287,9 +254,9 @@ void saveData(uint8_t* data) {
         return;
     }
 
-    //Get id of node that sent the data
+    //Get id of node that sent the registration
     uint16_t add;
-    memcpy(&add, &data[0], sizeof(uint8_t) * 2);
+    memcpy(&add, data, sizeof(uint8_t) * 2);
     
     //Get the file name for that node
     char* fileName = malloc(sizeof(char) * 13);
@@ -314,38 +281,19 @@ void saveData(uint8_t* data) {
             uint32_t position = file.curPosition(); //Get the position before the new data in the node's file
             
             //Add the new data points to the node's file
-            
-            uint8_t numData = 0; //Keeps track of how many data points and locations have been added
-            uint8_t numLoc = 0; //Keeps track of how many locations have been added
-            
-            for (uint8_t i = 5 + data[4]; i < payloadLen + 3; ) { //While there's still data in the message
-                numData++;
+            uint8_t numData = 0;
+            for (uint8_t i = 4; i < payloadLen + 3; ) { //While there's still data in the message
+                numData++; //Keeps track of how many data points are being added
                 
                 //Get the time for the current data points
                 unsigned long time;
                 memcpy(&time, &data[i], sizeof(uint8_t) * 4);
                 
-                i += 4; //Make sure the index for the message data is being augmented
+                i += 4; //Make sure the index for the message data in being augmented
                 
                 //Print the time into the file
                 file.print(time);
                 file.print(F(","));
-                
-                if (numData == data[5 + numLoc] && numLoc < data[4]) { //Check if this data point has location
-                    numLoc++;
-                    
-                    for (uint8_t j = 0; j < 2; j++) { //Print lat and lon to file
-                        float currFloat;
-                        memcpy(&currFloat, &data[i], sizeof(uint8_t) * 4);
-
-                        i += 4;
-
-                        file.printField(currFloat, ',', 6);
-                        //file.print(F(","));
-                    }
-                } else {
-                    file.print(F(",,")); //Print empty location if there's no location here
-                }
                 
                 for (uint8_t j = 0; j < numSensors; j++) { //Iterate through the value for each sensor
                     //Get the value of the current sensor
@@ -355,14 +303,10 @@ void saveData(uint8_t* data) {
                     i += 4;
                     
                     //Print the current sensor value into the file
-                    //file.print(currFloat);
-                    file.printField(currFloat, 0, 6);
+                    file.print(currFloat);
                     
                     if (j+1 != numSensors) { //Print a , if it's not the last sensor
                         file.print(F(","));
-                        //file.printField(currFloat, ',', 6);
-                    } else {
-                        //file.printField(currFloat, 0, 6);
                     }
                 }
                 file.print("\n"); //Finish the line
@@ -370,24 +314,22 @@ void saveData(uint8_t* data) {
 
             //See if the node already has data to be sent in ToSend.csv
             File toSendFile = sd.open("ToSend.csv", FILE_WRITE);
-            toSendFile.seekSet(0);
+            toSendFile.seekSet(31);
             
             bool notFound = false;
             uint16_t currId;
-            
             do { //While the node id on the current line isn't the node id we're looking for
-                while (toSendFile.read() != 10); //Go to end of line (skips first line)
-                
                 if (!toSendFile.available()) { //If we reach the end of ToSend.csv without finding the id of the node
                     notFound = true;
                     break;
                 }
-                
                 //Get the id of the node on the current line
                 char currStr[12];
                 int len = toSendFile.fgets(currStr, 12, ",");
-                currStr[len-1] = 0;
+                currStr[len-2] = 0;
                 currId = atoi(currStr);
+
+                while (toSendFile.read() != 10); //Go to end of line
             } while (currId != add);
 
             if (notFound) { //If the node isn't already in ToSend.csv
@@ -395,14 +337,9 @@ void saveData(uint8_t* data) {
                 toSendFile.print(add);
                 toSendFile.print(F(","));
                 
-                //Print the number of data points into theToSend file
+                //Print the number of data points into theToSend  file
                 char numDataStr[4];
                 sprintf(numDataStr, "%.3hu", numData);
-                toSendFile.print(numDataStr);
-                toSendFile.print(F(","));
-                
-                //Print the number of locations into the file
-                sprintf(numDataStr, "%.3hu", numLoc);
                 toSendFile.print(numDataStr);
                 toSendFile.print(F(","));
                 
@@ -410,7 +347,6 @@ void saveData(uint8_t* data) {
                 toSendFile.print(position);
                 toSendFile.print("\n");
             } else { //If the node is already in ToSend.csv
-                /*
                 for (uint8_t i = 0; i < 2; i++) { //Back up until it's before the number of data points
                     toSendFile.seekCur(-1);
                     while (toSendFile.peek() != 44) { // ','
@@ -418,7 +354,9 @@ void saveData(uint8_t* data) {
                     }
                 }
                 
-                toSendFile.read(); //Get rid of the ,*/
+                toSendFile.read(); //Get rid of the ,
+                
+                //Position will now be about to read number of data points
                 
                 //Read the current amount of data points ready to be sent for the current node
                 char currStr[12];
@@ -431,29 +369,13 @@ void saveData(uint8_t* data) {
                 while (toSendFile.peek() != 44) { // ','
                     toSendFile.seekCur(-1);
                 }
-                toSendFile.read(); //Get rid of ','
+                toSendFile.read();
+                
+                //Position will now be about to write number of data points
                 
                 //Write the new number of data points
                 char numPointsStr[4];
                 sprintf(numPointsStr, "%.3hu", numPoints + numData);
-                toSendFile.print(numPointsStr);
-                
-                toSendFile.read(); //Get rid of ','
-                
-                //Read the current amount of locations ready to be sent for the current node
-                len = toSendFile.fgets(currStr, 12, ",");
-                currStr[len-1] = 0; //Overwrite ','
-                numPoints = atoi(currStr);
-                
-                //Go back until it's before the number of locations
-                toSendFile.seekCur(-2);
-                while (toSendFile.peek() != 44) { // ','
-                    toSendFile.seekCur(-1);
-                }
-                toSendFile.read();
-                
-                //Write the new number of locations
-                sprintf(numPointsStr, "%.3hu", numPoints + numLoc);
                 toSendFile.print(numPointsStr);
             }
 
@@ -476,17 +398,16 @@ bool checkSensorData(File file, uint8_t numSensors) {
     
     file.seekSet(0); //Go to the begining of the file
     
-    while (file.read() != 10) ; //Skip first line (name)
-    
     //Count the number of sensors in the given file
-    uint8_t sum = 1;
+    //Technically counts Time (which isn't included in numSensors), but misses the last one, so the count comes out right
+    uint8_t sum = 0;
     while (file.peek() != 10) { //While it's not a newline character
         if (file.read() == 44) { //If it's a comma
             sum++;
         }
     }
     
-    if (sum - 3 != numSensors) { //If the number of sensors in the file isn't the same as the given number
+    if (sum != numSensors) { //If the number of sensors in the file isn't the same as the given number
         return false;
     } else { //If it is
         file.seek(position);
@@ -494,12 +415,102 @@ bool checkSensorData(File file, uint8_t numSensors) {
     }
 }
 
+
+/*----------------Location Handling Functions----------------*/
+
+//Didn't bother commenting this cause it needs heavy changing
+//The location data should maybe just be sent with every data point, and the name with the registration
+
+//Sends the location of an end node to the server
+void sendLocation(uint8_t* data) {
+    uint16_t address;
+    memcpy(&address, data, sizeof(uint8_t) * 2);
+    
+    //Send first acknowledgement to show that it's being worked on
+    uint8_t* ackData = malloc(sizeof(uint8_t));
+    ackData[0] = 1;
+    sendData(loraPort, address, 1, ackData);
+    free(ackData);
+    
+    uint32_t time;
+    float lat;
+    float lon;
+    
+    memcpy(&time, &data[4], sizeof(uint8_t) * 4);
+    memcpy(&lat, &data[8], sizeof(uint8_t) * 4);
+    memcpy(&lon, &data[12], sizeof(uint8_t) * 4);
+    
+    char* latStr = malloc(sizeof(char) * 11);
+    dtostrf(lat, 8, 6, latStr);
+    char* lonStr = malloc(sizeof(char) * 12);
+    dtostrf(lon, 8, 6, lonStr);
+    
+    uint8_t nameLen = data[16];
+    char* name = malloc(sizeof(char) * (nameLen + 1));
+
+    Serial.print(F("11: "));
+    Serial.println(freeMemory());
+    
+    for (uint8_t i = 0; i < nameLen; i++) {
+        name[i] = data[17 + i];
+    }
+    name[nameLen] = 0;
+    
+    char* request = malloc(sizeof(char) * (127 + nameLen));
+
+    Serial.print(F("12: "));
+    Serial.println(freeMemory());
+    
+    sprintf(request, "POST /ollie/sensor/info?id=%d&name=%s&coords=%s,%s&time=%lu HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n", address, name, latStr, lonStr, time);
+
+    free(latStr);
+    free(lonStr);
+    free(name);
+    
+    Serial.print(F("Time: "));
+    Serial.println(time);
+    
+    Serial.print(F("13: "));
+    Serial.println(freeMemory());
+    
+    bool error = fonaPost(request);
+
+    Serial.print(F("14: "));
+    Serial.println(freeMemory());
+    
+    free(request);
+    
+    loraPort.listen();
+    
+    ackData = malloc(sizeof(uint8_t));
+
+    Serial.print(F("15: "));
+    Serial.println(freeMemory());
+    
+    if (!error) {
+        ackData[0] = 0;
+    } else {
+        ackData[0] = 0xFF;
+    }
+
+    Serial.print(F("16: "));
+    Serial.println(freeMemory());
+    
+    sendData(loraPort, address, 1, ackData);
+    
+    free(ackData);
+
+    Serial.print(F("17: "));
+    Serial.println(freeMemory());
+}
+
+
 /*--------------Saved Data Posting Functions--------------*/
 //Post collected data to webserver
 void postData() {
     Serial.print(F("10: "));
     Serial.println(freeMemory());
-    
+
     //Build HTTP request
     char* reqArr = buildRequest();
     
@@ -549,9 +560,6 @@ char* buildRequest() {
     
     uint8_t size = 70; //Total size of the hardcoded request
     
-    Serial.print(F("Request size: "));
-    Serial.println(size + (2 * dataSize) + 1);
-    
     char* request = malloc(sizeof(char) * (size + (2 * dataSize) + 1)); //Allocate the char array for the request
     
     if (request == NULL) { //If the arduino doesn't have enough RAM for the request
@@ -579,8 +587,7 @@ char* buildRequest() {
     
     strcpy(&request[29 + (2 * dataSize)], " HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n\0"); //The last part of the HTTP request
     
-    //Free the allocated memory for the data
-    free(data);
+    free(data); //Free the allocated memory for the data
     
     Serial.print(F("11.6: "));
     Serial.println(freeMemory());
@@ -602,7 +609,7 @@ uint8_t* getAllData() {
     Serial.println(freeMemory());
     
     //Get some information on what needs to be sent (used to get the size of the data to be sent)
-    //The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #locations1(1) #points1(1) FilePostition1(4) id2(2) ...
+    //The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #points1(1) pos1(4) id2(2) ...
     uint8_t* sendInfo = getSendInfo();
     
     //If there's no data to be sent, return NULL
@@ -620,36 +627,28 @@ uint8_t* getAllData() {
     for (uint8_t i = 0; i < sendInfo[0]; i++) { //Go through each node that has data to send
         //Get the node's id
         int currId;
-        memcpy(&currId, &sendInfo[1 + (8 * i)], sizeof(uint8_t) * 2);
+        memcpy(&currId, &sendInfo[1 + (7 * i)], sizeof(uint8_t) * 2);
         
         totalLen += 2; //For the node's id
         
         //Gets the type info for the current node
-        uint8_t* currTypesInfo = malloc(sizeof(uint8_t) * 3); //Allocate the array to put the info into
-        getTypesInfo(currTypesInfo, currId); //First byte is total size that will be taken in final data array, second byte is just number of sensors, third byte is length of name
-        
-        
-        //Account for size of locations
-        totalLen += 1; //For # locations
-        
-        if (sendInfo[3 + (8 * i)] > 0) {
-            totalLen += 1 + currTypesInfo[2]; //For name length + name
-            totalLen += 9 * sendInfo[3 + (8 * i)]; //For locations
-        }
+        uint8_t* currTypesInfo = malloc(sizeof(uint8_t) * 2); //Allocate the array to put the info into
+        getTypesInfo(currTypesInfo, currId); //First byte is total size that will be taken in final data array, second byte is just number of sensors
         
         totalLen += currTypesInfo[0]; //Size of sensor types information
+        totalLen += 1; //For # data points
         
         //Account for size of data points
-        totalLen += 1; //For # data point
-        
         //Essentially doing: totalLen += #DataPoints * #Types * 4 bytes
-        totalLen += sendInfo[4 + (8 * i)] * currTypesInfo[1] * 4;
+        totalLen += sendInfo[3 + (7 * i)] * currTypesInfo[1] * 4;
         
         free(currTypesInfo); //Free allocated memory
     }
     
     Serial.print(F("11.13: "));
     Serial.println(freeMemory());
+    
+    Serial.println(totalLen);
     
     //Allocate the final data array
     uint8_t* ans = malloc(sizeof(uint8_t) * totalLen);
@@ -664,21 +663,17 @@ uint8_t* getAllData() {
     for (uint8_t i = 0; i < sendInfo[0]; i++) {
         //Get current node id
         int currId;
-        memcpy(&currId, &sendInfo[1 + (8 * i)], sizeof(uint8_t) * 2);
-        
-        //Get current number of locations
-        uint8_t currLocs = sendInfo[3 + (8 * i)];
+        memcpy(&currId, &sendInfo[1 + (7 * i)], sizeof(uint8_t) * 2);
         
         //Get postition in the node's file
         unsigned long currPos;
-        memcpy(&currPos, &sendInfo[5 + (8 * i)], sizeof(uint8_t) * 4);
+        memcpy(&currPos, &sendInfo[4 + (7 * i)], sizeof(uint8_t) * 4);
         
         //Gets the data for the current node and puts it into the ans array starting at curr, increments curr accordingly
-        getNodeData(ans, &curr, currId, currLocs, currPos);
+        getNodeData(ans, &curr, currId, currPos);
     }
     
-    //Free allocated memory
-    free(sendInfo);
+    free(sendInfo); //Free allocated memory
     
     memcpy(ans, &curr, sizeof(uint8_t) * 2); //Copy in data size onto the data array
     
@@ -689,20 +684,18 @@ uint8_t* getAllData() {
 }
 
 //Get the information on what data needs to be sent
-//The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #locations1(1) #points1(1) FilePostition1(4) id2(2) ...
+//The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #points1(1) pos1(4) id2(2) ...
 uint8_t* getSendInfo() {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
         Serial.println(F("Error initialising sd card"));
-        uint8_t* errAns = malloc(sizeof(uint8_t));
-        errAns[0] = 0;
-        return errAns;
+        return;
     }
     
     //Open ToSend.csv and skip the first line
     File file = sd.open("ToSend.csv", FILE_READ);
-    file.seekSet(42);
+    file.seekSet(31);
     
     //Get the number of nodes that have data to send
     uint8_t numNodes = 0;
@@ -711,9 +704,9 @@ uint8_t* getSendInfo() {
         numNodes++;
     }
     
-    file.seekSet(42); //Go back to right after the first line
+    file.seekSet(31); //Go back to right after the first line
     
-    uint8_t* ans = malloc(sizeof(uint8_t) * (1 + (8 * numNodes))); //Allocate the array to return
+    uint8_t* ans = malloc(sizeof(uint8_t) * (1 + (7 * numNodes))); //Allocate the array to return
     
     ans[0] = numNodes; //The first byte is the number of nodes
     
@@ -730,21 +723,15 @@ uint8_t* getSendInfo() {
         currStr[len-1] = 0; //Overwrite ','
         uint8_t numPoints = atoi(currStr);
         
-        //Get the number of data points that the current node has to send
-        len = file.fgets(currStr, 12, ",");
-        currStr[len-1] = 0; //Overwrite ','
-        uint8_t numLocs = atoi(currStr);
-        
         //Get the postition in the current node's file
         len = file.fgets(currStr, 12, "\n");
         currStr[len-1] = 0; //Overwrite '\n'
         uint32_t currPos = atol(currStr);
         
         //Put the gathered info into the array to return
-        memcpy(&ans[1 + (8 * i)], &currId, sizeof(uint8_t) * 2);
-        ans[3 + (8 * i)] = numLocs;
-        ans[4 + (8 * i)] = numPoints;
-        memcpy(&ans[5 + (8 * i)], &currPos, sizeof(uint8_t) * 4);
+        memcpy(&ans[1 + (7 * i)], &currId, sizeof(uint8_t) * 2);
+        ans[3 + (7 * i)] = numPoints;
+        memcpy(&ans[4 + (7 * i)], &currPos, sizeof(uint8_t) * 4);
     }
     
     file.close();
@@ -753,7 +740,7 @@ uint8_t* getSendInfo() {
 }
 
 //Get some information of the sensor types of a specific node
-//First byte is total size that will be taken in final data array, second byte is just number of sensors, third byte is length of name
+//First byte is total size that will be taken in final data array, second byte is just number of sensors
 void getTypesInfo(uint8_t* ans, int id) {
     //Initialise the microSD card
     SdFat sd;
@@ -767,44 +754,43 @@ void getTypesInfo(uint8_t* ans, int id) {
     sprintf(fileName, "node%u.csv", id);
     File file = sd.open(fileName, FILE_READ);
     
-    //Get length of name
-    ans[2] = 0;
-    while (file.read() != 10) {
-        ans[2]++;
-    }
+    char currStr[12];
     
-    for (uint8_t i = 0; i < 3; i++) { //Skip time, latitude, and longitude
-        while (file.read() != ',') ;
-    }
+    //Keep track of the total size of the sensor types
+    uint8_t typesSize = 1; //Add 1 to account for number of types
     
-    ans[0] = 2; //Total size of the sensor types
-    ans[1] = 2; //How many sensor types there are
+    //Keep track of how many sensor types there are
+    uint8_t numTypes = 1; //Won't count the last type, so add 1
     
     while (file.peek() != 10) { //While it's not the end of the line
-        if (file.read() == 44) { //If it's a comma
-            ans[1]++; //New sensor type
-            ans[0]++; //For length of new sensor type
+        if (file.read() != 44) { //If it's a comma
+            typesSize++;
         } else {
-            ans[0]++; //For char of sensor type
+            numTypes++;
         }
     }
     file.close();
+    
+    typesSize += numTypes; //For length of each sensor type
+    
+    //Put the data into the passed in array
+    ans[0] = typesSize;
+    ans[1] = numTypes;
     
     return;
 }
 
 //Gets the data to be sent from a specific node
 //Form of data: Id(2) NumTypes(1) Type1Len(1) Type1Char1(1) Type1Char2(1) ... Type1CharN(1) Type2Len(1) Type2Char1(1) ... Type2CharN(1) NumData(1) Data1Type1(4) Data1Type2(4) ... Data1TypeN(4) Data2Type1(4) ... DataNTypeN(4)
-void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, unsigned long pos) {
+void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, unsigned long pos) {
     //Currently this copies in Time as a type, but that's just a waste of space
+
     Serial.print(F("Getting data for node: "));
     Serial.println(id);
     
     //Copy the current node's id into the answer array
     memcpy(&ans[*ansCurr], &id, sizeof(uint8_t) * 2);
     (*ansCurr) += 2;
-    
-    ans[(*ansCurr)++] = numLocs;
     
     //Initialise the microSD card
     SdFat sd;
@@ -819,39 +805,8 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     File file = sd.open(fileName, FILE_READ);
     file.seekSet(0); //Should skip time
     
-    
-    //Copy in some location info
-    
-    unsigned int locationPtr = 0;
-    
-    if (numLocs > 0) { //Means we need to put in name and adjust for future location positions
-        (*ansCurr)++; //For name len, filled in later
-        uint8_t nameLen = 0;
-        
-        while (file.peek() != 10) {
-            nameLen++;
-            ans[(*ansCurr)++] = file.read();
-        }
-        file.read(); //Skip '\n'
-        
-        ans[(*ansCurr) - (nameLen + 1)] = nameLen; //Put length of name in
-        
-        locationPtr = *ansCurr; //For future use
-        
-        (*ansCurr) += numLocs; //Leave room for location info
-    } else {
-        while (file.read() != 10) ; //Skip name
-    }
-    
     Serial.print(F("11.14201: "));
     Serial.println(freeMemory());
-    
-    for (uint8_t i = 0; i < 3; i++) { //Skip time, latitude, and longitude
-        while (file.read() != ',') ;
-    }
-    
-    
-    //Copy in sensor types
     
     //Variables needed to copy in the sensor type names
     unsigned int numPos = *ansCurr; //Posistion where the total number of types needs to go
@@ -882,44 +837,21 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     currNum = 0; //Number of data points
     (*ansCurr)++;
     
-    
-    //Go through each data point and copy in time, location, and sensor readings
-    
+    //Go through each data point
     while (file.available()) { //While it's not the end of the file
-        currNum++;
-        char dataStr[20];
+        char dataStr[13];
         
         //Get the time for the curr data point
         uint8_t len = file.fgets(dataStr, 13, ",");
         dataStr[len-1] = 0; //Overwrite ','
         unsigned long currTime = strtoul(dataStr, NULL, 10);
         
+        Serial.print(F("TIME: "));
+        Serial.println(currTime);
+        
         //Put the current time into the answer array
         memcpy(&ans[*ansCurr], &currTime, sizeof(uint8_t) * 4);
         (*ansCurr) += 4;
-        
-        
-        //Location check and value copy
-        
-        if (file.peek() != 44) { //Means this data point has a location
-            ans[locationPtr++] = currNum; //Indicate that this data point has a location
-            
-            //Read both latitude and longitude and copy it in
-            for (uint8_t i = 0; i < 2; i++) {
-                len = file.fgets(dataStr, 13, ",");
-                dataStr[len-1] = 0; //Overwrite ','
-                float currLoc = atof(dataStr);
-                
-                memcpy(&ans[*ansCurr], &currLoc, sizeof(uint8_t) * 4);
-                (*ansCurr) += 4;
-            }
-        } else { //Skip the two commas
-            file.read();
-            file.read();
-        }
-            
-        
-        //Copy in sensor values
         
         float currData; //Value of current sensor value
         uint8_t currDataStr = 0; //Index for dataStr
@@ -947,7 +879,8 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
         memcpy(&ans[*ansCurr], &currData, sizeof(uint8_t) * 4);
         
         (*ansCurr) += 4;
-        file.read(); //Skip '\n'
+        file.read();
+        currNum++;
     }
     
     file.close();
@@ -971,7 +904,7 @@ void truncateToSend() {
     
     File file = sd.open("ToSend.csv", FILE_WRITE);
     
-    file.truncate(42);
+    file.truncate(31);
     
     file.close();
     
@@ -1062,7 +995,7 @@ bool fonaPost(char* reqArr) {
 
 //Send an AT command to the FONA and wait for a specific reply
 //Command is as a __FlashStringHelper
-bool sendCheckReply(Stream& port, const __FlashStringHelper* command, char* reply, unsigned long timeout) {
+bool sendCheckReply(Stream& port, __FlashStringHelper* command, char* reply, int timeout) {
     Serial.print(F("Sending to fona: "));
     Serial.println(command);
     
@@ -1108,7 +1041,7 @@ bool sendCheckReply(Stream& port, const __FlashStringHelper* command, char* repl
 
 //Send an AT command to the FONA and wait for a specific reply
 //Command is as a char*
-bool sendCheckReply(Stream& port, char* command, char* reply, unsigned long timeout) {
+bool sendCheckReply(Stream& port, char* command, char* reply, int timeout) {
     //Refer to the function above for comments, as it's the exact same code
     
     Serial.print(F("Sending to fona: "));
