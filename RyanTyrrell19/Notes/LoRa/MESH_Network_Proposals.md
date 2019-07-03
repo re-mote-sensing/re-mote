@@ -38,6 +38,7 @@ Essentially, the node sends a dummy load to "wake up the network". Once awake, t
 
 Send dummy loads based on time or quantity?
 * Quantity is best. This will ensure no delay between loads and optimizes the chance of not being missed by the Relay's
+* Could be time based. Set loads to transmit with a delay ewual to time-on-air. This way, should always be something for CAD to detect (I think)
 
 Delay between sending dummy loads and sending actual data?
 * Depends on several factors; time it takes for dummy load to send and relay to receive, and the size of the network
@@ -49,7 +50,7 @@ Arduino power consumption when sleeping -> approx. 72.3uA
 |:------:|:---------:|:---------------------------------------:|
 | During Dummy load transmission | sending 20 dummy loads in 0.137 seconds | 117mA (max value displayed) |
 | Delay between dummy loads and actual data | User Defined | 6.25mA (can have driver + Arduino sleep for this time) 																				      |
-| Transmission of data and receiving acknowledgement | total duration is 237mA | Holds at 14.7mA, spikes briefly to 117mA (the holding is from finding a route so this time will vary) 		   		  |
+| Transmission of data and receiving acknowledgement | total duration is 237ms | Holds at 14.7mA, spikes briefly to 117mA (the holding is from finding a route so this time will vary) 		   		  |
 
 
 ## Relay
