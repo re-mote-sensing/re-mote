@@ -13,6 +13,12 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 
 # Proposals 3: RFM95 MESH Network
 
+
+## Setup Ideas
+
+* Set preamble longer than sleep time of Relayer's, send one message, Relayer wakes up, sends 1 dummy load, changes preamble, stays awake for X seconds. Node waits Z amount of time before sending message (at that point, network is "awake")
+	* this way everything is "set in stone", so the battery life can be computed
+
 ## Setup Outline
 
 The setup consists of three components; a Node, several Relays, and the Gateway. 
