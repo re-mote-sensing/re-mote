@@ -21,10 +21,10 @@ Node - Broadcasts a message to the Gateway, block until Acknowledgement is recei
 
 Relay - The Relay's will run through the following loop; Sleep the radio, sleep the Arduino for X amount of time, run the Channel Activity Detector (CAD). If CAD returns true, break the loop. Otherwise, repeat the loop.
 
-Gateway - Acts just like a relay, only it will determine that it's own ID is the target ID and process the message accordingly
+Gateway - acts just like a relay, only it will determine that it's own ID is the target ID and process the message accordingly
 
 The following outlines how a message is sent from the node to the Gateway:
-1. The node sends X amounts of dummy messages, and than delays for Y amount of time
+1. The node sends X amount of dummy messages, and than delays for Y amount of time
 2. Any relays that receive the broadcast will break the CAD loop, broadcast their own dummy messages, than wait for an actual message for Z amount of time.
 	* The node must provide enough of a delay to allow all Relay's to wake up, and the relay's must block for long enough that the actual message can get though, but not so long that power is wasted.
 3. The Node will send it's message, and hopefully receive an Acknowledgement from the Gateway
@@ -37,51 +37,50 @@ Essentially, the node sends a dummy load to "wake up the network". Once awake, t
 # Node
 
 Send dummy loads based on time or quantity?
-	* Quantity is best. This will ensure no delay between loads and optimizes the chance of not being missed by the Relay's
+* Quantity is best. This will ensure no delay between loads and optimizes the chance of not being missed by the Relay's
 
 Delay between sending dummy loads and sending actual data?
-	* Depends on several factors; time it takes for dummy load to send and relay to receive, and the size of the network
+* Depends on several factors; time it takes for dummy load to send and relay to receive, and the size of the network
 
-Power consumed - of RFM95 (3.3V)
-	* During Dummy load transmission - 
-	* Delay between dummy loads and actual data - 
-	* Transmission of data and receiving acknowledgement - 
+Arduino power consumption when powered -> approx. 4.5mA
+Arduino power consumption when sleeping -> approx. 72.3uA
 
-Power consumed - of RFM95 + Arduino Pro Mini (3.3V)
-	* During Dummy load transmission - 
-	* Delay between dummy loads and actual data - 
-	* Transmission of data and receiving acknowledgement - 
+| Phase  | Duration  | Power Consumed (RFM95 + Pro Mini)(3.3V) |
+|:------:|:---------:|:---------------------------------------:|
+| During Dummy load transmission | sending 20 dummy loads in 0.137 seconds | 117mA (max value displayed) |
+| Delay between dummy loads and actual data | User Defined | 6.25mA (can have driver + Arduino sleep for this time) 																				      |
+| Transmission of data and receiving acknowledgement | total duration is 237mA | Holds at 14.7mA, spikes briefly to 117mA (the holding is from finding a route so this time will vary) 		   		  |
+
 
 ## Relay
 
 Time between running CAD
-	* Depends; longer time equals less power consumed in the long run, but it requires the Node's to send more dummy loads to ensure one is received when CAD is run
-	* 500MS seems like a good choice
+* Depends; longer time equals less power consumed in the long run, but it requires the Node's to send more dummy loads to ensure one is received when CAD is run
+* 500MS seems like a good choice
+* Don't try to have Arduino sleep while CAD runs. Interrupts are handled internally by the RadioHead Library and trying to use the interrupt messes it up (plus CAD runs quick enough that having the Arduino sleep isn't really needed)
 
 Dummy Load send time?
-	* Quantity based; identical to the Node
+* Quantity based; identical to the Node
 
 
 Time spent waiting for the actual data to transmit?
-	* Depends
+* Depends
 
-Power consumed - of RFM95 (3.3V)
-	* Cycle between sleeping and running CAD - 
-	* During Dummy load transmission - 
-	* Blocking while waiting for data transmission - 
 
-Power consumed - of RFM95 + Arduino Pro Mini (3.3V)
-	* Cycle between sleeping and running CAD - 
-	* During Dummy load transmission - 
-	* Blocking while waiting for data transmission - 
+
+| Phase  | Duration  | Power Consumed (RFM95 + Pro Mini)(3.3V) |
+|:------:|:---------:|:---------------------------------------:|
+| Cycle between sleeping and running CAD | CAD - 6ms (experimentally); sleep - user defined | CAD - 6.1mA; sleep - 72.8uA |
+| During Dummy load transmission | sending 20 dummy loads in 0.137 seconds | 117mA (max value displayed) | 
+| Blocking while waiting for data transmission | User Defined | 14.57mA |
+
 
 
 ## Gateway
 * Identical to Node, only the data will be processed upon realizing it's ID matches that of the target ID for the data; processes the data accordingly
 
 # Power consumed during Various Modes
-
-## RFM95
+## RFM95 (Theoretical)
 
 Sleep - approx. 1uA  
 Receiving - 10 - 12mA (Depends on the settings used)  
@@ -105,7 +104,7 @@ The receiver is then in full receiver mode for just over half of the activity de
 ![alt-text][LoRa CAD Consumption Figure]
 
 
-Example:
+**Example:**
 
 Let SF = 7 (128 chips/symbol), BW = 125kHz  
 Symbol rate = BW / 2^SF = 125000 / 2^7 = 976.56 symbols/second
@@ -122,8 +121,6 @@ Remainder of the CAD process = 1.966 - 1.28 = 0.686 milliseconds
 At 125 kHz, power consumed during receiver mode is 10.8mA and power for the remainder of CAD is 5.6 mA.
 
 Therefore, total current consumed is (10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)
-
-
 
 
 
