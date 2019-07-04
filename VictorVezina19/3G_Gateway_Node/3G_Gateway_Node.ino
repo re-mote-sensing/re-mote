@@ -35,7 +35,7 @@ Things to do:
 #include <SoftwareSerial.h>
 #include <SdFat.h>
 
-#include <MemoryFree.h>
+//#include <MemoryFree.h>
 
 /*----------------------DEFINITIONS-----------------------------*/
 
@@ -57,30 +57,17 @@ void setup() {
     loraPort.begin(9600);
     Serial.begin(9600);
 
-    //All these freeMemory() calls are for testing, you can just ignore them
-    Serial.print(F("\n\n1: "));
-    Serial.println(freeMemory());
-
     //Write the LoRa configuration from the defines to the LoRa module
     writeConfig(loraPort, NETWORK_ID, NODE_ID);
     
     delay(1000);
-
-    Serial.print(F("1.1: "));
-    Serial.println(freeMemory());
     
     while (!Serial.available()) ; //Useful for testing
     
     while (loraPort.available()) loraPort.read(); //Delete data in loraPort, seems to mess gateway up once in a while
 
-    Serial.print(F("2: "));
-    Serial.println(freeMemory());
-
     //Make sure ToSend.csv exists
     createToSend();
-
-    Serial.print(F("2.1: "));
-    Serial.println(freeMemory());
     
     //Pretend like the last post just happened
     lastPost = millis();
@@ -91,9 +78,6 @@ void setup() {
 void loop() {
     loraPort.listen(); //Listen on the LoRa module software serial
     Serial.println(F("Waiting for LoRa messages"));
-    
-    Serial.print(F("3: "));
-    Serial.println(freeMemory());
 
     //Just keep checking the LoRa module until the right amount of time has passed
     while ((millis() >= lastPost) ? ((millis() - lastPost) < 60000) : ((millis() + (4294967295 - lastPost)) < 60000 )) { //Makes sure to check for overflow
@@ -131,9 +115,6 @@ void loop() {
         }
     }
     Serial.println(F("Posting data"));
-    
-    Serial.print(F("8: "));
-    Serial.println(freeMemory());
     
     lastPost = millis(); //Get post time before we actually post, this ensures that the posting starts exactly every hour
     postData(); //Post the saved data
@@ -494,215 +475,71 @@ bool checkSensorData(File file, uint8_t numSensors) {
     }
 }
 
+
 /*--------------Saved Data Posting Functions--------------*/
 //Post collected data to webserver
 void postData() {
-    Serial.print(F("10: "));
-    Serial.println(freeMemory());
+    //Should handle running out of memory better
+    //Could loop, if encounter error free current and continue(means numNodes--)
+    //If no error break, and truncate a number of nodes
+    //Would have to go through ToSend.csv backwards
     
-    //Build HTTP request
-    char* reqArr = buildRequest();
-    
-    //Makes sure the request isn't empty
-    if (reqArr == NULL) {
-        return;
-    }
-    
-    Serial.print(F("12: "));
-    Serial.println(freeMemory());
-
-    //Post the request through the FONA
-    bool error = fonaPost(reqArr);
-    
-    //Free the allocaated memory
-    free(reqArr);
-    
-    if (!error) { //If it posted correctly, truncate ToSend.csv (all the data that needed to be sent was sent)
-        truncateToSend();
-    }
-}
-
-//Build HTTP request to send through fona
-char* buildRequest() {
-    Serial.print(F("11.1: "));
-    Serial.println(freeMemory());
-    
-    uint8_t* data = getAllData(); //Get the data to send in the request
-    
-    //If there's no data to send, return NULL
-    if (data == NULL) {
-        return NULL;
-    }
-    
-    Serial.print(F("11.2: "));
-    Serial.println(freeMemory());
-    
-    //Get the size of the data
-    unsigned int dataSize;
-    memcpy(&dataSize, data, sizeof(uint8_t) * 2);
-    dataSize -= 2; //Don't need to account for the bytes taken by dataSize
-    
-    Serial.print(F("Data size: ")); //For debugging
-    Serial.println(dataSize);
-    
-    //Stuff here needs to be changed; the URL shouldn't be hardcoded
-    
-    uint8_t size = 70; //Total size of the hardcoded request
-    
-    Serial.print(F("Request size: "));
-    Serial.println(size + (2 * dataSize) + 1);
-    
-    char* request = malloc(sizeof(char) * (size + (2 * dataSize) + 1)); //Allocate the char array for the request
-    
-    if (request == NULL) { //If the arduino doesn't have enough RAM for the request
-        Serial.println(F("Ran out of memory while building request"));
-        return NULL;
-    }
-    
-    Serial.print(F("11.3: "));
-    Serial.println(freeMemory());
-    
-    strcpy(request, "POST /ollie/sensor/data?data="); //The first part of the HTTP request
-    
-    Serial.print(F("11.4: "));
-    Serial.println(freeMemory());
-    
-    for (unsigned int i = 0; i < dataSize; i++) { //Go through each byte of data, convert it into hex, and add that to the request
-        char* curr = byteToHexStr(data[i + 2]);
-        request[(2 * i) + 29] = curr[0];
-        request[(2 * i) + 29 + 1] = curr[1];
-        free(curr);
-    }
-    
-    Serial.print(F("11.5: "));
-    Serial.println(freeMemory());
-    
-    strcpy(&request[29 + (2 * dataSize)], " HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n\0"); //The last part of the HTTP request
-    
-    //Free the allocated memory for the data
-    free(data);
-    
-    Serial.print(F("11.6: "));
-    Serial.println(freeMemory());
-    
-    return request;
-}
-
-//Converts a uint8_t (byte) into a char* representing the hexadecimal form of the byte
-char* byteToHexStr(uint8_t data) {
-    char* ans = malloc(sizeof(char) * 2); //Allocate the char array
-    
-    sprintf(ans, "%02X", data); //Print the byte of data as hex into the char array, always aking up two characters
-    return ans;
-}
-
-//Get data for all nodes for HTTP request
-uint8_t* getAllData() {
-    Serial.print(F("11.11: "));
-    Serial.println(freeMemory());
-    
-    //Get some information on what needs to be sent (used to get the size of the data to be sent)
-    //The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #locations1(1) #points1(1) FilePostition1(4) id2(2) ...
-    uint8_t* sendInfo = getSendInfo();
-    
-    //If there's no data to be sent, return NULL
-    if (sendInfo[0] == 0) {
-        free(sendInfo);
-        return NULL;
-    }
-    
-    Serial.print(F("11.12: "));
-    Serial.println(freeMemory());
-    
-    //Keep track of the total size of the final data array
-    unsigned int totalLen = 3; //2 for data size (just used in converting to string), 1 for # of nodes
-    
-    for (uint8_t i = 0; i < sendInfo[0]; i++) { //Go through each node that has data to send
-        //Get the node's id
-        int currId;
-        memcpy(&currId, &sendInfo[1 + (8 * i)], sizeof(uint8_t) * 2);
-        
-        totalLen += 2; //For the node's id
-        
-        //Gets the type info for the current node
-        uint8_t* currTypesInfo = malloc(sizeof(uint8_t) * 3); //Allocate the array to put the info into
-        getTypesInfo(currTypesInfo, currId); //First byte is total size that will be taken in final data array, second byte is just number of sensors, third byte is length of name
-        
-        
-        //Account for size of locations
-        totalLen += 1; //For # locations
-        
-        if (sendInfo[3 + (8 * i)] > 0) {
-            totalLen += 1 + currTypesInfo[2]; //For name length + name
-            totalLen += 9 * sendInfo[3 + (8 * i)]; //For locations
+    while (true) {
+        uint8_t numNodes = countNodesToSend();
+        if (numNodes == 0) {
+            return;
         }
-        
-        totalLen += currTypesInfo[0]; //Size of sensor types information
-        
-        //Account for size of data points
-        totalLen += 1; //For # data point
-        
-        //Essentially doing: totalLen += #DataPoints * #Types * 4 bytes
-        totalLen += sendInfo[4 + (8 * i)] * currTypesInfo[1] * 4;
-        
-        free(currTypesInfo); //Free allocated memory
+
+        uint8_t* sendInfo = malloc(sizeof(uint8_t) * (8 * numNodes));
+        if (sendInfo == NULL) {
+            return;
+        }
+        getSendInfo(sendInfo, numNodes);
+
+        unsigned int dataSize = getDataSize(sendInfo, numNodes);
+        uint8_t* data = malloc(sizeof(uint8_t) * dataSize);
+        if (data == NULL) {
+            return;
+        }
+        getData(data, sendInfo, numNodes);
+
+        char* request = malloc(sizeof(char) * (2 + 2 * dataSize + urlLen() + 1));
+        if (request == NULL) {
+            return;
+        }
+        buildRequest(request, data, numNodes, dataSize);
+
+        bool error = fonaPost(request);
+
+        free(request);
+        free(data);
+        free(sendInfo);
+
+        //If it posted correctly, truncate ToSend.csv to the correct length (remove numNodes nodes from the end)
+        if (!error) {
+            truncateToSend(numNodes);
+        } else {
+            return;
+        }
     }
-    
-    Serial.print(F("11.13: "));
-    Serial.println(freeMemory());
-    
-    //Allocate the final data array
-    uint8_t* ans = malloc(sizeof(uint8_t) * totalLen);
-    
-    ans[2] = sendInfo[0]; //Number of nodes
-    
-    Serial.print(F("11.14: "));
-    Serial.println(freeMemory());
-    
-    //Go through each node and get the data for the data points it needs to send
-    unsigned int curr = 3;
-    for (uint8_t i = 0; i < sendInfo[0]; i++) {
-        //Get current node id
-        int currId;
-        memcpy(&currId, &sendInfo[1 + (8 * i)], sizeof(uint8_t) * 2);
-        
-        //Get current number of locations
-        uint8_t currLocs = sendInfo[3 + (8 * i)];
-        
-        //Get postition in the node's file
-        unsigned long currPos;
-        memcpy(&currPos, &sendInfo[5 + (8 * i)], sizeof(uint8_t) * 4);
-        
-        //Gets the data for the current node and puts it into the ans array starting at curr, increments curr accordingly
-        getNodeData(ans, &curr, currId, currLocs, currPos);
-    }
-    
-    //Free allocated memory
-    free(sendInfo);
-    
-    memcpy(ans, &curr, sizeof(uint8_t) * 2); //Copy in data size onto the data array
-    
-    Serial.print(F("11.15: "));
-    Serial.println(freeMemory());
-    
-    return ans;
 }
 
-//Get the information on what data needs to be sent
-//The returned array has the form(the numbers in the brackets is number of bytes): #nodes(1) id1(2) #locations1(1) #points1(1) FilePostition1(4) id2(2) ...
-uint8_t* getSendInfo() {
+int urlLen() {
+    return 70;
+}
+
+//Counts the number of nodes that have data to send to the web server
+uint8_t countNodesToSend() {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
         Serial.println(F("Error initialising sd card"));
-        uint8_t* errAns = malloc(sizeof(uint8_t));
-        errAns[0] = 0;
-        return errAns;
+        return 0;
     }
     
     //Open ToSend.csv and skip the first line
     File file = sd.open("ToSend.csv", FILE_READ);
-    file.seekSet(42);
+    while (file.available() && file.read() != 10);
     
     //Get the number of nodes that have data to send
     uint8_t numNodes = 0;
@@ -711,11 +548,22 @@ uint8_t* getSendInfo() {
         numNodes++;
     }
     
-    file.seekSet(42); //Go back to right after the first line
+    return numNodes;
+}
+
+//Get the information on what data needs to be sent
+//The returned array has the form(the numbers in the brackets is number of bytes): id1(2) #locations1(1) #points1(1) FilePostition1(4) id2(2) ...
+void getSendInfo(uint8_t* ans, uint8_t numNodes) {
+    //Initialise the microSD card
+    SdFat sd;
+    if (!sd.begin()) {
+        Serial.println(F("Error initialising sd card"));
+        return;
+    }
     
-    uint8_t* ans = malloc(sizeof(uint8_t) * (1 + (8 * numNodes))); //Allocate the array to return
-    
-    ans[0] = numNodes; //The first byte is the number of nodes
+    //Open ToSend.csv and skip the first line
+    File file = sd.open("ToSend.csv", FILE_READ);
+    while (file.available() && file.read() != 10);
     
     for (uint8_t i = 0; i < numNodes; i++) { //Go through each node, and get it's corresponding information
         char currStr[12];
@@ -741,15 +589,52 @@ uint8_t* getSendInfo() {
         uint32_t currPos = atol(currStr);
         
         //Put the gathered info into the array to return
-        memcpy(&ans[1 + (8 * i)], &currId, sizeof(uint8_t) * 2);
-        ans[3 + (8 * i)] = numLocs;
-        ans[4 + (8 * i)] = numPoints;
-        memcpy(&ans[5 + (8 * i)], &currPos, sizeof(uint8_t) * 4);
+        memcpy(&ans[8 * i], &currId, sizeof(uint8_t) * 2);
+        ans[2 + (8 * i)] = numLocs;
+        ans[3 + (8 * i)] = numPoints;
+        memcpy(&ans[4 + (8 * i)], &currPos, sizeof(uint8_t) * 4);
     }
     
     file.close();
+}
+
+//Calculates the array size needed for the data to be sent to the server
+unsigned int getDataSize(uint8_t* sendInfo, uint8_t numNodes) {
+    //Calculate needed size
+    unsigned int totalLen = 0;
     
-    return ans;
+    for (uint8_t i = 0; i < numNodes; i++) { //Go through each node that has data to send
+        //Get the node's id
+        int currId;
+        memcpy(&currId, &sendInfo[8 * i], sizeof(uint8_t) * 2);
+        
+        totalLen += 2; //For the node's id
+        
+        //Gets the type info for the current node
+        uint8_t* currTypesInfo = malloc(sizeof(uint8_t) * 3); //Allocate the array to put the info into
+        getTypesInfo(currTypesInfo, currId); //First byte is total size that will be taken in final data array, second byte is just number of sensors, third byte is length of name
+        
+        
+        //Account for size of locations
+        totalLen += 1; //For # locations
+        
+        if (sendInfo[2 + (8 * i)] > 0) {
+            totalLen += 1 + currTypesInfo[2]; //For name length + name
+            totalLen += 9 * sendInfo[2 + (8 * i)]; //For locations
+        }
+        
+        totalLen += currTypesInfo[0]; //Size of sensor types information
+        
+        //Account for size of data points
+        totalLen += 1; //For # data point
+        
+        //Essentially doing: totalLen += #DataPoints * #Types * 4 bytes
+        totalLen += sendInfo[3 + (8 * i)] * currTypesInfo[1] * 4;
+        
+        free(currTypesInfo); //Free allocated memory
+    }
+    
+    return totalLen;
 }
 
 //Get some information of the sensor types of a specific node
@@ -788,9 +673,29 @@ void getTypesInfo(uint8_t* ans, int id) {
             ans[0]++; //For char of sensor type
         }
     }
-    file.close();
     
-    return;
+    file.close();
+}
+
+//Get the data to send to the server
+void getData(uint8_t* ans, uint8_t* sendInfo, uint8_t numNodes) {
+    //Go through each node and get the data for the data points it needs to send
+    unsigned int curr = 0;
+    for (uint8_t i = 0; i < numNodes; i++) {
+        //Get current node id
+        int currId;
+        memcpy(&currId, &sendInfo[8 * i], sizeof(uint8_t) * 2);
+        
+        //Get current number of locations
+        uint8_t currLocs = sendInfo[2 + (8 * i)];
+        
+        //Get postition in the node's file
+        unsigned long currPos;
+        memcpy(&currPos, &sendInfo[4 + (8 * i)], sizeof(uint8_t) * 4);
+        
+        //Gets the data for the current node and puts it into the ans array starting at curr, increments curr accordingly
+        getNodeData(ans, &curr, currId, currLocs, currPos);
+    }
 }
 
 //Gets the data to be sent from a specific node
@@ -843,9 +748,6 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
         while (file.read() != 10) ; //Skip name
     }
     
-    Serial.print(F("11.14201: "));
-    Serial.println(freeMemory());
-    
     for (uint8_t i = 0; i < 3; i++) { //Skip time, latitude, and longitude
         while (file.read() != ',') ;
     }
@@ -873,9 +775,6 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     
     ans[(*ansCurr) - (currTypeLen + 1)] = currTypeLen; //Put in the length of the type name that was just copied in
     ans[numPos] = currNum; //Put in the total number of types that was copied in
-    
-    Serial.print(F("11.14202: "));
-    Serial.println(freeMemory());
     
     file.seekSet(pos); //Go to the position where the data points start
     numPos = *ansCurr; //Postition for the number of data points
@@ -954,14 +853,34 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     
     ans[numPos] = currNum; //Put the number of data points into the answer array
     
-    Serial.print(F("11.14203: "));
-    Serial.println(freeMemory());
-    
     return;
 }
 
+//Build HTTP request to send through fona
+void buildRequest(char* request, uint8_t* data, uint8_t numNodes, unsigned int dataSize) {
+    Serial.print(F("Data size: ")); //For debugging
+    Serial.println(dataSize);
+    
+    //Stuff here needs to be changed; the URL shouldn't be hardcoded
+    
+    strcpy(request, "POST /ollie/sensor/data?data="); //The first part of the HTTP request
+    
+    char curr[2]; //Char buffer
+    sprintf(curr, "%02X", numNodes); //Print the number of nodes as hex into the char array, always taking up two characters
+    request[29] = curr[0];
+    request[29 + 1] = curr[1];
+    
+    for (unsigned int i = 0; i < dataSize; i++) { //Go through each byte of data, convert it into hex, and add that to the request
+        sprintf(curr, "%02X", data[i]); //Print the byte of data as hex into the char array, always taking up two characters
+        request[(2 * i) + 29 + 2] = curr[0];
+        request[(2 * i) + 29 + 2 + 1] = curr[1];
+    }
+    
+    strcpy(&request[29 + 2 + (2 * dataSize)], " HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n\0"); //The last part of the HTTP request
+}
+
 //Truncate ToSend.csv to account for sent data
-void truncateToSend() {
+void truncateToSend(uint8_t numNodes) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
@@ -974,8 +893,6 @@ void truncateToSend() {
     file.truncate(42);
     
     file.close();
-    
-    return;
 }
 
 
