@@ -7,11 +7,22 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 
 # Proposals 1: MESH Modules; continuously on
 
+## Setup
+
+
+
+## Power
+
+
+
 
 # Proposals 2: MESH Modules; synchronized power
 
 
 # Proposals 3: RFM95 MESH Network
+
+## Background Info
+
 
 
 ## Setup Ideas
@@ -20,18 +31,26 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 	* this way everything is "set in stone", so the battery life can be computed
 
 
+* Set preamble longer than sleep time of Relayer's, send 1 message, preamble wakes Relayer up, and it is able to catch the associated message with the preamble. Requires MESH Timout to increase substantially
 
-* Set preamble longer than sleep time of Relayer's, send 1 message, preamble wakes Relayer up, and it is able to catch the associated message with the preamble. Rquires MESH Timout to increase substantially
+* MESH network flow
+	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
+	* * Get 
+
+* Ignore the MESH Network Protocol completely. Instead, just have Node Broadcast its message to all Relay's/Nodes. They will then rebroadcast the message until it makes it to the Gateway. The Gateway will then do the same thing for the ACK.
+	* Issue - broadcast storm. Include a flag, or something in the header to verify if this has already been broadcast. Musk Like how the MESH Network works for finding a route
+	* Issue - Nodes may still broadcast the data even though the Gateway has already received it.
+	* * Could mark the messages to ID as data or the associated to that data ACK. This can let the Relayer's know whether to rebroadcast or chill
 
 ## Setup Outline
 
-The setup consists of three components; a Node, several Relays, and the Gateway. 
+The setup consists of three components; End-Node, Relay-Node, and a Gateway. 
 
-Node - Broadcasts a message to the Gateway, block until Acknowledgement is received
+End-Node - Broadcasts a message to the Gateway, waits until an Acknowledgement is received
 
-Relay - The Relay's will run through the following loop; Sleep the radio, sleep the Arduino for X amount of time, run the Channel Activity Detector (CAD). If CAD returns true, break the loop. Otherwise, repeat the loop.
+Relay-Node - The Relay-Node's will run through the following loop; Sleep the RFM95 & Arduino for X amount of time, run the Channel Activity Detector (CAD). If CAD returns true, break the loop. Otherwise, repeat the loop.
 
-Gateway - acts just like a relay, only it will determine that it's own ID is the target ID and process the message accordingly
+Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
 
 The following outlines how a message is sent from the node to the Gateway:
 1. The node sends X amount of dummy messages, and than delays for Y amount of time
@@ -53,7 +72,7 @@ Send dummy loads based on time or quantity?
 Delay between sending dummy loads and sending actual data?
 * Depends on several factors; time it takes for dummy load to send and relay to receive, and the size of the network
 
-Arduino power consumption when powered -> approx. 4.5mA
+Arduino power consumption when powered -> approx. 4.5mA  
 Arduino power consumption when sleeping -> approx. 72.3uA
 
 | Phase  | Duration  | Power Consumed (RFM95 + Pro Mini)(3.3V) |
@@ -131,8 +150,9 @@ Remainder of the CAD process = 1.966 - 1.28 = 0.686 milliseconds
 
 At 125 kHz, power consumed during receiver mode is 10.8mA and power for the remainder of CAD is 5.6 mA.
 
-Therefore, total current consumed is (10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)
+Average current consumption is ((10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)) / (1.28e-3 + 0.686e-3) = 8.98 mA
 
+**Therefore, CAD runs for a total time of 1.966 milliseconds drawing an average of 8.98mA.**
 
 
 

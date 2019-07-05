@@ -1,37 +1,15 @@
 # Overview
-
-# Neat Features
-* Low Battery Detector
-	* A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
-
-* Beacon Mode (only in FSK/OOK Mode)
-	* In some short range wireless network topologies a repetitive message, also known as beacon, is transmitted periodically by a transmitter. The Beacon Tx mode allows for the re-transmission of the same packet without having to fill the FIFO multiple times with the same data.
-
-* Built-in Temperature Sensor
-	* A stand alone temperature measurement block is used in order to measure the temperature in any mode except Sleep and Standby. 
-	* Due to process variations, the absolute accuracy of the result is +/- 10 °C. Higher precision requires a calibration procedure at a known temperature. The figure below shows the influence of just such a calibration process.
+* Changeable LoRa Parameters and their influence on transmission
+* RFM95 Features
+	* CAD Mode
+* Radiohead Library
+* Additional Notes
+* Additional Resources
 
 
-
-# Links with Key Notes Summarized
-
-
-* [Ultra low power listening mode for battery nodes][Site 3]
-	* 
-*
-* [Small loop antennas @ 433 Mhz][Site 4]
-	* Check out later
-
-* [Build LoRa node using Arduino Uno and HopeRF RFM95 LoRa transceiver module][Site 5]
-
-
-* [Build a copper 868MHz coil antenna][Site 6]
-
-
-
+* Unless otherwise specified, this information came from the [RFM95 Datasheet][1]
 
 # Changeable parameters and how they relate to one another
-
 ## Overview
 
 * Frequency Range
@@ -42,7 +20,7 @@
 * Coding Rate
 * Transmission Power
 
-* " So that it is possible to optimise the LoRa modulation for a given application, access is given to the designer to three critical design parameters. Each one permitting a trade off between link budget, immunity to interference, spectral occupancy and nominal data rate. These parameters are spreading factor, modulation bandwidth and error coding rate."
+* "So that it is possible to optimise the LoRa modulation for a given application, access is given to the designer to three critical design parameters. Each one permitting a trade off between link budget, immunity to interference, spectral occupancy and nominal data rate. These parameters are spreading factor, modulation bandwidth and error coding rate."
 
 ## Parameters
 ### Spreading Factor
@@ -113,7 +91,72 @@ Addition of these two durations gives the total packet on-air time.
 
 ![alt-text][Time on air 4]
 
-# Other, Random Notes
+# RFM95 Features
+
+## Channel Activity Detection (CAD)
+### Principal Operation
+"The channel activity detection mode is designed to detect a LoRa preamble on the radio channel with the best possible power efficiency. Once in CAD mode, the RFM95/96/97/98(W)will perform a very quick scan of the band to detect a LoRa packet preamble."
+
+### Duration, Power consumption, and Example
+
+The time taken for the channel activity detection is dependent upon the LoRa modulation settings used. For a given configuration the typical CAD detection time is shown in the graph below, expressed as a multiple of the LoRa symbol period. Of this period the radio is in receiver mode for (2^SF + 32) / BW seconds. For the remainder of the CAD cycle the radio is in a reduced consumption state.
+
+![alt-text][CAD as a Function of SF]
+
+To illustrate this process and the respective consumption in each mode, the CAD process follows the sequence of events outlined below:
+
+![alt-text][Consumption Profile of the LoRa CAD profile]
+
+The receiver is then in full receiver mode for just over half of the activity detection, followed by a reduced consumption processing phase where the consumption varies with the LoRa bandwidth as shown in the table below.
+
+![alt-text][LoRa CAD Consumption Figure]
+
+
+**Example:**
+
+Let SF = 7 (128 chips/symbol), BW = 125kHz  
+Symbol rate = BW / 2^SF = 125000 / 2^7 = 976.56 symbols/second
+
+With SF = 7, CAD runs for a total time of approx. 1.92 Symbols (according to the chart)
+
+Total CAD time = (1/976.56) * 1.92 = 1.966 milliseconds
+
+Of that time, Receiver mode is running for (2^SF + 32) / BW = (2^7 + 32) / 125000 = 1.28 milliseconds
+
+
+Remainder of the CAD process = 1.966 - 1.28 = 0.686 milliseconds
+
+At 125 kHz, power consumed during receiver mode is 10.8mA and power for the remainder of CAD is 5.6 mA.
+
+Average current consumption is ((10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)) / (1.28e-3 + 0.686e-3) = 8.98 mA
+
+**Therefore, CAD runs for a total time of 1.966 milliseconds drawing an average of 8.98mA.**
+
+
+## Other Neat Features
+* Low Battery Detector
+	* A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
+
+* Beacon Mode (only in FSK/OOK Mode)
+	* In some short range wireless network topologies a repetitive message, also known as beacon, is transmitted periodically by a transmitter. The Beacon Tx mode allows for the re-transmission of the same packet without having to fill the FIFO multiple times with the same data.
+
+* Built-in Temperature Sensor
+	* A stand alone temperature measurement block is used in order to measure the temperature in any mode except Sleep and Standby. 
+	* Due to process variations, the absolute accuracy of the result is +/- 10 °C. Higher precision requires a calibration procedure at a known temperature. The figure below shows the influence of just such a calibration process.
+
+
+# [RadioHead Library][RadioHead Library]
+* Caution: Developing this type of software and using data radios successfully is challenging and requires a substantial knowledge base in software and radio and data transmission technologies and theory. It may not be an appropriate project for beginners. If you are a beginner, you will need to spend some time gaining knowledge in these areas first.
+
+** Check out this site for buying a [Helical Antenna][Helical Antenna Site]**
+
+## RadioHead MESH Network
+
+See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated) example on a MESH network setup. This example has each node display it's routing table. Could be useful.
+
+* **Recall the RFM95 Modules DO NOT go to sleep when powered via USB**
+
+# Additional Notes
 ## Acronyms 
 * OOK - On-Off Keying Modulation
 * (G)FSK - (Gaussian) Frequency-Shift Keying modulation
@@ -130,26 +173,20 @@ Addition of these two durations gives the total packet on-air time.
 * LO - Local Oscillator 
 * LNA - Low-noise Amplifier
 
-## Receiver Startup Time (FSK/OOK Mode)
-
-The receiver startup time, TS_RE, only depends upon the receiver bandwidth effective at the time of startup. When AFC is enabled (AfcAutoOn=1), AfcBw should be used instead of RxBw to extract the receiver startup time:
-
-![alt-text][Receiver Startup Time]
-
-TS_RE or later after setting the device in Receive mode, any incoming packet will be detected and demodulated by the transceiver.
-
-## Low battery Detector
-
-A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
-
 ## Receiver Enabled and Receiver Active States
-In the receiver operating mode two states of functionality are defined. Upon initial transition to receiver operating mode the receiver is in the ‘receiver-enabled’ state. In this state the receiver awaits for either the user defined valid preamble or RSSI detection criterion to be fulfilled. Once met the receiver enters ‘receiver-active’ state. In this second state the received signal is processed by the packet engine and top level sequencer. For a complete description of the digital functions of the RFM95/96/97/98(W) receiver please see Section 4 of the datasheet.
+In the receiver operating mode two states of functionality are defined. Upon initial transition to receiver operating mode the receiver is in the ‘receiver-enabled’ state. In this state the receiver awaits for either the **user defined valid preamble or RSSI detection** criterion to be fulfilled. Once met the receiver enters ‘receiver-active’ state. In this second state the received signal is processed by the packet engine and top level sequencer. For a complete description of the digital functions of the RFM95/96/97/98(W) receiver please see Section 4 of the datasheet.
 
-## Automtic Gain Control (AGC) (in FSK/OOK Mode)
+# Additional Resources
 
-The AGC feature allows receiver to handle a wide Rx input dynamic range from the sensitivity level up to maximum input level of 0dBm or more, whilst optimizing the system linearity.
+* [Ultra low power listening mode for battery nodes][Site 3]
+* [Small loop antennas @ 433 Mhz][Site 4]
+	* Check out later
+* [Build LoRa node using Arduino Uno and HopeRF RFM95 LoRa transceiver module][Site 5]
+* [Build a copper 868MHz coil antenna][Site 6]
 
-## RFMx series
+
+
+## RFMx series (Differntiating between the different modules)
 
 * RFM95 & RFM69HCW - Only difference is the frequency they are attuned for (The hardware related to the frequency setting)
 	* RFM96 is for 433MHz
@@ -165,20 +202,6 @@ The AGC feature allows receiver to handle a wide Rx input dynamic range from the
 [source][4]
 
 
-# [RadioHead Library][RadioHead Library]
-* Caution: Developing this type of software and using data radios successfully is challenging and requires a substantial knowledge base in software and radio and data transmission technologies and theory. It may not be an appropriate project for beginners. If you are a beginner, you will need to spend some time gaining knowledge in these areas first.
-
-
-** Check out this site for buying a [Helical Antenna][Helical Antenna Site]**
-
-## RadioHead MESh Network
-
-See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated) example on a NESH network setup. This example has each node display it's routing table. Could be useful.
-
-* **Recall the RFM95 Moduels DO NOT go to sleep when powered via USB**
-* ** Can't wake up via preamble and also read message associated with that preamble**
-	* May not be the case. Seems to stop working just from increasing the preamble
-	* Timeout for MESh Network NOT configurable. Need to edit the library itself
 
 [Site 1]: https://lowpowerlab.com/forum/low-power-techniques/any-success-with-lora-low-power-listening/
 [Site 2]: https://lowpowerlab.com/forum/low-power-techniques/using-listenmode-as-wakeup-timer/15/
@@ -212,3 +235,8 @@ See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated
 [4]: https://lowpowerlab.com/guide/moteino/transceivers/
 
 [RFM95 MESH Netwrok Example]: https://nootropicdesign.com/projectlab/2018/10/20/lora-mesh-networking/
+
+
+[CAD as a Function of SF]:https://i.ibb.co/J5spnY6/CAD-as-a-Function-of-SF.png
+[Consumption Profile of the LoRa CAD profile]: https://i.ibb.co/3fd2R2v/Consumption-Profile-of-the-Lo-Ra-CAD-profile.png 
+[LoRa CAD Consumption Figure]: https://i.ibb.co/FsSK3RP/Lo-Ra-CAD-Consumption-Figure.png
