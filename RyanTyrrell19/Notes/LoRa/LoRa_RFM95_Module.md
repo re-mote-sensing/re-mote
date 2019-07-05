@@ -20,7 +20,7 @@
 * Coding Rate
 * Transmission Power
 
-* "So that it is possible to optimise the LoRa modulation for a given application, access is given to the designer to three critical design parameters. Each one permitting a trade off between link budget, immunity to interference, spectral occupancy and nominal data rate. These parameters are spreading factor, modulation bandwidth and error coding rate."
+* "So that it is possible to optimize the LoRa modulation for a given application, access is given to the designer to three critical design parameters. Each one permitting a trade off between link budget, immunity to interference, spectral occupancy and nominal data rate. These parameters are spreading factor, modulation bandwidth and error coding rate."
 
 ## Parameters
 ### Spreading Factor
@@ -186,7 +186,7 @@ In the receiver operating mode two states of functionality are defined. Upon ini
 
 
 
-## RFMx series (Differntiating between the different modules)
+## RFMx series (Differentiating between the different modules)
 
 * RFM95 & RFM69HCW - Only difference is the frequency they are attuned for (The hardware related to the frequency setting)
 	* RFM96 is for 433MHz
