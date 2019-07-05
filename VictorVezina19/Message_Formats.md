@@ -104,7 +104,7 @@ where {data} is a long string of hex characters representing the bytes of the da
 | **Size in bytes** |1|2|1|Variable|1|Variable|1|Variable|
 | **Contents** |The number of nodes that have data being posted to the server|The ID of the node who's data follows, as a 16 bit integer|The number of locations this node has to post|The location information this node is posting, empty if there are no locations to post|The number of sensors this node has|The information of this node's attached sensors, empty if there are none|The number of data points this node has to post|The data this node is posting, empty if there is no data to post|
 
-The last 5 columns are repeated for every node that has data being posted to the server. The variable length columns are described below:
+The last 7 columns are repeated for every node that has data being posted to the server. The variable length columns are described below:
 
 ### Location Information:
 
