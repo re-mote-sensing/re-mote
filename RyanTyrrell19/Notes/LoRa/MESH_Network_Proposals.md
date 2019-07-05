@@ -102,7 +102,7 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 
 * Ignore the MESH Network Protocol completely. Instead, just have the End-Node Broadcast its message to all Relay-Nodes. They will then rebroadcast the message until it makes it to the Gateway. The Gateway will then do the same thing for the Acknowledgement. This is known as **[Flooding][Flooding]**
 	* Potential Issue - broadcast storm, Nodes may still broadcast the data even though the Gateway has already received it.
-	* This implementation already exists, and sp do solutions to the above issues		
+	* This implementation already exists, and so do solutions to the above issues		
 
 * MESH network flow
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
