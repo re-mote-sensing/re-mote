@@ -175,7 +175,10 @@ The AGC feature allows receiver to handle a wide Rx input dynamic range from the
 
 See [this site][RFM95 MESH Netwrok Example] for an excellent (albeit complicated) example on a NESH network setup. This example has each node display it's routing table. Could be useful.
 
-* **Recall the RFM95 Moduels DO NOT g oto sleep when powered via USB**
+* **Recall the RFM95 Moduels DO NOT go to sleep when powered via USB**
+* ** Can't wake up via preamble and also read message associated with that preamble**
+	* May not be the case. Seems to stop working just from increasing the preamble
+	* Timeout for MESh Network NOT configurable. Need to edit the library itself
 
 [Site 1]: https://lowpowerlab.com/forum/low-power-techniques/any-success-with-lora-low-power-listening/
 [Site 2]: https://lowpowerlab.com/forum/low-power-techniques/using-listenmode-as-wakeup-timer/15/

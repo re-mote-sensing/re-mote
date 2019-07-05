@@ -19,6 +19,10 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 * Set preamble longer than sleep time of Relayer's, send one message, Relayer wakes up, sends 1 dummy load, changes preamble, stays awake for X seconds. Node waits Z amount of time before sending message (at that point, network is "awake")
 	* this way everything is "set in stone", so the battery life can be computed
 
+
+
+* Set preamble longer than sleep time of Relayer's, send 1 message, preamble wakes Relayer up, and it is able to catch the associated message with the preamble. Rquires MESH Timout to increase substantially
+
 ## Setup Outline
 
 The setup consists of three components; a Node, several Relays, and the Gateway. 
