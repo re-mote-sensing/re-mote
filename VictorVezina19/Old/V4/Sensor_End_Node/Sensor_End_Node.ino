@@ -1,10 +1,10 @@
 /*----------IMPORTANT INFORMATION AND CONFIG PARAMETERS---------*/
 
 // Change the following parameters to accommodate your specific setup
-#define NAME "Office"           //Name to associate with this node
+#define NAME "Akwesasne"           //Name to associate with this node
 
 #define NETWORK_ID 0x1           //LoRa network ID, has to be the same on every LoRa module in your network
-#define NODE_ID 0x0              //LoRa ID of this node, must be unique to all nodes in a network
+#define NODE_ID 0x4              //LoRa ID of this node, must be unique to all nodes in a network
 #define GATEWAY_ADDRESS 0x1000   //ID of the gateway node to send data to
 
 #define LORA_RX 7                //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
@@ -16,7 +16,7 @@
 // The following paramaters have to do with the sensors you're using on this end node
 // Look on our GitLab (LINK!) for more information on sensor setup and how to edit these values
 #define NUMBER_SENSORS 4 //Max is 15
-char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Conductivity", "Turbidity", "Water_Temperature"};
+char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Conductivity", "Turbidity", "Temperature"};
 uint8_t sensorPorts[NUMBER_SENSORS][2] = { {12, 11}, {9, 8}, {5, 20}, {4, 0} };
 
 
@@ -169,7 +169,7 @@ void setup() {
     delay(250);
     
     //For debugging where you can't get a GPS signal
-    bool bypassGPS = false;
+    bool bypassGPS = true;
     
     if (bypassGPS) {
         latitude = 43;
@@ -253,7 +253,7 @@ void initialiseSensors() {
             initialiseAtlas(i);
         } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //TB
             initialiseTB(i);
-        } else if (strcmp(sensorTypes[i], "Water_Temperature") == 0) { //Temp
+        } else if (strcmp(sensorTypes[i], "Temperature") == 0) { //Temp
             initialiseTemp(i);
         }
     }
@@ -665,7 +665,7 @@ uint8_t* readSensors() {
             data = readAS(i);
         } else if (strcmp(sensorTypes[i], "Turbidity") == 0) { //DFRobot Turbidity
             data = readTB(i);
-        } else if (strcmp(sensorTypes[i], "Water_Temperature") == 0) { //DFRobot Temperature
+        } else if (strcmp(sensorTypes[i], "Temperature") == 0) { //DFRobot Temperature
             data = readTemp(i);
         } else { //Should probably handle this better
             data = -1;
@@ -796,7 +796,7 @@ float readTemp(uint8_t i) {
     } while (ans == 85); //It returns 85 if the conversion isn't yet finished
     
     //Debugging print statements
-    Serial.print(F("Read Water Temp sensor: "));
+    Serial.print(F("Read Temp sensor: "));
     Serial.println(ans);
     
     return ans;
@@ -930,7 +930,6 @@ void readEEPROM(uint8_t* message, uint8_t* messageIndex, unsigned int* memAddres
         }
     }
 }
-
 
 /*-------------------Helper Functions-------------------*/
 

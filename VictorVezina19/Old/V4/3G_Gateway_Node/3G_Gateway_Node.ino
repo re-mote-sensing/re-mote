@@ -5,17 +5,17 @@
 // Change the following parameters to accommodate your specific setup
 #define NETWORK_ID 0x1   //LoRa network ID, has to be the same on every LoRa module in your network
 #define NODE_ID 0x1000   //LoRa ID of this node, you then need to put this into the end nodes that are sending to this gateway
-#define LORA_RX 6        //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
-#define LORA_TX 7        //Pin that the LoRa RXD pin is connected to
-
-#define URL_HOST "www.cas.mcmaster.ca"
-#define URL_PATH "/ollie"
-#define PORT_NUMBER 80
+#define LORA_RX 6      //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
+#define LORA_TX 7      //Pin that the LoRa RXD pin is connected to
 
 
 /*
 Things to do:
-- Add temperature/humidity sensor
+- Hardcoded URL takes global memory, which is no bueno!!!!!!
+
+- Add location to main HTTP request
+- Change HTTP request to not include "Time"
+- Change HTTP requests to not be hardcoded
 - Actually implement other acks
 - Don't just sit there waiting, sleep and check every second for lora
 - Check for SD card being full
@@ -479,58 +479,53 @@ bool checkSensorData(File file, uint8_t numSensors) {
 /*--------------Saved Data Posting Functions--------------*/
 //Post collected data to webserver
 void postData() {
+    //Should handle running out of memory better
+    //Could loop, if encounter error free current and continue(means numNodes--)
+    //If no error break, and truncate a number of nodes
+    //Would have to go through ToSend.csv backwards
+    
     while (true) {
-        uint8_t numNodes = countNodesToSend(); //Number of nodes with data to send
-        
-        //Loop over numNodes, essentially if it runs out of memory, try again with less nodes
-        for (; numNodes > 0; numNodes--) {
-            //Get info on what needs to be sent
-            uint8_t* sendInfo = malloc(sizeof(uint8_t) * (8 * numNodes));
-            if (sendInfo == NULL) {
-                continue;
-            }
-            getSendInfo(sendInfo, numNodes);
-
-            //Get data to be sent
-            unsigned int dataSize = getDataSize(sendInfo, numNodes);
-            uint8_t* data = malloc(sizeof(uint8_t) * dataSize);
-            if (data == NULL) {
-                free(sendInfo);
-                continue;
-            }
-            getData(data, sendInfo, numNodes);
-
-            //Build HTTPS request
-            char* request = malloc(sizeof(char) * (strlen(URL_PATH) + 2 + 2 * dataSize + strlen(URL_HOST) + 46));
-            if (request == NULL) {
-                free(sendInfo);
-                free(data);
-                continue;
-            }
-            buildRequest(request, data, numNodes, dataSize);
-
-            //Post the data, see if there's an error
-            bool error = fonaPost(request);
-
-            //Free allocated memory
-            free(request);
-            free(data);
-            free(sendInfo);
-
-            //If it posted correctly, truncate ToSend.csv to the correct length (remove numNodes nodes from the end)
-            if (!error) {
-                truncateToSend(numNodes);
-                break;
-            } else {
-                continue;
-            }
-        }
-        
-        //No data to send or can't send any
+        uint8_t numNodes = countNodesToSend();
         if (numNodes == 0) {
             return;
         }
+
+        uint8_t* sendInfo = malloc(sizeof(uint8_t) * (8 * numNodes));
+        if (sendInfo == NULL) {
+            return;
+        }
+        getSendInfo(sendInfo, numNodes);
+
+        unsigned int dataSize = getDataSize(sendInfo, numNodes);
+        uint8_t* data = malloc(sizeof(uint8_t) * dataSize);
+        if (data == NULL) {
+            return;
+        }
+        getData(data, sendInfo, numNodes);
+
+        char* request = malloc(sizeof(char) * (2 + 2 * dataSize + urlLen() + 1));
+        if (request == NULL) {
+            return;
+        }
+        buildRequest(request, data, numNodes, dataSize);
+
+        bool error = fonaPost(request);
+
+        free(request);
+        free(data);
+        free(sendInfo);
+
+        //If it posted correctly, truncate ToSend.csv to the correct length (remove numNodes nodes from the end)
+        if (!error) {
+            truncateToSend(numNodes);
+        } else {
+            return;
+        }
     }
+}
+
+int urlLen() {
+    return 70;
 }
 
 //Counts the number of nodes that have data to send to the web server
@@ -568,17 +563,10 @@ void getSendInfo(uint8_t* ans, uint8_t numNodes) {
     
     //Open ToSend.csv and skip the first line
     File file = sd.open("ToSend.csv", FILE_READ);
-    file.seekEnd();
+    while (file.available() && file.read() != 10);
     
     for (uint8_t i = 0; i < numNodes; i++) { //Go through each node, and get it's corresponding information
-        //Go to in front of the next node
-        file.seekCur(-2);
-        while (file.available() && file.peek() != 10) {
-            file.seekCur(-1);
-        }
-        file.seekCur(1);
-        
-        char currStr[12]; //Buffer
+        char currStr[12];
         
         //Get the current node's id
         int len = file.fgets(currStr, 12, ",");
@@ -605,12 +593,6 @@ void getSendInfo(uint8_t* ans, uint8_t numNodes) {
         ans[2 + (8 * i)] = numLocs;
         ans[3 + (8 * i)] = numPoints;
         memcpy(&ans[4 + (8 * i)], &currPos, sizeof(uint8_t) * 4);
-        
-        //Go to in front of the current node
-        while (file.available() && file.peek() != 10) {
-            file.seekCur(-1);
-        }
-        file.seekCur(1);
     }
     
     file.close();
@@ -646,8 +628,8 @@ unsigned int getDataSize(uint8_t* sendInfo, uint8_t numNodes) {
         //Account for size of data points
         totalLen += 1; //For # data point
         
-        //Essentially doing: totalLen += #DataPoints * (#Types + 1(for Time)) * 4 bytes
-        totalLen += sendInfo[3 + (8 * i)] * (currTypesInfo[1] + 1) * 4;
+        //Essentially doing: totalLen += #DataPoints * #Types * 4 bytes
+        totalLen += sendInfo[3 + (8 * i)] * currTypesInfo[1] * 4;
         
         free(currTypesInfo); //Free allocated memory
     }
@@ -672,18 +654,18 @@ void getTypesInfo(uint8_t* ans, int id) {
     
     //Get length of name
     ans[2] = 0;
-    while (file.available() && file.read() != 10) {
+    while (file.read() != 10) {
         ans[2]++;
     }
     
     for (uint8_t i = 0; i < 3; i++) { //Skip time, latitude, and longitude
-        while (file.available() && file.read() != ',') ;
+        while (file.read() != ',') ;
     }
     
-    ans[0] = 2; //Total size of the sensor types (add 2; 1 for number of types and 1 for length of last type)
-    ans[1] = 1; //How many sensor types there are (doesn't count the last one, so add 1)
+    ans[0] = 2; //Total size of the sensor types
+    ans[1] = 2; //How many sensor types there are
     
-    while (file.available() && file.peek() != 10) { //While it's not the end of the line
+    while (file.peek() != 10) { //While it's not the end of the line
         if (file.read() == 44) { //If it's a comma
             ans[1]++; //New sensor type
             ans[0]++; //For length of new sensor type
@@ -740,7 +722,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     char fileName[13];
     sprintf(fileName, "node%u.csv", id);
     File file = sd.open(fileName, FILE_READ);
-    file.seekSet(0);
+    file.seekSet(0); //Should skip time
     
     
     //Copy in some location info
@@ -751,7 +733,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
         (*ansCurr)++; //For name len, filled in later
         uint8_t nameLen = 0;
         
-        while (file.available() && file.peek() != 10) {
+        while (file.peek() != 10) {
             nameLen++;
             ans[(*ansCurr)++] = file.read();
         }
@@ -763,11 +745,11 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
         
         (*ansCurr) += numLocs; //Leave room for location info
     } else {
-        while (file.available() && file.read() != 10) ; //Skip name
+        while (file.read() != 10) ; //Skip name
     }
     
     for (uint8_t i = 0; i < 3; i++) { //Skip time, latitude, and longitude
-        while (file.available() && file.read() != ',') ;
+        while (file.read() != ',') ;
     }
     
     
@@ -779,7 +761,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     uint8_t currNum = 1; //Number of sensor types (won't count the last one, so add one)
     (*ansCurr) += 2;
     
-    while (file.available() && file.peek() != 10) { //While it's not the end of the line
+    while (file.peek() != 10) { //While it's not the end of the line
         if (file.peek() == 44) { //If it's a comma
             ans[((*ansCurr)++) - (currTypeLen + 1)] = currTypeLen; //Put in the length of the type name that was just copied in
             currNum++;
@@ -842,7 +824,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
         uint8_t currDataStr = 0; //Index for dataStr
         
         //Go through the value of each sensor for the current data point
-        while (file.available() && file.peek() != 10) { //While it's not the end of the line (end of current data point)
+        while (file.peek() != 10) { //While it's not the end of the line (end of current data point)
             if (file.peek() == 44) { //If it's a comma
                 dataStr[currDataStr] = 0; //Add a 0 to the end of the current data string
                 currDataStr = 0; //Reset dataStr index
@@ -879,15 +861,22 @@ void buildRequest(char* request, uint8_t* data, uint8_t numNodes, unsigned int d
     Serial.print(F("Data size: ")); //For debugging
     Serial.println(dataSize);
     
-    sprintf(request, "POST %s/sensor/data?data=%02X", URL_PATH, numNodes);//The first part of the HTTP request
+    //Stuff here needs to be changed; the URL shouldn't be hardcoded
     
-    //sprintf(&request[29], "%02X", numNodes); //Print the number of nodes as hex into the char array, always taking up two characters
+    strcpy(request, "POST /ollie/sensor/data?data="); //The first part of the HTTP request
+    
+    char curr[2]; //Char buffer
+    sprintf(curr, "%02X", numNodes); //Print the number of nodes as hex into the char array, always taking up two characters
+    request[29] = curr[0];
+    request[29 + 1] = curr[1];
     
     for (unsigned int i = 0; i < dataSize; i++) { //Go through each byte of data, convert it into hex, and add that to the request
-        sprintf(&request[strlen(URL_PATH) + 25 + (2 * i)], "%02X", data[i]); //Print the byte of data as hex into the char array, always taking up two characters
+        sprintf(curr, "%02X", data[i]); //Print the byte of data as hex into the char array, always taking up two characters
+        request[(2 * i) + 29 + 2] = curr[0];
+        request[(2 * i) + 29 + 2 + 1] = curr[1];
     }
     
-    sprintf(&request[strlen(URL_PATH) + 25 + (2 * dataSize)], " HTTPS/1.1\r\nHost: %s\r\n\r\n\0", URL_HOST);//The last part of the HTTP request
+    strcpy(&request[29 + 2 + (2 * dataSize)], " HTTPS/1.1\r\nHost: www.cas.mcmaster.ca\r\n\r\n\0"); //The last part of the HTTP request
 }
 
 //Truncate ToSend.csv to account for sent data
@@ -901,17 +890,7 @@ void truncateToSend(uint8_t numNodes) {
     
     File file = sd.open("ToSend.csv", FILE_WRITE);
     
-    //Go through numNodes nodes
-    for (uint8_t i = 0; i < numNodes; i++) {
-        file.seekCur(-2);
-        while (file.available() && file.peek() != 10) {
-            file.seekCur(-1);
-        }
-        file.seekCur(1);
-    }
-    
-    //Truncate the file to delete the data that was sentS
-    file.truncate(file.curPosition());
+    file.truncate(42);
     
     file.close();
 }
@@ -952,16 +931,9 @@ bool fonaPost(char* reqArr) {
         }
     }
     
-    //Build HTTP open session command with the defined url and port
-    char* httpsArr = malloc(sizeof(char) * (20 + strlen(URL_HOST) + 5));
-    if (httpsArr == NULL) {
-        err = true;
-    }
-    sprintf(httpsArr, "AT+CHTTPSOPSE=\"%s\",%d,1", URL_HOST, PORT_NUMBER);
-    
     //Send HTTP open session command
     for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, httpsArr, "OK", 5000)) {
+        if (!sendCheckReply(fonaSS, F("AT+CHTTPSOPSE=\"www.cas.mcmaster.ca\",80,1"), "OK", 5000)) {
             if (i == 2) {
                 err = true;
             }
@@ -970,18 +942,13 @@ bool fonaPost(char* reqArr) {
         }
     }
     
-    free(httpsArr);
-    
     //Build HTTP send command with size of given request
-    httpsArr = malloc(sizeof(char) * 20);
-    if (httpsArr == NULL) {
-        err = true;
-    }
-    sprintf(httpsArr, "AT+CHTTPSSEND=%d", strlen(reqArr)+20);
+    char* httpssendArr = malloc(sizeof(char) * 20);
+    sprintf(httpssendArr, "AT+CHTTPSSEND=%d", strlen(reqArr)+20);
     
     //Send HTTP send command
     for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, httpsArr, ">", 5000)) {
+        if (!sendCheckReply(fonaSS, httpssendArr, ">", 5000)) {
             if (i == 2) {
                 err = true;
             }
@@ -990,7 +957,7 @@ bool fonaPost(char* reqArr) {
         }
     }
     
-    free(httpsArr);
+    free(httpssendArr); //Free allocated memory
     
     //Send HTTP request
     for (uint8_t i = 0; !err && i < 3; i++) {
@@ -1003,8 +970,8 @@ bool fonaPost(char* reqArr) {
         }
     }
     
-    sendCheckReply(fonaSS, F("AT+CHTTPSCLSE"), "OK", 2000); //Send close HTTP session command
-    sendCheckReply(fonaSS, F("AT+CHTTPSSTOP"), "OK", 2000); //Send stop HTTP command
+    sendCheckReply(fonaSS, F("AT+CHTTPSCLSE"), "OK", 1000); //Send close HTTP session command
+    sendCheckReply(fonaSS, F("AT+CHTTPSSTOP"), "OK", 1000); //Send stop HTTP command
     fonaSS.end();
     
     return err; //Return if there was an error or not
