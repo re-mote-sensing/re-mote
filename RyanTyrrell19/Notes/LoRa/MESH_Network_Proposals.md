@@ -101,8 +101,10 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 * Currently have the Relay-Nodes and Gateway break the CAD cycle and run in receiver mode for a set amount of time. Instead, have them break the CAD cycle, process the message, then re-enter the CAD cycle. Whether it's a broadcast to find a route, the actual data being sent, or the Acknowledgement; as long as the preamble is set long enough, the Relay-Nodes & Gateway should have enough time to exit the loop and receive the message.
 
 * Ignore the MESH Network Protocol completely. Instead, just have the End-Node Broadcast its message to all Relay-Nodes. They will then rebroadcast the message until it makes it to the Gateway. The Gateway will then do the same thing for the Acknowledgement. This is known as **[Flooding][Flooding]**
-	* Potential Issue - broadcast storm, Nodes may still broadcast the data even though the Gateway has already received it.
-	* This implementation already exists, and so do solutions to the above issues		
+	* Ensure each node only relays a message once. Perhaps create a circular array that stores an ID for the message. Circular so that the oldest message (that has most likely expired long a go), is removed
+	* Each time a message is relayed, increment a counter (that is a part of the message) by 1. Once that message exceeds a value, do not re-transmit it
+	* If a node has already received the ACK for a message it is suppose to re-transmit, do not re-transmit the message
+	
 
 * MESH network flow
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
