@@ -29,6 +29,8 @@
 
 4. See if Can put GPS into sleep mode (i.e. use Enable Pin) via commands using U-center
 
+5. Use rfm95 with turtles and MESH for other stuff. MESH has the SMA connector already on, good for relayer's, bad for trutles (it'll have to be removed)
+
 1. Solder pins on water sensor
 7. Check range of RFM95 Modules
 
