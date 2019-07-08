@@ -203,7 +203,7 @@ On the other hand, the ephemerides takes 6 seconds/subframe x 5 subframes = **30
 
             * **AssistNow Autonomous** - Based on a broadcast ephemeris downloaded from the satellite (or obtained by AssistNow Online) the receiver can **autonomously** (i.e. without any host interaction or online connection) **generate an accurate satellite orbit representatio**n («AssistNow Autonomous data») that is usable for navigation much longer than the underlying broadcast ephemeris was intended for. This makes downloading new ephemeris or aiding data for the first fix unnecessary for subsequent start-ups of the receiver.
 
-
+## [MTK Protocol][MTK Protocol]
 
 
 # Terminology: [[1]]
@@ -262,3 +262,5 @@ Source [[2]] is quite informative and goes very in-depth reagrding how GPS's wor
 [23]: https://i.ibb.co/mvgY3kZ/1.png
 [24]: https://www.measurementsystems.co.uk/docs/TTFFstartup.pdf
 [25]: https://insidegnss.com/measuring-gnss-signal-strength/
+
+[MTK Protocol][https://cdn-shop.adafruit.com/datasheets/PMTK+command+packet-Complete-C39-A01.pdf]

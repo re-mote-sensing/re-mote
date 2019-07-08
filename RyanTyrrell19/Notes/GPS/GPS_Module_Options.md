@@ -12,7 +12,6 @@
     * < 50mA
 * Quick fix
     * < 30 sec
-* pass
 
  # [GPS Receiver - GP-20U7][GPS Receiver - GP-20U7 Specs]:
 

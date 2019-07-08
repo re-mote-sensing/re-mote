@@ -27,6 +27,8 @@
 
 3. Unify Code between projects and get on the same page for the different setups (Trackers, nodes, Gateway, relyers)
 
+4. See if Can put GPS into sleep mode (i.e. use Enable Pin) via commands using U-center
+
 1. Solder pins on water sensor
 7. Check range of RFM95 Modules
 
