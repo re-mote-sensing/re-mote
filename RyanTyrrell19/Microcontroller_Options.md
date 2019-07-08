@@ -2,6 +2,7 @@
 * Arduino Pro Mini
 * Moteino
 
+
 # Arduino Pro Mini
 
 
@@ -21,6 +22,7 @@
 	* The new SAMD21 Cortex M0+ based MoteinoM0 sleeps at just ~8uA!
 * **wirelessly (aka OTA) programmable:**
 	* be able to re-flash it without wires, when deployed in difficult locations **(supported with RFM69 radios only)**
+	* The wireless programming protocol is generic and supported by all Moteinos with DualOptiboot and FLASH Memory option, but the **example implementation was only done for RFM69 transceivers**
 * affordable
 	* zero-cost wire monopole antennas yield excellent RF range for all-around wireless projects. 
 	* With the u.FL/IPEX and SMA connector pads you can attach any other external antennas with higher gain
@@ -65,7 +67,7 @@ All Moteinos now accept these types of transceivers:
 * two special Moteino variants with integrated PCB trace antennas, these are available for Moteino and MoteinoMEGA. 
 	* The PCB antennas are tuned for the 868-915mhz bands and have an excellent performance given their compact size. 
 	* Other than the PCB antenna, they are identical and work the same as regular Moteinos.
-
+	* Small size – 1.0 x 2.6 inch
 
 
 ## M0 Sensor Shields
