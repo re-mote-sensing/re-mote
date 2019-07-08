@@ -133,7 +133,7 @@ Average current consumption is ((10.8mA * 1.28e-3) + (5.6mA * 0.686e-3)) / (1.28
 **Therefore, CAD runs for a total time of 1.966 milliseconds drawing an average of 8.98mA.**
 
 
-## Other Neat Features
+## Other Neat Features (only in FSK/OOK Mode)
 * Low Battery Detector
 	* A low battery detector is also included allowing the generation of an interrupt signal in response to the supply voltage dropping below a programmable threshold that is adjustable through the register RegLowBat. The interrupt signal can be mapped to any of the DIO pins by programming RegDioMapping.
 
@@ -188,14 +188,12 @@ In the receiver operating mode two states of functionality are defined. Upon ini
 
 ## RFMx series (Differentiating between the different modules)
 
-* RFM95 & RFM69HCW - Only difference is the frequency they are attuned for (The hardware related to the frequency setting)
+* RFM95 & RFM96 - Only difference is the frequency they are attuned for (The hardware related to the frequency setting)
 	* RFM96 is for 433MHz
 	* RFM95 is for 868/915 MHz
 	* Both have RF96 on the black chip - ignore it
 
-* RFM69HCW & RFM9x are pin compatible with each other. (i.e. same pin layout)
-	* * can be mounted on the same SMD footprint
-* RFM95/95 **not** compatible with the RFM69 Library
+* RFM69 do not support LoRa. They only support OOK & FSK Modes. RFM95 supports LoRa
 
 ![alt-text][Transceiver Compatibility Chart]
 
