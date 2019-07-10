@@ -9,6 +9,19 @@ This outline provides a condensed overview of all the research that has been don
 	* Weight
 	* Size
 	* Power consumption
+
+
+# Plan to COmpletet this Project
+1. Decide on what Hardware to use
+	* Which GPS module?
+	* Which LoRa module?
+	* Which Microcontroller?
+2. Change the code to reflect the hardware being used
+	* LoRa Mesh Protocol
+	* GPS features (UBLOX commands, RTC, etc.)
+4. With everything set in stone, calculations can be made, and parameters altered to optimize transmission and power consumption
+3. Design a waterproof casing that encompasses the Tracker while maintaining a small and streamline shape
+
 	
 # Hardware Breakdown
 ## GPS
