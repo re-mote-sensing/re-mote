@@ -125,6 +125,8 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 ## Setup 2 Outline - RFM95 Flooding
 ### Setup Outline
 
+The End-Node broadcasts its message, and all relayer's within range rebroadcast the message. Eventually, the message will be received by the Gateway.
+The Gatetway then sends an ACK back. Precations are taken to avoid broadcast storms and discard stale messages.
 
 
 
