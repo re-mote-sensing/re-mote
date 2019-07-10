@@ -3,7 +3,7 @@
 This outline provides a condensed overview of all the research that has been done on these trackers. It includes:  
 
 * Summary of each component, what it does, and any additional, in-depth info that is relevant to this project
-*  The requirements of each component. A sort of checklist to use when deciding what to purchase
+* The requirements of each component. A sort of checklist to use when deciding what to purchase
 
 * Keep in mind the following constraints
 	* Weight
@@ -41,6 +41,8 @@ This outline provides a condensed overview of all the research that has been don
 
 ## LoRa
 ### LoRa MESH Modules
+
+### LoRa RFM95 Modules
 
 ### Antenna
 
