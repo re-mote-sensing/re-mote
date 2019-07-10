@@ -5,23 +5,51 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 3. LoRa RFM95 Modules
 
 
-# Proposals 1 & 2: MESH Modules; continuously on
-## Setup
+# Proposals 1 & 2: MESH Modules
+
+[LoRa MESH Modules]:  
+* Includes a separate processor allowing them to continue running and relaying messages while the Arduino sleeps
+* Processor when Idle draws ~10mA
+* Data sheets available are in a different language and fairly cryptic and there are few forums out here discussing these modules
+* Modules are limited on what Parameters can be changed (SF, BW, etc) either because it is not fully understood how to, or it is not supported
+* The Modules come with an SMA connector (for the antenna) already attached. This can be good for the Relayer's (it enables us to attach a more heavy duty antenna) but is an inconvenience for the Turtles Trackers (since they have to be removed; not an easy task)
+* The modules may be an issue to use with the Turtle Trackers in terms of weight and size 
+* The Modules handle the data relaying, so little must be done software wise other than transmitting the data
+
+## Proposals 1: MESH Modules; continuously on
+### Setup
+The setup consists of three components; End-Node, Relay-Node, and a Gateway. 
+
+End-Node - To conserve power, the MESH Modules are powered off when not used. When ready to transmit data, the moduels are powered on, and data is transmitted to the desired Gateway.
+
+Relay-Node - Due to the Modules having their own processor, the Relayer's do not require an Arduino to run. After an intila configuration, these modules simply need an antenna and battery to receive and forward data. THe main issue is the large power drawn when idle. (However, the Relayer's do are not limited in weight and/or size, so a larger batter and solar panels may be employed)
+
+Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
+
+### Power
+
+When idle - ~10mA
+When Transmitting - ~100mA (very brief)
 
 
-## Power
+## Proposals 2: MESH Modules; synchronized power
+### Setup
 
+Similar to the previous setup, however, all devices are equipped with an RTC and powered off for the majority of the same. Every predetermined interval, for a predetermined window of time (both measured using the RTC), all devices will power on the MESH Modules and transmit their data. A schedule must be created so that all data is not transmitted simultaneously)
 
-# Proposals 2: MESH Modules; synchronized power
+End-Node - The Tracker will power on during the predetermined time, collect, and transmit its data
+
+Relay-Node - The Relay-Nodes require an Arduino to use the RTC with the MESH Module. The additional hardware required is compensated for with a significant decrease in power drawn from the MESH Module (since it will be powered off for the majority of the time). During the allocated on-period, the MESH module will be powered and capable of relaying any data.
+
+Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
 
 
 # Proposals 3: RFM95 MESH Network
-## Background Info
-### RFM95 Background Info
+## RFM95 Background Info
 See LoRa_RFM95_Module.md for Background Information
 
-
-## Setup Outline
+## Setup 1 - RFM95 Mesh
+### Setup Outline
 
 The setup consists of three components; End-Node, Relay-Node, and a Gateway. 
 
@@ -42,7 +70,7 @@ Requirements:
 5. All device's go back to sleep
 
 
-## Power Consumption Details
+### Power Consumption Details
 
 Arduino power consumption when powered -> approx. 4.5mA  
 Arduino power consumption when sleeping -> approx. 72.3uA  
@@ -60,7 +88,7 @@ RFM95 power consumption when Transmitting - 20 - 120mA (Depends on the settings 
 
 Note: Majority of these values depend on the what the Parameters are set to
 
-# Current setup value and calculations
+#### Current setup value and calculations
 
 Parameter settings and associated air time values calculated using the [LoRa Calculator][LoRa Calculator]  
 
@@ -94,6 +122,11 @@ Time spent waiting for the actual data to transmit?
 **Gateway:**  
 Identical to Node, only the data will be processed upon realizing it's ID matches that of the target ID for the data; processes the data accordingly
 
+## Setup 2 Outline - RFM95 Flooding
+### Setup Outline
+
+
+
 
 ## Other Potential Setup Ideas
 
@@ -110,6 +143,8 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
 
 
+
+[LoRa MESH Modules]: https://www.dfrobot.com/product-1670.html
 
 
 [LoRa Calculator]:https://www.loratools.nl/#/airtime

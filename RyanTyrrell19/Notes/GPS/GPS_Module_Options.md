@@ -115,6 +115,20 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * VBACKUP - Backup Power Input for RTC & Navigation Data Retention
 
 
+#[GPS Receiver - GP-735][GPS Receiver - GP-735]
+* Follow the link to see image, dimensions, and documentation
+
+* Requires a 6-pin JST connector
+* **Contains a Battery Backup Pin and an Enable pin**
+* designed with u-blox’s latest 7th generation single chip
+* Fairly small and long. 
+
+
+
+
+
+
+
 # Notes about to GPS Units in General
 
 * **EN Pin** - When this pin is connected to GND, the GPS is powerd down (even if the VCC pin is connected to power.) This method can allow us to connect the GPS directly to a power line, avoiding the need for a transistor. Simply connect the EN pin to a digital pin, and set the output accordingly (LOW Poer mode may automatically set all pins to LOW, so it may not even be necessary to set the output of the pin)
@@ -134,6 +148,8 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 [Adafruit Ultimate Pinout]: https://learn.adafruit.com/adafruit-ultimate-gps/pinouts
 [Adafruit Ultimate Battery Backup]: https://learn.adafruit.com/adafruit-ultimate-gps/battery-backup
 [Adafruit Ultimate Commands]: https://cdn-shop.adafruit.com/datasheets/PMTK+command+packet-Complete-C39-A01.pdf
+
+[GPS Receiver - GP-735]: https://www.sparkfun.com/products/13670
 
 
 [1]: https://lastminuteengineers.com/neo6m-gps-arduino-tutorial/
