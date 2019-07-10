@@ -69,6 +69,7 @@ All Moteinos now accept these types of transceivers:
 	* Other than the PCB antenna, they are identical and work the same as regular Moteinos.
 	* Small size – 1.0 x 2.6 inch
 
+![alt-text][Moteino Board with Trace Antenna]
 
 ## M0 Sensor Shields
 There are now a few compact low-power sensor breakouts available that can flat-mount straight on the M0 PCB (bottom side).
@@ -91,3 +92,4 @@ There are now a few compact low-power sensor breakouts available that can flat-m
 [Moteino M0]: https://i.ibb.co/dr53PPF/Moteino-M0-Board.png
 [BME280 sensor]: https://www.adafruit.com/product/2652
 [Transceivers Supported]: https://i.ibb.co/c8Ms2W1/Transceivers-Supported.png
+[Moteino Board with Trace Antenna]: https://i.ibb.co/sg7LxYL/Moteino-Board-with-Trace-Antenna.png
