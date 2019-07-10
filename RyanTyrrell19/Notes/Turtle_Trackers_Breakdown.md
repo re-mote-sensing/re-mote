@@ -11,7 +11,7 @@ This outline provides a condensed overview of all the research that has been don
 	* Power consumption
 
 
-# Plan to COmpletet this Project
+# Plan to Completet this Project
 1. Decide on what Hardware to use
 	* Which GPS module?
 	* Which LoRa module?
