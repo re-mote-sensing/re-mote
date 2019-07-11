@@ -128,8 +128,20 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 The End-Node broadcasts its message, and all relayer's within range rebroadcast the message. Eventually, the message will be received by the Gateway.
 The Gatetway then sends an ACK back. Precations are taken to avoid broadcast storms and discard stale messages.
 
+Message Format - [ACK]|[Lifespan]|[Message ID]|[Message Data]
+ACK - 0 or 1 ( 0 = not an ACK, 1 = is an ACK)
+Lifespan - Exceeding a threshold will result in the message being terminated
+Message ID - Uniquely determined using the Node ID, # of nodes in the network, and the # of messages the node has sent
+Message Data - Reason for the message transmission. This data could be GPS coordinates, commands, etc.
 
 
+End-Node - Constructs and broadcast the message. Enters the CAD loop and, when a message is detected, checks if it matched the assigned message ID of the message it sent, and whether it is the acknowledgement or not
+
+Relay-Node - Stays in the CAD loop until a message is detected. When a message is received, the below condition table outlines the steps taken to determine whether to relay the data or not. Afterwards, the Relayer re-enters the CAD loop  
+
+![alt-text][Flooding Relay Condition Table]
+
+Gateway -  Stays in the CAD loop until a message is detected. When a message is received, it checks whether it has already seen the message. If not, it saves the message ID, resets the Lifespan count, Sets the ACK TO 1, and broadcasts the message
 ## Other Potential Setup Ideas
 
 
@@ -158,3 +170,4 @@ The Gatetway then sends an ACK back. Precations are taken to avoid broadcast sto
 [Parameter Settings]: https://i.ibb.co/hHT9zHZ/Parameter-Settings.png
 
 [Flooding]:https://en.wikipedia.org/wiki/Flooding_(computer_networking)
+[Flooding Relay Condition Table]:https://i.ibb.co/QDZJ7xx/Flooding-Relay-Condition-Table.png
