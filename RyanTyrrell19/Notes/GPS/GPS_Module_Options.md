@@ -115,7 +115,7 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * VBACKUP - Backup Power Input for RTC & Navigation Data Retention
 
 
-#[GPS Receiver - GP-735][GPS Receiver - GP-735]
+# [GPS Receiver - GP-735][GPS Receiver - GP-735]
 * Follow the link to see image, dimensions, and documentation
 
 * Requires a 6-pin JST connector
