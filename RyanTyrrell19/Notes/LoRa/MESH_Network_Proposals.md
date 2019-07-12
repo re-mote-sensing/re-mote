@@ -153,6 +153,9 @@ Gateway -  Stays in the CAD loop until a message is detected. When a message is 
 	* If a node has already received the ACK for a message it is suppose to re-transmit, do not re-transmit the message
 	* Potential issue with multiple Gateways receiving the same message	
 
+* End-Nodes broadcast the message, but relayer’s have a specific, predetermined route (similar to what Emil mentioned in his email)
+	* Issue of a node fails (cuts of connection for that "branch")
+
 * MESH network flow
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
 
