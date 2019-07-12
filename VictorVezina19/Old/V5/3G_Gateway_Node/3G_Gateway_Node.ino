@@ -5,17 +5,12 @@
 // Change the following parameters to accommodate your specific setup
 #define NETWORK_ID 0x1   //LoRa network ID, has to be the same on every LoRa module in your network
 #define NODE_ID 0x1000   //LoRa ID of this node, you then need to put this into the end nodes that are sending to this gateway
-#define NAME "Gateway"   //Name to associate with this node
 #define LORA_RX 6        //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
 #define LORA_TX 7        //Pin that the LoRa RXD pin is connected to
 
 #define URL_HOST "www.cas.mcmaster.ca"
 #define URL_PATH "/ollie"
 #define PORT_NUMBER 80
-
-#define NUMBER_SENSORS 2
-char* sensorTypes[NUMBER_SENSORS] = {"Air_Temperature", "Humidity"};
-uint8_t sensorPorts[NUMBER_SENSORS][2] = { {2, 0}, {2, 0} };
 
 
 /*
@@ -36,70 +31,60 @@ Things to do:
 
 /*---------------------------INCLUDES---------------------------*/
 
-#include <remoteConfig.h>
-#include <remoteLoRa.h>
-#include <NeoSWSerial.h>
+#include <SPI.h>
+#include <SoftwareSerial.h>
 #include <SdFat.h>
 
-#ifdef DEBUG
-#include <MemoryFree.h>
-#endif
+//#include <MemoryFree.h>
 
 /*----------------------DEFINITIONS-----------------------------*/
 
 #define FONA_TX 4
 #define FONA_RX 5
-#define FONA_EN 8
+
+/*-------------------------GLOBALS------------------------------*/
+
+unsigned long lastPost; //The millis() value that the last data post happened at
 
 /*------------------------CONSTRUCTORS--------------------------*/
 
-remoteLoRa LoRa(LORA_RX, LORA_TX);
+SoftwareSerial loraPort(LORA_RX, LORA_TX);
 
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
-    //Turn on the 3G chip on the fona
-    pinMode(FONA_EN, OUTPUT);
-    digitalWrite(FONA_EN, HIGH);
-    delay(180);
-    digitalWrite(FONA_EN, LOW);
-    
+    //Begin some serials
+    loraPort.begin(9600);
     Serial.begin(9600);
+
+    //Write the LoRa configuration from the defines to the LoRa module
+    writeConfig(loraPort, NETWORK_ID, NODE_ID);
     
-    //initialiseSensors
+    delay(1000);
     
-    LoRa.writeConfig(NETWORK_ID, NODE_ID);
-    
-    //#ifdef DEBUG
     while (!Serial.available()) ; //Useful for testing
-    //#endif
     
-    //LoRa.readData(); //Backed-up data seems to break the gateway sometimes
-    
+    while (loraPort.available()) loraPort.read(); //Delete data in loraPort, seems to mess gateway up once in a while
+
     //Make sure ToSend.csv exists
     createToSend();
+    
+    //Pretend like the last post just happened
+    lastPost = millis();
 }
 
 /*----------------------------LOOP------------------------------*/
 
 void loop() {
-    //readSensors();
-    
-    unsigned long lastPost = millis(); //Get post time before we actually post, this ensures that the posting starts exactly every hour
-    postData(); //Post the saved data
-    
-    #ifdef DEBUG
+    loraPort.listen(); //Listen on the LoRa module software serial
     Serial.println(F("Waiting for LoRa messages"));
-    Serial.println(freeMemory());
-    #endif
 
     //Just keep checking the LoRa module until the right amount of time has passed
-    while (((millis() >= lastPost) ? (millis() - lastPost) : (millis() + (4294967295 - lastPost))) < 60000) { //Makes sure to check for overflow
-        uint8_t* loraData = LoRa.readData(); //Read the LoRa module
-        
-        if (loraData != NULL) { //If the LoRa module received a message
-            
-            #ifdef DEBUG
+    while ((millis() >= lastPost) ? ((millis() - lastPost) < 60000) : ((millis() + (4294967295 - lastPost)) < 60000 )) { //Makes sure to check for overflow
+        if (loraPort.available()) { //If the LoRa module received a message
+
+            uint8_t* loraData = readData(loraPort); //Read the data from the LoRa module
+
             //Print the data to the Serial interface
             Serial.println(F("Received LoRa message"));
             printByte(loraData[0]);
@@ -109,7 +94,6 @@ void loop() {
                 printByte(loraData[i+3]);
             }
             Serial.println();
-            #endif
 
             //Once we encrypt data, it will be decrypted here
 
@@ -124,19 +108,20 @@ void loop() {
                     break;
 
                 default: //Unknown message
-                    #ifdef DEBUG
                     Serial.println(F("Unknown Message Type Received"));
-                    #else
-                    ;
-                    #endif
             }
 
             free(loraData); //Free allocated message memory
         }
     }
+    Serial.println(F("Posting data"));
+    
+    lastPost = millis(); //Get post time before we actually post, this ensures that the posting starts exactly every hour
+    postData(); //Post the saved data
 }
 
 /*------------------------ALL FUNCTIONS-------------------------*/
+
 
 /*------------ToSend.csv Initialisation Function------------*/
 //Create "ToSend.csv" if it doesn't already exist
@@ -144,18 +129,13 @@ void createToSend() {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
     
     //If ToSend.csv doesn't already exist, create it with the appropriate starting line
     if (!sd.exists("ToSend.csv")) {
-        #ifdef DEBUG
         Serial.println(F("Creating ToSend.csv"));
-        #endif
-        
         File file = sd.open("ToSend.csv", FILE_WRITE);
         file.print(F("Node ID, Data Points, Locations, Position\n"));
         file.close();
@@ -171,7 +151,7 @@ void parseRegistration(uint8_t* data) {
     char *types[numSensors]; //Create array of char arrays for the sensor types
     
     uint8_t nameLen = data[curr++];
-    char* name = (char*) malloc(sizeof(char) * (nameLen + 1));
+    char* name = malloc(sizeof(char) * (nameLen + 1));
     
     for (uint8_t i = 0; i < nameLen; i++) {
         name[i] = data[curr++];
@@ -180,7 +160,7 @@ void parseRegistration(uint8_t* data) {
     
     for (uint8_t i = 0; i < numSensors; i++) { //Get the sensor types from the message
         uint8_t len = data[curr++]; //Get length of type
-        char *currType = (char*) malloc(sizeof(char) * (len + 1)); //Allocate current char array
+        char *currType = malloc(sizeof(char) * (len + 1)); //Allocate current char array
         currType[len] = 0;
         for (uint8_t j = 0; j < len; j++) { //Copy type into char array
 	        currType[j] = data[curr++];
@@ -191,9 +171,7 @@ void parseRegistration(uint8_t* data) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
 
@@ -202,7 +180,7 @@ void parseRegistration(uint8_t* data) {
     memcpy(&add, data, sizeof(uint8_t) * 2);
     
     //Get the file name for that node
-    char* fileName = (char*) malloc(sizeof(char) * 13);
+    char* fileName = malloc(sizeof(char) * 13);
     sprintf(fileName, "node%u.csv", add);
 
     if (sd.exists(fileName)) { //Receiving registration from already registered node, check to see if good or not
@@ -238,15 +216,13 @@ void parseRegistration(uint8_t* data) {
         
         if (err) { //If the registration is bad
             //Should send error acknowledgement back
-            #ifdef DEBUG
             Serial.print(F("Received bad registration data from node "));
             Serial.println(add);
-            #endif
         } else { //If the registration is good
             //Send success acknoledgement back
-            uint8_t* ackData = (uint8_t*) malloc(sizeof(uint8_t));
+            uint8_t* ackData = malloc(sizeof(uint8_t));
             ackData[0] = 0;
-            LoRa.sendData(add, 1, ackData);
+            sendData(loraPort, add, 1, ackData);
             free(ackData);
         }
     } else { //Registering new node
@@ -267,9 +243,9 @@ void parseRegistration(uint8_t* data) {
         file.close();
         
         //Send success acknowledgement back
-        uint8_t* ackData = (uint8_t*) malloc(sizeof(uint8_t));
+        uint8_t* ackData = malloc(sizeof(uint8_t));
         ackData[0] = 0;
-        LoRa.sendData(add, 1, ackData);
+        sendData(loraPort, add, 1, ackData);
         free(ackData);
     }
 
@@ -288,9 +264,7 @@ void saveData(uint8_t* data) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
 
@@ -299,7 +273,7 @@ void saveData(uint8_t* data) {
     memcpy(&add, &data[0], sizeof(uint8_t) * 2);
     
     //Get the file name for that node
-    char* fileName = (char*) malloc(sizeof(char) * 13);
+    char* fileName = malloc(sizeof(char) * 13);
     sprintf(fileName, "node%u.csv", add);
     
     //Get some useful information from the message data
@@ -308,19 +282,15 @@ void saveData(uint8_t* data) {
     
     if (!sd.exists(fileName)) { //If the node hasn't yet registered with this gateway
         //Should send error acknowledgement
-        #ifdef DEBUG
         Serial.print(F("Received sensor data before registration from node "));
         Serial.println(add);
-        #endif
     } else {
         File file = sd.open(fileName, FILE_WRITE);
         //Check the data to make sure it matches the node's registration
         if (!checkSensorData(file, numSensors)) { //If it doesn't match
             //Should send error acknowledgement
-            #ifdef DEBUG
             Serial.print(F("Received bad sensor data from node "));
             Serial.println(add);
-            #endif
         } else { //If it does match
             uint32_t position = file.curPosition(); //Get the position before the new data in the node's file
             
@@ -421,6 +391,16 @@ void saveData(uint8_t* data) {
                 toSendFile.print(position);
                 toSendFile.print("\n");
             } else { //If the node is already in ToSend.csv
+                /*
+                for (uint8_t i = 0; i < 2; i++) { //Back up until it's before the number of data points
+                    toSendFile.seekCur(-1);
+                    while (toSendFile.peek() != 44) { // ','
+                        toSendFile.seekCur(-1);
+                    }
+                }
+                
+                toSendFile.read(); //Get rid of the ,*/
+                
                 //Read the current amount of data points ready to be sent for the current node
                 char currStr[12];
                 int len = toSendFile.fgets(currStr, 12, ",");
@@ -461,9 +441,9 @@ void saveData(uint8_t* data) {
             toSendFile.close(); //Close ToSend.csv
             
             //Send a success acknowledgement
-            uint8_t* ackData = (uint8_t*) malloc(sizeof(uint8_t));
+            uint8_t* ackData = malloc(sizeof(uint8_t));
             ackData[0] = 0;
-            LoRa.sendData(add, 1, ackData);
+            sendData(loraPort, add, 1, ackData);
             free(ackData);
         }
         file.close(); //Close the node's file
@@ -499,18 +479,13 @@ bool checkSensorData(File file, uint8_t numSensors) {
 /*--------------Saved Data Posting Functions--------------*/
 //Post collected data to webserver
 void postData() {
-    #ifdef DEBUG
-    Serial.println(F("Posting data"));
-    #endif
-    
-    //Loop until there's no data to send
     while (true) {
         uint8_t numNodes = countNodesToSend(); //Number of nodes with data to send
         
         //Loop over numNodes, essentially if it runs out of memory, try again with less nodes
         for (; numNodes > 0; numNodes--) {
             //Get info on what needs to be sent
-            uint8_t* sendInfo = (uint8_t*) malloc(sizeof(uint8_t) * (8 * numNodes));
+            uint8_t* sendInfo = malloc(sizeof(uint8_t) * (8 * numNodes));
             if (sendInfo == NULL) {
                 continue;
             }
@@ -518,7 +493,7 @@ void postData() {
 
             //Get data to be sent
             unsigned int dataSize = getDataSize(sendInfo, numNodes);
-            uint8_t* data = (uint8_t*) malloc(sizeof(uint8_t) * dataSize);
+            uint8_t* data = malloc(sizeof(uint8_t) * dataSize);
             if (data == NULL) {
                 free(sendInfo);
                 continue;
@@ -526,7 +501,7 @@ void postData() {
             getData(data, sendInfo, numNodes);
 
             //Build HTTPS request
-            char* request = (char*) malloc(sizeof(char) * (strlen(URL_PATH) + 2 + 2 * dataSize + strlen(URL_HOST) + 46));
+            char* request = malloc(sizeof(char) * (strlen(URL_PATH) + 2 + 2 * dataSize + strlen(URL_HOST) + 46));
             if (request == NULL) {
                 free(sendInfo);
                 free(data);
@@ -563,9 +538,7 @@ uint8_t countNodesToSend() {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return 0;
     }
     
@@ -589,9 +562,7 @@ void getSendInfo(uint8_t* ans, uint8_t numNodes) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
     
@@ -658,7 +629,7 @@ unsigned int getDataSize(uint8_t* sendInfo, uint8_t numNodes) {
         totalLen += 2; //For the node's id
         
         //Gets the type info for the current node
-        uint8_t* currTypesInfo = (uint8_t*) malloc(sizeof(uint8_t) * 3); //Allocate the array to put the info into
+        uint8_t* currTypesInfo = malloc(sizeof(uint8_t) * 3); //Allocate the array to put the info into
         getTypesInfo(currTypesInfo, currId); //First byte is total size that will be taken in final data array, second byte is just number of sensors, third byte is length of name
         
         
@@ -690,9 +661,7 @@ void getTypesInfo(uint8_t* ans, int id) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
     
@@ -750,10 +719,9 @@ void getData(uint8_t* ans, uint8_t* sendInfo, uint8_t numNodes) {
 //Gets the data to be sent from a specific node
 //Form of data: Id(2) NumTypes(1) Type1Len(1) Type1Char1(1) Type1Char2(1) ... Type1CharN(1) Type2Len(1) Type2Char1(1) ... Type2CharN(1) NumData(1) Data1Type1(4) Data1Type2(4) ... Data1TypeN(4) Data2Type1(4) ... DataNTypeN(4)
 void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, unsigned long pos) {
-    #ifdef DEBUG
+    //Currently this copies in Time as a type, but that's just a waste of space
     Serial.print(F("Getting data for node: "));
     Serial.println(id);
-    #endif
     
     //Copy the current node's id into the answer array
     memcpy(&ans[*ansCurr], &id, sizeof(uint8_t) * 2);
@@ -764,9 +732,7 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
     
@@ -910,18 +876,18 @@ void getNodeData(uint8_t* ans, unsigned int* ansCurr, int id, uint8_t numLocs, u
 
 //Build HTTP request to send through fona
 void buildRequest(char* request, uint8_t* data, uint8_t numNodes, unsigned int dataSize) {
-    #ifdef DEBUG
-    Serial.print(F("Data size: "));
+    Serial.print(F("Data size: ")); //For debugging
     Serial.println(dataSize);
-    #endif
     
     sprintf(request, "POST %s/sensor/data?data=%02X", URL_PATH, numNodes);//The first part of the HTTP request
+    
+    //sprintf(&request[29], "%02X", numNodes); //Print the number of nodes as hex into the char array, always taking up two characters
     
     for (unsigned int i = 0; i < dataSize; i++) { //Go through each byte of data, convert it into hex, and add that to the request
         sprintf(&request[strlen(URL_PATH) + 25 + (2 * i)], "%02X", data[i]); //Print the byte of data as hex into the char array, always taking up two characters
     }
     
-    sprintf(&request[strlen(URL_PATH) + 25 + (2 * dataSize)], " HTTPS/1.1\r\nHost: %s\r\n\r\n", URL_HOST);//The last part of the HTTP request
+    sprintf(&request[strlen(URL_PATH) + 25 + (2 * dataSize)], " HTTPS/1.1\r\nHost: %s\r\n\r\n\0", URL_HOST);//The last part of the HTTP request
 }
 
 //Truncate ToSend.csv to account for sent data
@@ -929,9 +895,7 @@ void truncateToSend(uint8_t numNodes) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin()) {
-        #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
-        #endif
         return;
     }
     
@@ -957,8 +921,8 @@ void truncateToSend(uint8_t numNodes) {
 //Post a given HTTP request through the FONA
 bool fonaPost(char* reqArr) {
     //Initialise the FONA software serial
-    NeoSWSerial fonaSS(FONA_TX, FONA_RX);
-    fonaSS.begin(9600);
+    SoftwareSerial fonaSS(FONA_TX, FONA_RX);
+    fonaSS.begin(4800);
     
     delay(250); //Delay to ensure the software serial is initialised
     
@@ -977,9 +941,6 @@ bool fonaPost(char* reqArr) {
         }
     }
     
-    sendCheckReply(fonaSS, F("AT+CHTTPSCLSE"), "OK", 2000); //Send close HTTP session command
-    sendCheckReply(fonaSS, F("AT+CHTTPSSTOP"), "OK", 2000); //Send stop HTTP command
-    
     //Send HTTP start command
     for (uint8_t i = 0; !err && i < 3; i++) {
         if (!sendCheckReply(fonaSS, F("AT+CHTTPSSTART"), "OK", 10000)) {
@@ -992,7 +953,7 @@ bool fonaPost(char* reqArr) {
     }
     
     //Build HTTP open session command with the defined url and port
-    char* httpsArr = (char*) malloc(sizeof(char) * (20 + strlen(URL_HOST) + 5));
+    char* httpsArr = malloc(sizeof(char) * (20 + strlen(URL_HOST) + 5));
     if (httpsArr == NULL) {
         err = true;
     }
@@ -1012,7 +973,7 @@ bool fonaPost(char* reqArr) {
     free(httpsArr);
     
     //Build HTTP send command with size of given request
-    httpsArr = (char*) malloc(sizeof(char) * 20);
+    httpsArr = malloc(sizeof(char) * 20);
     if (httpsArr == NULL) {
         err = true;
     }
@@ -1033,7 +994,7 @@ bool fonaPost(char* reqArr) {
     
     //Send HTTP request
     for (uint8_t i = 0; !err && i < 3; i++) {
-        if (!sendCheckReply(fonaSS, reqArr, "OK", 5000)) {
+        if (!sendCheckReply(fonaSS, reqArr, "OK", 15000)) {
             if (i == 2) {
                 err = true;
             }
@@ -1052,10 +1013,8 @@ bool fonaPost(char* reqArr) {
 //Send an AT command to the FONA and wait for a specific reply
 //Command is as a __FlashStringHelper
 bool sendCheckReply(Stream& port, const __FlashStringHelper* command, char* reply, unsigned long timeout) {
-    #ifdef DEBUG
     Serial.print(F("Sending to fona: "));
     Serial.println(command);
-    #endif
     
     port.println(command); //Send the command to the FONA
     
@@ -1082,9 +1041,7 @@ bool sendCheckReply(Stream& port, const __FlashStringHelper* command, char* repl
         if (curr != 0) { //If the response is non-empty
             response[curr] = 0; //Add a terminating 0
 
-            #ifdef DEBUG
             Serial.println(response);
-            #endif
 
             if (strcmp(response, reply) == 0) { //If it's the response we're waiting for
                 return true;
@@ -1104,10 +1061,8 @@ bool sendCheckReply(Stream& port, const __FlashStringHelper* command, char* repl
 bool sendCheckReply(Stream& port, char* command, char* reply, unsigned long timeout) {
     //Refer to the function above for comments, as it's the exact same code
     
-    #ifdef DEBUG
     Serial.print(F("Sending to fona: "));
     Serial.println(command);
-    #endif
     
     port.println(command);
     
@@ -1131,9 +1086,7 @@ bool sendCheckReply(Stream& port, char* command, char* reply, unsigned long time
         if (curr != 0) {
             response[curr] = 0;
 
-            #ifdef DEBUG
             Serial.println(response);
-            #endif
 
             if (strcmp(response, reply) == 0) {
                 return true;
@@ -1168,11 +1121,291 @@ void TestFona() {
     }
 }*/
 
-#ifdef DEBUG
+
+/*----------------------LORA FUNCTIONS----------------------*/
+//These were mostly written by Spencer Park
+
+//Write config parameters to the LoRa module
+//Function written by Ryan Tyrrell
+void writeConfig(Stream& port, uint16_t netID, uint16_t nodeID) {
+
+	uint8_t payloadLen = 16;
+	uint8_t* payload = (uint8_t*)malloc(sizeof(uint8_t) * payloadLen);
+
+	// Configuration flag - 2-byte short
+	payload[0] = (uint8_t)((0xA5A5 >> 8) & 0xFF);
+	payload[1] = (uint8_t)(0xA5A5 & 0xFF);
+
+	// Channel Number
+	payload[2] = (uint8_t)1;
+
+	// RF transmit power (tx_power)
+	payload[3] = (uint8_t)0;
+
+	// User interface mode
+	payload[4] = (uint8_t)0;
+
+	// Equpment type
+	payload[5] = (uint8_t)1;
+
+	// Network ID - 2-byte short
+	payload[6] = (uint8_t)((netID >> 8) & 0xFF);
+	payload[7] = (uint8_t)(netID & 0xFF);
+
+	// Node ID - 2-byte short
+	payload[8] = (uint8_t)((nodeID >> 8) & 0xFF);
+	payload[9] = (uint8_t)(nodeID & 0xFF);
+
+	// Reserved - 2-byte short
+	payload[10] = (uint8_t)((0x0000 >> 8) & 0xFF);
+	payload[11] = (uint8_t)(0x0000 & 0xFF);
+
+	// Reserved
+	payload[12] = (uint8_t)1;
+
+	// Serial port Parameter
+	payload[13] = (uint8_t)0x40;
+
+	// Air Rate - 2-byte short
+	payload[14] = (uint8_t)((0x0909 >> 8) & 0xFF);
+	payload[15] = (uint8_t)(0x0909 & 0xFF);
+
+
+	// FrameType: 0x01		Configuration parameters for reading and writing modules, etc
+	// Command Type: Write configuration information request (0x01)
+	writeFrame(port, 0x01, 0x01, payloadLen, payload);
+
+	free(payload);
+
+	uint8_t frameType = 0;
+	uint8_t cmdType = 0;
+	uint8_t * responsePayload = NULL;
+	int len = readFrame(port, &frameType, &cmdType, &responsePayload);
+
+	if (frameType == 0x01 && cmdType == 0x81) {
+		// Application data sending response
+		uint8_t status = responsePayload[0];
+		//Serial.print("status="); printByte(status);
+		//Serial.println();
+	}
+	free(responsePayload);
+}
+
 void printByte(uint8_t b) {
   Serial.print(F(" 0x"));
   if (b <= 0xF)
 	Serial.print(F("0"));
   Serial.print(b, HEX);
 }
-#endif
+
+void printShort(uint16_t s) {
+  Serial.print(F(" 0x"));
+  if (s <= 0xFFF)
+	Serial.print(F("0"));
+  if (s <= 0xFF)
+	Serial.print(F("0"));
+  if (s <= 0xF)
+	Serial.print(F("0"));
+  Serial.print(s, HEX);
+}
+
+
+uint8_t readByte(Stream& port) {
+  while (!port.available());
+  return port.read();
+}
+
+int readFrame(Stream& port, byte* rFrameType, byte* rCmdType, byte** rPayload) {
+  uint8_t checksum = 0;
+
+  uint8_t frameType = readByte(port);
+  
+  uint8_t frameNum = readByte(port);
+  uint8_t cmdType = readByte(port);
+  uint8_t payloadLen = readByte(port);
+
+  checksum ^= frameType;
+  checksum ^= frameNum;
+  checksum ^= cmdType;
+  checksum ^= payloadLen;
+
+  uint8_t* payload = (uint8_t *) malloc(sizeof(uint8_t) * payloadLen);
+  for (int i = 0; i < payloadLen; i++) {
+	payload[i] = readByte(port);
+	checksum ^= payload[i];
+  }
+
+  *rFrameType = frameType;
+  *rCmdType = cmdType;
+  *rPayload = payload;
+
+  uint8_t frameCheck = readByte(port);
+  checksum ^= frameCheck;
+
+  if (checksum != 0)
+	return -1;
+  return payloadLen;
+}
+
+void writeFrame(Stream& port, uint8_t frameType, uint8_t cmdType, uint8_t payloadLen, uint8_t* payload) {
+  uint8_t checksum = 0;
+
+  checksum ^= frameType;
+  checksum ^= 0; // frameNum which is unused and always 0
+  checksum ^= cmdType;
+  checksum ^= payloadLen;
+
+  printByte(frameType);
+  printByte((uint8_t) 0); // frameNum
+  printByte(cmdType);
+  printByte(payloadLen);
+
+  port.write(frameType);
+  port.write((uint8_t) 0); // frameNum
+  port.write(cmdType);
+  port.write(payloadLen);
+
+  for (int i = 0; i < payloadLen; i++) {
+	checksum ^= payload[i];
+	port.write(payload[i]);
+	printByte(payload[i]);
+  }
+
+  port.write(checksum);
+  printByte(checksum);
+
+  Serial.println();
+}
+
+uint8_t* readData(Stream& port) {
+  uint8_t frameType = 0;
+  uint8_t cmdType = 0;
+  uint8_t* payload = NULL;
+  int len = readFrame(port, &frameType, &cmdType, &payload);
+
+  if (frameType != 0x05 || cmdType != 0x82) {
+	Serial.println(F("BAD TYPE"));
+	free(payload);
+	return;
+  }
+
+  uint16_t srcAddr = (payload[0] << 8) | payload[1];
+  //uint8_t power = payload[2];
+  uint8_t userPayloadLength = payload[3];
+  //Serial.print(" srcAddr="); printShort(srcAddr);
+  //Serial.print(" power="); printByte(power);
+  //Serial.print(" userPayloadLength="); printByte(userPayloadLength);
+
+  uint8_t *ans = malloc(sizeof(uint8_t) * (userPayloadLength + 3));
+  memcpy(ans, &srcAddr, sizeof(uint8_t) * 2);
+  ans[2] = userPayloadLength;
+  for (int i = 0; i < userPayloadLength; i++) {
+	ans[i+3] = payload[4+i];
+	//printByte(payload[4 + i]);
+  }
+  //Serial.println();
+  free(payload);
+  return ans;
+}
+
+// Max len is 111 bytes
+void sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_t* data) {
+  // We add 7 bytes to the head of data for this payload
+  uint8_t payloadLen = 6 + dataLen;
+  uint8_t* payload = (uint8_t *) malloc(sizeof(uint8_t) * payloadLen);
+
+  // target address as big endian short
+  payload[0] = (uint8_t) ((target >> 8) & 0xFF);
+  payload[1] = (uint8_t) (target & 0xFF);
+
+  // ACK request == 1 -> require acknowledgement of recv
+  payload[2] = (uint8_t) 0;//1;
+
+  // Send radius: which defaults to max of 7 hops, we can use that
+  payload[3] = (uint8_t) 7;
+
+  // Discovery routing params == 1 -> automatic routing
+  payload[4] = (uint8_t) 1;
+
+  // Source routing domain: unused when automatic routing enabled
+  //    - number of relays is 0
+  //    - relay list is therefor non-existent
+  //payload[5] = (uint8_t) 0;
+
+  // Data length
+  payload[5] = dataLen;
+
+  // Data from index 7 to the end should be the data
+  memcpy(payload + (sizeof(uint8_t) * 6), data, dataLen);
+
+  // frameType = 0x05, cmdType = 0x01 for sendData
+  writeFrame(port, 0x05, 0x01, payloadLen, payload);
+
+  free(payload);
+
+  uint8_t frameType = 0;
+  uint8_t cmdType = 0;
+  uint8_t* responsePayload = NULL;
+  int len = readFrame(port, &frameType, &cmdType, &responsePayload);
+
+  if (frameType == 0x5 && cmdType == 0x81) {
+	// Application data sending response
+	uint16_t targetAddr = (responsePayload[0] << 8) | responsePayload[1];
+	uint8_t status = responsePayload[2];
+	Serial.print(F(" targetAddr=")); printShort(targetAddr);
+	Serial.print(F(" status=")); printByte(status);
+	Serial.println();
+  }
+  free(responsePayload);
+}
+
+uint16_t readConfig(Stream& port) {
+  writeFrame(port, 0x01, 0x02, 0x00, NULL);
+  
+  uint8_t frameType = 0;
+  uint8_t cmdType = 0;
+  uint8_t* payload = NULL;
+  
+  int len = readFrame(port, &frameType, &cmdType, &payload);
+
+  if (len < 0) {
+	Serial.println(F("ERROR"));
+	free(payload);
+	return;
+  }
+
+  Serial.print(F("FrameType="));
+  printByte(frameType);
+  Serial.print(F(" CmdType="));
+  printByte(cmdType);
+
+  if (frameType != 0x01 || cmdType != 0x82) {
+	Serial.println(F("BAD TYPE"));
+	free(payload);
+	return;
+  }
+
+  uint16_t flag = (payload[0] << 8) | payload[1];
+  uint8_t channel = payload[2];
+  uint8_t txPower = payload[3];
+  uint8_t uiMode = payload[4];
+  uint8_t eqType = payload[5];
+  uint16_t netId = (payload[6] << 8) | payload[7];
+  uint16_t nodeId = (payload[8] << 8) | payload[9];
+  // 10, 11, 12 reserved
+  uint8_t serPortParam = payload[13];
+  uint16_t airRate = (payload[14] << 8) | payload[15];
+  free(payload);
+
+  Serial.print(F(" flag=")); printShort(flag);
+  Serial.print(F(" channel=")); printByte(channel);
+  Serial.print(F(" txPower=")); printByte(txPower);
+  Serial.print(F(" uiMode=")); printByte(uiMode);
+  Serial.print(F(" eqType=")); printByte(eqType);
+  Serial.print(F(" netId=")); printShort(netId);
+  Serial.print(F(" nodeId=")); printShort(nodeId);
+  Serial.print(F(" serPortParam=")); printByte(serPortParam);
+  Serial.print(F(" airRate=")); printShort(airRate);
+  Serial.println();
+  return nodeId;
+}

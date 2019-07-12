@@ -1,0 +1,6 @@
+remoteEndData	KEYWORD1
+initialise	KEYWORD2
+reset	KEYWORD2
+saveData	KEYWORD2
+getDataMessage	KEYWORD2
+messageSuccess	KEYWORD2

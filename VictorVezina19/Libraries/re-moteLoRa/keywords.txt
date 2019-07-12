@@ -1,0 +1,6 @@
+remoteLoRa	KEYWORD1
+readConfig	KEYWORD2
+writeConfig	KEYWORD2
+sendReceive	KEYWORD2
+readData	KEYWORD2
+sendData	KEYWORD2
