@@ -40,7 +40,7 @@ Specs for the board can be found [here][Board Specs]. The specs are in the form 
 	* Bottom has a slight curve on the bottom, flat ends, narrow. The curve can be altered based on the turtles shell. It's mostly solid except for a hollow rectangular shape on the inside where the battery will fit into. One end is slightly longer and flatter for the Boards antenna to lay.
 	* End pieces are customized based on the turtles shell. 
 	* Top piece is more of a shell then a case. It covers the board and GPS. The top is non-existent, allowing the GPS to be uncovered. It has a slight curved shape 
-		* If needed, the top case can be cut away slighlty to expose the LoRa antenna. This can be done if the casing blocks the signal (although it'll make the caseing less streamlined) 
+		* If needed, the top case can be cut away slighlty to expose the LoRa antenna. This can be done if the casing blocks the signal (although it'll make the casing less streamlined) 
 
 
 The below images show an exploded view of the Tracker and casing. From top to bottom; Casing - top, GPS, Moteino board, Battery, Casing - Bottom
