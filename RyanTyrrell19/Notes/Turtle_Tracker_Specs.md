@@ -1,6 +1,12 @@
-# Turtle Tracker Specs
-
 # Overview
+* Hardware Specs
+	* Battery
+	* GPS
+	* Micro-controller
+	* Casing
+* Waterproofing methods
+	* 3D Printing
+
 
 # Hardware Specs
 ## Lithium Ion Battery - 400mAh
@@ -55,6 +61,12 @@ The below images show an exploded view of the Tracker and casing. From top to bo
 * Plastic Spray paint
 * Conformal coating
 * Painting the print with epoxy
+
+
+
+* Attaching the top and bottom case
+	* Glue
+	* 4 pins on each corner of the top case that clip into the botoom case. How to unclip though?
 
 ## 3D Printing
 
