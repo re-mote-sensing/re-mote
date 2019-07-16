@@ -62,6 +62,7 @@ The below images show an exploded view of the Tracker and casing. From top to bo
 * Conformal coating
 * Painting the print with epoxy
 
+* acetone works only with ABS
 
 
 * Attaching the top and bottom case
