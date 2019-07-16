@@ -104,7 +104,7 @@ Second - the fluctuating temp of a device turning on and off. Changing from 75°
 
 # 3D Printing Tips
 ## Snap-Joint
-
+![alt-text][Snap-Fit Printing Tip]
 ![alt-text][Cantilever Snap Joint]  
 ![alt-text][Snap Fit 1]
 ![alt-text][Snap Fit 2]
@@ -155,7 +155,7 @@ of the cantilever
 [Structure Design 1]: https://i.ibb.co/Th9M2Fx/Structure-Design-1.png
 [Structure Design 2]: https://i.ibb.co/JKKD0gt/Structure-Design-2.png
 [Structure Design 3]: https://i.ibb.co/d6Cg48Z/Structure-Design-3.png
-[Printing Tip]: https://i.ibb.co/9Tr8CFp/Snap-Fit-Printing.png
+[Snap-Fit Printing Tip]: https://i.ibb.co/9Tr8CFp/Snap-Fit-Printing.png
 [Snap Fit Calculations 1]: https://i.ibb.co/BPs4d51/Snap-Fit-Calculations-1.png
 [Snap Fit Calculations 2]: https://i.ibb.co/9yqybMs/Snap-Fit-Calculations-2.png
 
