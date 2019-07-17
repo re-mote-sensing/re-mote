@@ -13,6 +13,7 @@
 
 [Dimensions][Battery Dimensions Source]: 26.5mm x 36.9mm x 5mm  
 [Weight][Battery Weight Source]: 9g
+Order: https://lowpowerlab.com/shop/product/145
 
 ![alt-text][Battery Image]
 ![alt-text][Battery Specs]
