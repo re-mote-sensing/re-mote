@@ -38,6 +38,9 @@
 	* If needed, the top case can be cut away slightly to expose the LoRa antenna. This can be done if the casing blocks the signal (although it'll make the casing less streamlined) 
 	
 * Top and bottom attachment ideas
+	* Screw the top case into the bottom case
+		* ** Can use a tap to create the thread fr the hole (rather then printing the thread)**
+		* Metal screws may heat up and melt the plastic in the sun (or corrode in the water)
 	* Permanent solution; gluing the two together
 	* Attach using joints; snap-fit joint
 	* Sliding joint; top case into the bottom case
@@ -99,7 +102,9 @@ Second - the fluctuating temp of a device turning on and off. Changing from 75°
 	* Heat buildup from battery. Main concern is heat buildup if pinpointed to a specific area (rather then the entire unit heating up)
 * Setting influence on the Tracker + Enclosure
 	* Underwater; heat should dissipate quickly
-	* Above water, direct sunlight; turtles sunbath. Tracker could become quite hot if in the sun for a few hours (plastic may melt, battery may overheat, etc.)
+	* Above water, direct sunlight; turtles sunbath. Tracker could become quite hot if in the sun for a few hours
+		* Plastic melting - Unlikley (look up metling temp.)
+		* Tracker heating up - possible
 * ** Battery (or entire tracking unit) should have an additional waterproof layer to ensure it does not malfunction**
 
 # 3D Printing Tips
