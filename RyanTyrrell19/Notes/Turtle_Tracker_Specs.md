@@ -26,6 +26,12 @@ Order: https://lowpowerlab.com/shop/product/145
 ![alt-text][GPS Image]
 ![alt-text][GPS Specs]
 
+* When EN pin is LOW, RTC is not retained. Must use the V_bAT pin
+* EN Pin and V_BAT Pin work as expected
+	* Haveing V_BAT Pin powered while EN Pin is LOW (i.e. GPS is at full power) does not cause excess current drawn. So the V_BAT pin can be left HIGH indefinitely (may require additional tests to confirm)
+* B_BAT Pin output HIGh when Arduino In Low Power?
+	* yes
+* GPS needs full Position data before it saves the RTC and position. After that, Enable and Backup work as expected
 
 ## Micro-controller + LoRa
 
