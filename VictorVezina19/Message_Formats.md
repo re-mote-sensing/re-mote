@@ -19,12 +19,13 @@ The last two columns are repeated for each sensor on the end node.
 
 The gateway node sends an acknowledgement containing one byte of data, the codes are as follows:
 
-| **Ack** | **Description**                                                                       |
-|------|-----------------------------------------------------------------------------------|
-| 0x00 | Successful registration; new node registered                                      |
-| 0x01 | Successful registration; the sent data is the same as saved data for this node id |
-| 0x02 | Failed registration; saved data for this node id differs from what was sent       |
-| 0x03 | Failed registration; unknown gateway error                                        |
+| **Ack** | **Description**                                                                   |
+|---------|-----------------------------------------------------------------------------------|
+| 0x00    | Successful registration; new node registered                                      |
+| 0x01    | Successful registration; the sent data is the same as saved data for this node id |
+| 0x02    | Failed registration; saved data for this node id differs from what was sent       |
+| 0x03    | Failed registration; unknown gateway error                                        |
+| 0xFE    | Bad message type received                                                         |
 
 <br/>
 
@@ -65,12 +66,13 @@ The last column is described below:
 
 The gateway node sends an acknowledgement containing one byte of data, the codes are as follows:
 
-| **Ack**  | **Description**                                                                      |
-|------|----------------------------------------------------------------------------------|
-| 0x00 | Success; the data was logged                                                     |
-| 0x01 | Fail; this node hasn't been registered                                           |
-| 0x02 | Fail; the data sent doesn't correspond to the registration data for this node id |
-| 0x03 | Fail; unknown gateway error                                                      |
+| **Ack** | **Description**                                                                  |
+|---------|----------------------------------------------------------------------------------|
+| 0x00    | Success; the data was logged                                                     |
+| 0x01    | Fail; this node hasn't been registered                                           |
+| 0x02    | Fail; the data sent doesn't correspond to the registration data for this node id |
+| 0x03    | Fail; unknown gateway error                                                      |
+| 0xFE    | Bad message type received                                                        |
 
 <br/>
 
