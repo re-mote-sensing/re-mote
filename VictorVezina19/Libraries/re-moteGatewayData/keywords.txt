@@ -1,0 +1,7 @@
+remoteGatewayData	KEYWORD1
+initialise	KEYWORD2
+reset	KEYWORD2
+saveRegistration	KEYWORD2
+saveData	KEYWORD2
+getDataMessage	KEYWORD2
+messageSuccess	KEYWORD2

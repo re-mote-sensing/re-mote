@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 9, 2019
 Released into the public domain
 */
 
@@ -10,52 +10,39 @@ Released into the public domain
 #include <DHT.h>
 #include <remoteConfig.h>
 
-//#define EN false
+#define EN false
 
-remoteSensors::remoteSensors() {
+remoteSensors::remoteSensors(int numberSensors, char* sensorTypes[], uint8_t sensorPorts[][2]) {
+    _numberSensors = (uint8_t) numberSensors;
+    _sensorTypes = sensorTypes;
+    _sensorPorts = sensorPorts;
 }
 
 void remoteSensors::initialise() {
     //Go through each sensor and call it's respective initialisation function
-    for (uint8_t i = 0; i < NUMBER_SENSOR_TYPES; i++) {
-        #ifdef AS_DO_Sensor
-        if (strcmp(sensorTypes[i], "AS_DO") == 0) {
-            initialiseASDO(i);
-        }
-        #endif
-        
-        #ifdef AS_EC_Sensor
-        if (strcmp(sensorTypes[i], "AS_EC") == 0) {
-            initialiseASEC(i);
-        }
-        #endif
-        
-        #ifdef DF_TB_Sensor
-        if (strcmp(sensorTypes[i], "DF_TB") == 0) {
-            initialiseDFTB(i);
-        }
-        #endif
-        
-        #ifdef DF_Temp_Sensor
-        if (strcmp(sensorTypes[i], "DF_Temp") == 0) {
-            initialiseDFTemp(i);
-        }
-        #endif
-        
-        #ifdef DHT22_Sensor
-        if (strcmp(sensorTypes[i], "DHT22") == 0) {
+    for (uint8_t i = 0; i < _numberSensors; i++) {
+        if (strcmp(_sensorTypes[i], "Dissolved_Oxygen") == 0) {
+            initialiseDO(i);
+        } else if (strcmp(_sensorTypes[i], "Conductivity") == 0) {
+            initialiseConductivity(i);
+        } else if (strcmp(_sensorTypes[i], "Turbidity") == 0) {
+            initialiseTurbidity(i);
+        } else if (strcmp(_sensorTypes[i], "Water_Temperature") == 0) {
+            initialiseWaterTemp(i);
+        } else if (strcmp(_sensorTypes[i], "Air_Temperature") == 0) {
+            initialiseDHT22(i);
+        } else if (strcmp(_sensorTypes[i], "Humidity") == 0) {
             initialiseDHT22(i);
         }
-        #endif
     }
 }
 
-#ifdef AS_DO_Sensor
 //Initialise an Atlas Scientific Dissolved Oxygen sensor at index index
-void remoteSensors::initialiseASDO(uint8_t index) {
+void remoteSensors::initialiseDO(uint8_t index) {
     //Initialise the software serial for this sensor
-    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    NeoSWSerial sensor (_sensorPorts[index][0], _sensorPorts[index][1]);
     sensor.begin(9600);
+    delay(100);
     
     //Itialise common Atlas Scientific settings
     initialiseAtlas(sensor);
@@ -82,14 +69,13 @@ void remoteSensors::initialiseASDO(uint8_t index) {
     
     sensor.end();
 }
-#endif
 
-#ifdef AS_EC_Sensor
 //Initialise an Atlas Scientific Conductivity sensor at index index
-void remoteSensors::initialiseASEC(uint8_t index) {
+void remoteSensors::initialiseConductivity(uint8_t index) {
     //Initialise the software serial for this sensor
-    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    NeoSWSerial sensor (_sensorPorts[index][0], _sensorPorts[index][1]);
     sensor.begin(9600);
+    delay(100);
     
     //Itialise common Atlas Scientific settings
     initialiseAtlas(sensor);
@@ -125,7 +111,7 @@ void remoteSensors::initialiseASEC(uint8_t index) {
 
 
     //Put sensor to sleep or turn it off
-    if (AS_EC_Sensor) {
+    if (EN) {
         Serial.println(F("This hasn't been implemented yet"));
         while (true) ;
     } else {
@@ -134,9 +120,7 @@ void remoteSensors::initialiseASEC(uint8_t index) {
     
     sensor.end();
 }
-#endif
 
-#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor)
 //Initialise an Atlas Scientific sensor at index index
 void remoteSensors::initialiseAtlas(Stream& sensor) {
     //For some reason it seems you have to send arandom command at startup
@@ -167,31 +151,24 @@ void remoteSensors::initialiseAtlas(Stream& sensor) {
     delay(100);
     while (sensor.available()) sensor.read() ;
 }
-#endif
 
-#ifdef DF_TB_Sensor
 //Initialise a DFRobot Turbidity sensor at index i
-void remoteSensors::initialiseDFTB(uint8_t index) {
-    pinMode(sensorPorts[index][0], OUTPUT); //Set the digital pin to output
-    digitalWrite(sensorPorts[index][0], LOW); //Turn the sensor off
+void remoteSensors::initialiseTurbidity(uint8_t index) {
+    pinMode(_sensorPorts[index][0], OUTPUT); //Set the digital pin to output
+    digitalWrite(_sensorPorts[index][0], LOW); //Turn the sensor off
     
-    pinMode(sensorPorts[index][1], INPUT); //Set the analog pin to input
+    pinMode(_sensorPorts[index][1], INPUT); //Set the analog pin to input
 }
-#endif
 
-#ifdef DF_Temp_Sensor
 //Initialise a DFRobot Temperature sensor at index i
-void remoteSensors::initialiseDFTemp(uint8_t index) {
+void remoteSensors::initialiseWaterTemp(uint8_t index) {
     ;
 }
-#endif
 
-#ifdef DHT22_Sensor
 //Initialise a DHT22 sensor at index i
 void remoteSensors::initialiseDHT22(uint8_t index) {
     ;
 }
-#endif
 
 
 //Read data from all sensors based on their types
@@ -202,47 +179,37 @@ void remoteSensors::read(uint8_t* dataArr) {
     
     uint8_t curr = 0; //Current position in the array
     //Go through each sensor and get the data, then add it to the data array
-    for (uint8_t i = 0; i < NUMBER_SENSOR_TYPES; i++) {
-        #ifdef AS_DO_Sensor
-        if (strcmp(sensorTypes[i], "AS_DO") == 0) {
-            curr += readASDO(i, &dataArr[curr]);
+    for (uint8_t i = 0; i < _numberSensors; i++) {
+        float data; //Data from this sensor
+        
+        if (strcmp(_sensorTypes[i], "Dissolved_Oxygen") == 0) {
+            data = readDO(i);
+        } else if (strcmp(_sensorTypes[i], "Conductivity") == 0) {
+            data = readConductivity(i);
+        } else if (strcmp(_sensorTypes[i], "Turbidity") == 0) {
+            data = readTurbidity(i);
+        } else if (strcmp(_sensorTypes[i], "Water_Temperature") == 0) {
+            data = readWaterTemp(i);
+        } else if (strcmp(_sensorTypes[i], "Air_Temperature") == 0) {
+            data = readAirTemp(i);
+        } else if (strcmp(_sensorTypes[i], "Humidity") == 0) {
+            data = readHumidity(i);
+        } else { //Should probably handle this better
+            data = -1;
         }
-        #endif
-
-        #ifdef AS_EC_Sensor
-        if (strcmp(sensorTypes[i], "AS_EC") == 0) {
-            curr += readASEC(i, &dataArr[curr]);
-        }
-        #endif
-
-        #ifdef DF_TB_Sensor
-        if (strcmp(sensorTypes[i], "DF_TB") == 0) {
-            curr += readDFTB(i, &dataArr[curr]);
-        }
-        #endif
-
-        #ifdef DF_Temp_Sensor
-        if (strcmp(sensorTypes[i], "DF_Temp") == 0) {
-            curr += readDFTemp(i, &dataArr[curr]);
-        }
-        #endif
-
-        #ifdef DHT22_Sensor
-        if (strcmp(sensorTypes[i], "DHT22") == 0) {
-            curr += readDHT22(i, &dataArr[curr]);
-        }
-        #endif
-
-        //Should probably handle default
+        
+        //Copy this sensor's data into the data array
+        memcpy(&dataArr[curr], &data, sizeof(uint8_t) * 4);
+        curr += 4;
     }
 }
 
-#ifdef AS_DO_Sensor
 //Read data from an Atlas Scientific Dissolved Oxygen sensor at index i
-uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
+float remoteSensors::readDO(uint8_t index) {
     //Initialise the sensor's software serial
-    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    NeoSWSerial sensor (_sensorPorts[index][0], _sensorPorts[index][1]);
     sensor.begin(9600);
+    delay(100);
     
     float ans = readAtlas(sensor);
     
@@ -254,19 +221,16 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
     //Put sensor to sleep
     sensor.print(F("Sleep\r"));
     
-    memcpy(data, &ans, sizeof(float));
-    
     sensor.end();
-    return 4;
+    return ans;
 }
-#endif
 
-#ifdef AS_EC_Sensor
 //Read data from an Atlas Scientific Conductivity sensor at index i
-uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
+float remoteSensors::readConductivity(uint8_t index) {
     //Initialise the sensor's software serial
-    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    NeoSWSerial sensor (_sensorPorts[index][0], _sensorPorts[index][1]);
     sensor.begin(9600);
+    delay(100);
     
     float ans = readAtlas(sensor);
     
@@ -276,21 +240,17 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     #endif
     
     //Put sensor to sleep or turn it off
-    if (AS_EC_Sensor) {
+    if (EN) {
         Serial.println(F("This hasn't been implemented yet"));
         while (true) ;
     } else {
         sensor.print(F("Sleep\r"));
     }
     
-    memcpy(data, &ans, sizeof(float));
-    
     sensor.end();
-    return 4;
+    return ans;
 }
-#endif
 
-#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor)
 //Read data from an Atlas Scientific sensor at index i
 float remoteSensors::readAtlas(Stream& sensor) {
     //Compensate for temp(both) and salinity(DO)??
@@ -313,7 +273,7 @@ float remoteSensors::readAtlas(Stream& sensor) {
             while (sensor.available() <= 0); //Wait for it's response
             delay(100); //Delay to wait for the entire response to be ready
 
-            int dataIndex = sensor.readBytesUntil('\r', buf, 40); //Read the response
+            int dataIndex = sensor.readBytesUntil('\r', buf, 16); //Read the response
             buf[dataIndex] = 0; //Add terminating character
         } while ((buf[0]<48) || (buf[0]>57)); //While the buffer isn't a number
 
@@ -322,41 +282,37 @@ float remoteSensors::readAtlas(Stream& sensor) {
     
     return data;
 }
-#endif
 
-#ifdef DF_TB_Sensor
 //Read data from a DFRobot turbidity sensor at index i
-uint8_t remoteSensors::readDFTB(uint8_t index, uint8_t* data) {
-    digitalWrite(sensorPorts[index][0], HIGH); //Turn on the sensor
+float remoteSensors::readTurbidity(uint8_t index) {
+    digitalWrite(_sensorPorts[index][0], HIGH); //Turn on the sensor
+    delay(250);
     
-    float ansData = analogRead(sensorPorts[index][1]); //Read the sensor
+    float data = analogRead(_sensorPorts[index][1]); //Read the sensor
     
-    digitalWrite(sensorPorts[index][0], LOW); //Turn off the sensor
+    digitalWrite(_sensorPorts[index][0], LOW); //Turn off the sensor
     
     //Do some manipulation to the data to get a more "accurate" number (just something that looks more correct)
     float ans;
-    if (ansData < 775.0) {
-        ans = 775.0 - ansData;
+    if (data < 775.0) {
+        ans = 775.0 - data;
     } else {
-        int factor = ansData / 5;
-        ans = ansData - (5.0 * factor);
+        int factor = data / 5;
+        ans = data - (5.0 * factor);
     }
-    
-    memcpy(data, &ans, sizeof(float));
     
     #ifdef DEBUG
     Serial.print(F("Read Turbidity sensor: "));
     Serial.println(ans);
     #endif
     
-    return 4;
+    return ans;
 }
-#endif
 
-#ifdef DF_Temp_Sensor
 //Read data from a DFRobot turbidity sensor at index i
-uint8_t remoteSensors::readDFTemp(uint8_t index, uint8_t* data) {
-    OneWire tempSensor(sensorPorts[index][0]); //Start One Wire interface
+float remoteSensors::readWaterTemp(uint8_t index) {
+    OneWire tempSensor(_sensorPorts[index][0]); //Start One Wire interface
+    delay(100);
     
     uint8_t addr[8];
     
@@ -406,46 +362,42 @@ uint8_t remoteSensors::readDFTemp(uint8_t index, uint8_t* data) {
         ans = tmp / 16;
     } while (ans == 85); //It returns 85 if the conversion isn't yet finished
     
-    memcpy(data, &ans, sizeof(float));
-    
     #ifdef DEBUG
     Serial.print(F("Read Water_Temperature sensor: "));
     Serial.println(ans);
     #endif
     
-    return 4;
+    return ans;
 }
-#endif
 
-#ifdef DHT22_Sensor
-//Read temperature and humidity from a DHT22 sensor
-uint8_t remoteSensors::readDHT22(uint8_t index, uint8_t* data) {
-    DHT dht(sensorPorts[index][0], DHT22);
+//Read the temperature from a DHT22
+float remoteSensors::readAirTemp(uint8_t index) {
+    DHT dht(_sensorPorts[index][0], DHT22);
+    dht.begin();
+    delay(100);
+    
+    float ans = dht.readTemperature();
+    
+    #ifdef DEBUG
+    Serial.print(F("Read Air_Temperature sensor: "));
+    Serial.println(ans);
+    #endif
+    
+    return ans;
+}
+
+//Read the humidity from a DHT22
+float remoteSensors::readHumidity(uint8_t index) {
+    DHT dht(_sensorPorts[index][0], DHT22);
+    
     dht.begin();
     
-    float ans;
-    do {
-        ans = dht.readTemperature();
-    } while (isnan(ans));
-    
-    memcpy(data, &ans, sizeof(uint32_t));
+    float ans = dht.readHumidity();
     
     #ifdef DEBUG
-    Serial.print(F("Read DHT22 Temperature sensor: "));
+    Serial.print(F("Read Humidity sensor: "));
     Serial.println(ans);
     #endif
     
-    do {
-        ans = dht.readHumidity();
-    } while (isnan(ans) || ans < 0 || ans > 100);
-    
-    memcpy(&data[4], &ans, sizeof(uint32_t));
-    
-    #ifdef DEBUG
-    Serial.print(F("Read DHT22 Humidity sensor: "));
-    Serial.println(ans);
-    #endif
-    
-    return 8;
+    return ans;
 }
-#endif

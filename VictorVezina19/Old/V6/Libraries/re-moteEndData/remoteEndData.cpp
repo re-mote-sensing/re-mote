@@ -1,6 +1,6 @@
 /*
 Library for saving the data of an end node, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 10, 2019
 Released into the public domain
 */
 
@@ -9,48 +9,65 @@ Released into the public domain
 #include <remoteConfig.h>
 
 //Start the data saving method
-remoteEndData::remoteEndData() {
+remoteEndData::remoteEndData(char* typeStr, int sensorNumber) {
+    numberSensors = sensorNumber;
+    
+    //Set the data type
+    if (strcmp(typeStr, "EEPROM") == 0) {
+        type = 0;
+    } else {
+        //Should handle this better
+        Serial.println(F("Unknown data type"));
+        while (true) ;
+    }
 }
 
 //Initialise the data storage
 void remoteEndData::initialise() {
-    #if Data_Type == EEPROM_Type
-    initialiseEEPROM();
-    #endif
+    if (type == 0) {
+        initialiseEEPROM();
+    } else {
+        
+    }
 }
 
 //Reset the data storage
-void remoteEndData::reset(bool hard) {
-    #if Data_Type == EEPROM_Type
-    resetEEPROM(hard);
-    #endif
+void remoteEndData::reset() {
+    if (type == 0) {
+        resetEEPROM();
+    } else {
+        
+    }
 }
 
 //Save some data to the storage
 void remoteEndData::saveData(uint8_t* data) {
-    #if Data_Type == EEPROM_Type
-    saveEEPROM(data);
-    #endif
+    if (type == 0) {
+        saveEEPROM(data);
+    } else {
+        
+    }
 }
 
 //Get a LoRa data message
 uint8_t* remoteEndData::getDataMessage() {
-    #if Data_Type == EEPROM_Type
-    return getEEPROMMessage();
-    #endif
+    if (type == 0) {
+        return getEEPROMMessage();
+    }
     return NULL;
 }
 
 //Set the data according to a successful message sent
 void remoteEndData::messageSuccess() {
-    #if Data_Type == EEPROM_Type
-    EEPROMSuccess();
-    #endif
+    if (type == 0) {
+        EEPROMSuccess();
+    } else {
+        
+    }
 }
 
 /*--------------------------PRIVATE--------------------------*/
 
-#if Data_Type == EEPROM_Type
 /*--------------------------EEPROM---------------------------*/
 //Initialise the EEPROM
 void remoteEndData::initialiseEEPROM() {
@@ -64,15 +81,10 @@ void remoteEndData::initialiseEEPROM() {
 }
 
 //Reset the EEPROM
-void remoteEndData::resetEEPROM(bool hard) {
+void remoteEndData::resetEEPROM() {
     unsigned int i = 4;
     EEPROM.put(0, i);
     EEPROM.put(2, i - 1);
-    if (hard) {
-        for (unsigned int i = 5; i < EEPROM.length(); i++) {
-            EEPROM.update(i, 0);
-        }
-    }
 }
 
 //Save a data point to EEPROM
@@ -90,7 +102,7 @@ void remoteEndData::saveEEPROM(uint8_t* data) {
         validToAddress++;
     }
     
-    uint8_t size = 1 + (data[0] * 8) + (4 * (NUMBER_SENSOR_NAMES + 1)); //Get the size of the data array
+    uint8_t size = 1 + (data[0] * 8) + (4 * (numberSensors + 1)); //Get the size of the data array
     
     //Loop through each byte of the current value
     for (uint8_t i = 0; i < size; i++) {
@@ -108,7 +120,7 @@ void remoteEndData::saveEEPROM(uint8_t* data) {
     
     //If the address where valid data starts has changed, put that change into the EEPROM
     if (doubleLoop || (loop && (currAddress > validToAddress))) {
-        EEPROM.put(2, validToAddress + (4 * (NUMBER_SENSOR_NAMES + 1)));
+        EEPROM.put(2, validToAddress + (4 * (numberSensors + 1)));
     } else {
         EEPROM.put(2, validToAddress);
     }
@@ -136,7 +148,7 @@ uint8_t* remoteEndData::getEEPROMMessage() {
     uint8_t* dataArr = (uint8_t*) malloc(sizeof(uint8_t) * (messageSize + 1)); //Allocate the array for the LoRa message
     
     dataArr[0] = messageSize;
-    dataArr[1] = 0b00010000 | ((uint8_t) NUMBER_SENSOR_NAMES & 0b00001111); //Set the first byte of the message; the message type and the number of sensors
+    dataArr[1] = 0b00010000 | ((uint8_t) numberSensors & 0b00001111); //Set the first byte of the message; the message type and the number of sensors
     dataArr[2] = numLocations; //Number of locations
     
     //Variables for keeping track of important message information
@@ -164,7 +176,7 @@ uint8_t* remoteEndData::getEEPROMMessage() {
             dataArr[currLocPtr++] = currDataNum; //Put data point number into locations part of message
         }
         
-        readEEPROM(dataArr, &currDataPtr, &currAddress, 4 * NUMBER_SENSOR_NAMES); //Read sensor data
+        readEEPROM(dataArr, &currDataPtr, &currAddress, 4 * numberSensors); //Read sensor data
     }
     
     #ifdef DEBUG
@@ -215,8 +227,8 @@ void remoteEndData::getEEPROMMessageInfo(unsigned int validToAddress, unsigned i
         }
 
         //Sensor data
-        curr += 4 * NUMBER_SENSOR_NAMES;
-        (*messageSize) += 4 * NUMBER_SENSOR_NAMES;
+        curr += 4 * numberSensors;
+        (*messageSize) += 4 * numberSensors;
 
         if (curr >= EEPROM.length()) { //EEPROM loop check
             curr -= (EEPROM.length() - 4);
@@ -263,9 +275,8 @@ void remoteEndData::EEPROMSuccess() {
     EEPROM.get(0, validToAddress);
     
     if (lastAdd == validToAddress) { //If all valid data has been read, reset the addresses
-        resetEEPROM(false);
+        resetEEPROM();
     } else {
         EEPROM.put(2, lastAdd); //Set the address of the last data point correctly
     }
 }
-#endif

@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 9, 2019
+Created by Victor Vezina, last updated July 25, 2019
 Released into the public domain
 */
 
@@ -16,31 +16,25 @@ Released into the public domain
 
 class remoteSensors {
     public:
-        remoteSensors(int numberSensors, char* sensorTypes[], uint8_t sensorPorts[][2]);
+        remoteSensors();
         void initialise();
         void read(uint8_t* dataArr);
     private:
-        //Variables
-        uint8_t _numberSensors;
-        char** _sensorTypes;
-        uint8_t (*_sensorPorts)[2];
-    
         //Initialisation functions
-        void initialiseDO(uint8_t index);
-        void initialiseConductivity(uint8_t index);
+        void initialiseASDO(uint8_t index);
+        void initialiseASEC(uint8_t index);
         void initialiseAtlas(Stream& sensor);
-        void initialiseTurbidity(uint8_t index);
-        void initialiseWaterTemp(uint8_t index);
+        void initialiseDFTB(uint8_t index);
+        void initialiseDFTemp(uint8_t index);
         void initialiseDHT22(uint8_t index);
     
         //Reading functions
-        float readDO(uint8_t index);
-        float readConductivity(uint8_t index);
+        uint8_t readASDO(uint8_t index, uint8_t* data);
+        uint8_t readASEC(uint8_t index, uint8_t* data);
         float readAtlas(Stream& sensor);
-        float readTurbidity(uint8_t index);
-        float readWaterTemp(uint8_t index);
-        float readAirTemp(uint8_t index);
-        float readHumidity(uint8_t index);
+        uint8_t readDFTB(uint8_t index, uint8_t* data);
+        uint8_t readDFTemp(uint8_t index, uint8_t* data);
+        uint8_t readDHT22(uint8_t index, uint8_t* data);
 };
 
 #endif

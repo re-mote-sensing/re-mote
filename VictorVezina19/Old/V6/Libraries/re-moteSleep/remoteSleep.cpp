@@ -1,6 +1,6 @@
 /*
 Library for sleeping, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 12, 2019
 Released into the public domain
 */
 
@@ -9,7 +9,9 @@ Released into the public domain
 #include <avr/wdt.h>
 #include <remoteConfig.h>
 
-remoteSleep::remoteSleep() {
+//Set the type of sleep
+remoteSleep::remoteSleep(uint8_t inputType) {
+    type = inputType;
 }
 
 //Sleep for a certain amount of time, accounting for the time since start
@@ -35,7 +37,7 @@ long remoteSleep::sleep(unsigned long time, unsigned long start) {
     //Sleep setup
     byte prevADCSRA = ADCSRA;
     ADCSRA = 0;
-    set_sleep_mode(Sleep_Type);
+    set_sleep_mode(type);
     sleep_enable();
     
     //Sleep for the amount of time given

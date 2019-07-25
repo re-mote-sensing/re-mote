@@ -1,6 +1,6 @@
 /*
 Library for reading from a GPS, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 11, 2019
 Released into the public domain
 */
 
@@ -14,18 +14,21 @@ Released into the public domain
 #endif
 
 //Set the pins for the GPS
-remoteGPS::remoteGPS() {
+remoteGPS::remoteGPS(uint8_t RX, uint8_t TX, uint8_t EN) {
+    rx = RX;
+    tx = TX;
+    enable = EN;
 }
 
 //Initialise the GPS
 void remoteGPS::initialise() {
-    pinMode(GPS_EN, OUTPUT);
-    digitalWrite(GPS_EN, LOW);
+    pinMode(enable, OUTPUT);
+    digitalWrite(enable, LOW);
 }
 
 //Offset the time that the GPS last updated (needed if you are sleeping the Arduino and millis() isn't incremented)
 void remoteGPS::offsetTime(long offset) {
-    unixTime += offset/1000;
+    timeOffset += offset;
 }
 
 //Get data from the GPS
@@ -33,14 +36,15 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
     unsigned long start = millis();
     
     //Start GPS
-    digitalWrite(GPS_EN, HIGH);
+    digitalWrite(enable, HIGH);
+    delay(100);
     NMEAGPS gps;
-    NeoSWSerial gpsSS(GPS_RX, GPS_TX);
+    NeoSWSerial gpsSS(rx, tx);
     gpsSS.begin(9600);
-    delay(250); //Delay to make sure GPS is working properly
+    delay(500); //Delay to make sure GPS is working properly
     
-    //If it's the first run, it will force all data to be updated
-    bool force = unixTime == 0;
+    //If timeout is set to -1 (technically 4294967295), it will force all data to be updated
+    bool force = timeout == -1;
     bool gotLoc = !force && (lat == NULL) && (lon == NULL);
     bool gotTime = !force && (time == NULL);
     
@@ -87,6 +91,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                     
                     unixTime = currTime;
                     timeLastUpdated = millis();
+                    timeOffset = 0;
                     gotTime = true;
                 } else {
                     #ifdef DEBUG
@@ -115,9 +120,9 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                 if (!err) {
                     #ifdef DEBUG
                     Serial.print(F("Got location: "));
-                    Serial.print(currLat, 6);
+                    Serial.print(currLat);
                     Serial.print(F(", "));
-                    Serial.println(currLon, 6);
+                    Serial.println(currLon);
                     delay(250);
                     #endif
                     
@@ -134,7 +139,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
     }
     
     //Turn off GPS
-    digitalWrite(GPS_EN, LOW);
+    digitalWrite(enable, LOW);
     gpsSS.end();
     
     if (lat != NULL)
@@ -144,6 +149,9 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
         (*lon) = longitude;
     
     if (time != NULL) {
-        (*time) = unixTime + ((millis() >= timeLastUpdated) ? (millis() - timeLastUpdated) : (millis() + (4294967295 - timeLastUpdated)))/1000;
+        (*time) = unixTime + timeOffset + ((millis() >= timeLastUpdated) ? (millis() - timeLastUpdated) : (millis() + (4294967295 - timeLastUpdated)))/1000;
     }
+    #ifdef DEBUG
+    //delay(5000);
+    #endif
 }

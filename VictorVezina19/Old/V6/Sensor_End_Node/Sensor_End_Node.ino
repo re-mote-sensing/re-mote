@@ -1,3 +1,45 @@
+/*----------IMPORTANT INFORMATION AND CONFIG PARAMETERS---------*/
+
+// Change the following parameters to accommodate your specific setup
+#define NAME "Office"           //Name to associate with this node
+
+#define NETWORK_ID 0x1           //LoRa network ID, has to be the same on every LoRa module in your network
+#define NODE_ID 0x0              //LoRa ID of this node, must be unique to all nodes in a network
+#define GATEWAY_ADDRESS 0x1000   //ID of the gateway node to send data to
+
+
+#define LORA_RX 7                //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
+#define LORA_TX 6                //Pin that the LoRa RXD pin is connected to
+#define GPS_RX 2                 //Pin that the GPS TXD pin is connected to
+#define GPS_TX 3                 //Pin that the GPS RXD pin is connected to
+#define GPS_EN 10                //Pin that the GPS EN pin is connected to
+
+// The following paramaters have to do with the sensors you're using on this end node
+// Look on our GitLab (LINK!) for more information on sensor setup and how to edit these values
+#define NUMBER_SENSORS 4 //Max is 15
+
+char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Conductivity", "Turbidity", "Water_Temperature"};
+uint8_t sensorPorts[NUMBER_SENSORS][2] = { {12, 11}, {9, 8}, {5, 20}, {4, 0} };
+
+#define GPS_TIME 60000
+#define DATA_TYPE "EEPROM"
+
+#define SLEEP_TIME 120000
+#define FAIL_SLEEP_TIME (SLEEP_TIME * 3) / 4
+#define SLEEP_TYPE SLEEP_MODE_PWR_DOWN
+
+/*
+#define LORA_RX 8
+#define LORA_TX 7
+#define GPS_RX 4
+#define GPS_TX 3
+#define GPS_EN 2
+
+#define NUMBER_SENSORS 3
+char* sensorTypes[NUMBER_SENSORS] = {"Dissolved_Oxygen", "Turbidity", "Water_Temperature"};
+uint8_t sensorPorts[NUMBER_SENSORS][2] = { {10, 9}, {6, 14}, {16, 0} };
+*/
+
 /*
 Things to do:
 - Change code structure to use event loop
@@ -85,18 +127,11 @@ sleep {
 /*--------------------------------------------------------------*/
 
 /*---------------------------INCLUDES---------------------------*/
-#define MAIN
+
 #include <remoteConfig.h>
-#undef MAIN
-
-//Check to make sure compilation is in the right mode
-#ifndef End_Node
-#error Please put the config file into End_Node mode
-#endif
-
-#include <remoteLoRa.h>
-#include <remoteGPS.h>
 #include <remoteSensors.h>
+#include <remoteGPS.h>
+#include <remoteLoRa.h>
 #include <remoteEndData.h>
 #include <remoteSleep.h>
 
@@ -106,16 +141,16 @@ sleep {
 
 /*-------------------------CONSTRUCTORS-------------------------*/
 
-remoteLoRa LoRa;
-remoteGPS GPS;
-remoteSensors Sensors;
-remoteEndData Data;
-remoteSleep Sleep;
+remoteSensors Sensors(NUMBER_SENSORS, sensorTypes, sensorPorts);
+remoteGPS GPS(GPS_RX, GPS_TX, GPS_EN);
+remoteLoRa LoRa(LORA_RX, LORA_TX);
+remoteEndData Data(DATA_TYPE, NUMBER_SENSORS);
+remoteSleep Sleep(SLEEP_TYPE);
 
 /*-----------------------GLOBAL VARIABLES-----------------------*/
 
-float latitude = 0;
-float longitude = 0;
+float latitude;
+float longitude;
 
 /*---------------------------SETUP------------------------------*/
 
@@ -142,10 +177,9 @@ void setup() {
     #endif
     LoRa.writeConfig(NETWORK_ID, NODE_ID); //Write the config parameters to the LoRa module
     
-    #ifdef DEBUG
-    Serial.println(F("Waiting for input..."));
+    //#ifdef DEBUG
     while (!Serial.available()) ; //Useful for testing
-    #endif
+    //#endif
     
     #ifdef DEBUG
     Serial.println(F("Registering node"));
@@ -153,8 +187,13 @@ void setup() {
     registerNode(); //Register this node with the gateway
     
     #ifdef DEBUG
+    Serial.println(F("Getting initial GPS data"));
+    #endif
+    GPS.getData(NULL, NULL, NULL, -1);
+    
+    #ifdef DEBUG
     //Resets saved data, used in testing
-    Data.reset(false);
+    Data.reset();
     #endif
 }
 
@@ -192,12 +231,12 @@ void loop() {
     //Delay the appropriate amount of time before the next sensor read
     if (received >= 2) {
         //If sending the data wasn't successful, wait the fail amount of time
-        long time = Sleep.sleep(Fail_Sleep_Time, start);
-        GPS.offsetTime(time);
+        long time = Sleep.sleep(FAIL_SLEEP_TIME, start);
+        GPS.offsetTime(time/1000);
     } else {
         //If sending was successful, wait the normal amount of time
-        long time = Sleep.sleep(Sleep_Time, start);
-        GPS.offsetTime(time);
+        long time = Sleep.sleep(SLEEP_TIME, start);
+        GPS.offsetTime(time/1000);
     }
 }
 
@@ -210,8 +249,8 @@ void loop() {
 void registerNode() {
     //Get the length of the registration message
     uint8_t arrLength = 1 + 1 + strlen(NAME);
-    for (uint8_t i = 0; i < NUMBER_SENSOR_NAMES; i++) {
-        arrLength += 1 + strlen(sensorNames[i]);
+    for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
+        arrLength += 1 + strlen(sensorTypes[i]);
     }
     
     //If the length is longer than one LoRa message
@@ -223,28 +262,29 @@ void registerNode() {
 
     uint8_t* dataArr = (uint8_t*) malloc(sizeof(uint8_t) * arrLength); //Allocate the array for the LoRa message
 
-    dataArr[0] = ((uint8_t) NUMBER_SENSOR_NAMES) & 0b00001111; //Set first byte of message; registration type and number of sensors
+    dataArr[0] = ((uint8_t) NUMBER_SENSORS) & 0b00001111; //Set first byte of message; registration type and number of sensors
     
     uint8_t curr = 1; //Current posistion in the LoRa message
     
     //Copy the length of the node name into the message
     uint8_t currLen = strlen(NAME);
-    dataArr[curr++] = currLen;
+    memcpy(&dataArr[curr++], &currLen, sizeof(uint8_t));
     
     //Copy the node name into the message
     for (uint8_t i = 0; i < strlen(NAME); i++) {
-        dataArr[curr++] = NAME[i];
+        memcpy(&dataArr[curr++], &NAME[i], sizeof(uint8_t));
     }
     
     //Go through each connected sensor and add it's name to the LoRa message
-    for (uint8_t i = 0; i < NUMBER_SENSOR_NAMES; i++) {
+    for (uint8_t i = 0; i < NUMBER_SENSORS; i++) {
         //Copy the length of this sensor type into the message
-        currLen = strlen(sensorNames[i]);
-        dataArr[curr++] = currLen;
+        currLen = strlen(sensorTypes[i]);
+        memcpy(&dataArr[curr++], &currLen, sizeof(uint8_t));
         
-        //Copy the sensor name into the LoRa message
-        memcpy(&dataArr[curr], sensorNames[i], sizeof(char) * currLen);
-        curr += currLen;
+        //Go through the sensor name and copy it into the LoRa message
+        for (uint8_t j = 0; j < strlen(sensorTypes[i]); j++) {
+            memcpy(&dataArr[curr++], &sensorTypes[i][j], sizeof(uint8_t));
+        }
     }
     
     uint8_t ack = 0xFF;
@@ -255,7 +295,7 @@ void registerNode() {
         Serial.println(F("Sending registration")); //Debugging print statement
         #endif
         
-        uint8_t* ackMessage = LoRa.sendReceive(GATEWAY_ID, arrLength, dataArr, 10000); //Send the registration message
+        uint8_t* ackMessage = LoRa.sendReceive(GATEWAY_ADDRESS, arrLength, dataArr, 10000); //Send the registration message
         
         //Get acknowledgment byte
         if (ackMessage != NULL) {
@@ -264,14 +304,13 @@ void registerNode() {
         }
         
         #ifdef DEBUG
-        if (ack == 0 || ack == 1) { //If the registration was a success
+        if (ack == 0) { //If the registration was a success
             Serial.println(F("Received ack"));
         } else { //Should deal with different failure codes
-            Serial.print(F("Didn't receive ack: "));
-            Serial.println(ack);
+            Serial.println(F("Didn't receive ack"));
         }
         #endif
-    } while (ack > 1);
+    } while (ack != 0);
     
     free(dataArr); //Free allocated memory
 }
@@ -281,7 +320,7 @@ void registerNode() {
 
 //Read data from the GPS and the sensors
 uint8_t* readGPSSensors() {
-    unsigned long time;
+    unsigned long time = 12345;
     float lat;
     float lon;
     
@@ -293,8 +332,8 @@ uint8_t* readGPSSensors() {
     unsigned long before = millis();
     #endif
     
-    //Try to update gps data for GPS_Time time
-    GPS.getData(&time, &lat, &lon, GPS_Time);
+    //Try to update gps data for GPS_TIME time
+    GPS.getData(&time, &lat, &lon, GPS_TIME);
     
     #ifdef DEBUG
     Serial.println(F("GPS data:"));
@@ -319,27 +358,27 @@ uint8_t* readGPSSensors() {
         longitude = lon;
         
         //Allocate memory for answer, including latitude and longitude
-        ans = (uint8_t*) malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSOR_NAMES + 3))));
+        ans = (uint8_t*) malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSORS + 3))));
         
         ans[curr++] = 1; //Means that this data point has location data
         
         //Copy time into array
-        memcpy(&ans[curr], &time, sizeof(unsigned long));
+        memcpy(&ans[curr], &time, sizeof(uint8_t) * 4);
         curr +=4 ;
         
         //Copy location into array
-        memcpy(&ans[curr], &latitude, sizeof(float));
-        memcpy(&ans[curr + 4], &longitude, sizeof(float));
+        memcpy(&ans[curr], &latitude, sizeof(uint8_t) * 4);
+        memcpy(&ans[curr + 4], &longitude, sizeof(uint8_t) * 4);
         curr += 8;
     } else {
         //Allocate memory for answer, not including latitude and longitude
-        ans = (uint8_t*) malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSOR_NAMES + 1))));
+        ans = (uint8_t*) malloc(sizeof(uint8_t) * (1 + (4 * (NUMBER_SENSORS + 1))));
         
         ans[curr++] = 0; //Means that this data point doesn't have location data
         
         //Copy time into array
-        memcpy(&ans[curr], &time, sizeof(unsigned long));
-        curr += 4;
+        memcpy(&ans[curr], &time, sizeof(uint8_t) * 4);
+        curr +=4 ;
     }
     
     #ifdef DEBUG
@@ -347,7 +386,7 @@ uint8_t* readGPSSensors() {
     //Serial.println(freeMemory());
     #endif
     
-    Sensors.read(&ans[curr]); //Read the connected sensors
+    Sensors.read(&ans[curr]);
     
     #ifdef DEBUG
     Serial.println();
@@ -368,7 +407,7 @@ uint8_t sendSensorData() {
         return 1;
     }
     
-    uint8_t* ackMessage = LoRa.sendReceive(GATEWAY_ID, dataArr[0], &dataArr[1]); //Send data to the gateway
+    uint8_t* ackMessage = LoRa.sendReceive(GATEWAY_ADDRESS, dataArr[0], &dataArr[1]); //Send data to the gateway
     
     //Get acknowledgment byte
     uint8_t ack = 0xFF;
