@@ -1,6 +1,6 @@
 /*
 Header for some config parameters, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 29, 2019
 Released into the public domain
 */
 
@@ -51,9 +51,9 @@ Released into the public domain
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
     extern const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS];
     #ifdef MAIN
-        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Dissolved_Oxygen", /*"Conductivity",*/ "Turbidity", "Water_Temperature"};
-        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"AS_DO", /*"AS_EC",*/ "DF_TB", "DF_Temp"};
-        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {9, 8}, /*{12, 11, 13},*/ {5, 20}, {4, 0} };
+        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Water_Temperature", /*"Conductivity",*/ "Dissolved_Oxygen", "Turbidity"};
+        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DF_Temp", /*"AS_EC",*/ "AS_DO", "DF_TB"};
+        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {4}, /*{12, 11, 13},*/ {9, 8}, {5, 20} };
     #endif
 
     #define AS_DO_Sensor
@@ -61,6 +61,11 @@ Released into the public domain
     #define DF_TB_Sensor
     #define DF_Temp_Sensor
     //#define DHT22_Sensor
+
+    #define Temperature_Comp 0
+    //#define Temperature_Comp_Index 0
+    //#define Salinity_Comp 1
+    //#define Salinity_Comp_Index 0
 
     /*---------Extra Parameters---------*/
     #define Data_Type EEPROM_Type                   //Type of data storage being used
@@ -70,7 +75,7 @@ Released into the public domain
     #define Fail_Sleep_Time (Sleep_Time * 3) / 4    //Time that this node sleeps on fail
     #define Sleep_Type SLEEP_MODE_PWR_DOWN          //Type of sleep this node uses
 
-    #define DEBUG                   //Put code in debug mode
+    #define DEBUG                                   //Put code in debug mode
 #endif
 
 #ifdef Gateway
@@ -97,7 +102,7 @@ Released into the public domain
         const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DHT22"};
         const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS]= { {2, 0} };
     #endif
-    
+
     //#define AS_DO_Sensor
     //#define AS_EC_Sensor false      //Set this value to if the EC sensor has an enable pin or not
     //#define DF_TB_Sensor

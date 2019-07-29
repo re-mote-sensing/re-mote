@@ -4,14 +4,11 @@ Created by Victor Vezina, last updated July 29, 2019
 Released into the public domain
 */
 
-/* To do:
-- Add temperature and salinity compensation to Atlas Scientific sensors
-*/
-
 #ifndef remoteSensors_h
 #define remoteSensors_h
 
 #include <Arduino.h>
+#include <remoteConfig.h>
 
 class remoteSensors {
     public:
@@ -19,6 +16,14 @@ class remoteSensors {
         void initialise();
         void read(uint8_t* dataArr);
     private:
+        #ifdef Temperature_Comp
+        float lastTemp = 20;
+        #endif
+    
+        #ifdef Salinity_Comp
+        float lastSal = 0;
+        #endif
+    
         //Initialisation functions
         void initialiseASDO(uint8_t index);
         void initialiseASEC(uint8_t index);

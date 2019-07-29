@@ -54,24 +54,24 @@ void remoteSensors::initialiseASDO(uint8_t index) {
     //Initialise the software serial for this sensor
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
-    
+
     //Itialise common Atlas Scientific settings
     initialiseAtlas(sensor);
-    
-    
+
+
     //Set proper reading outputs
     sensor.print(F("O,DO,1\r")); //For older firmware versions
     ASWait(sensor);
-    
+
     sensor.print(F("O,mg,1\r"));
     ASWait(sensor);
-    
+
     sensor.print(F("O,%,0\r"));
     ASWait(sensor);
-    
-    
+
+
     sensor.print(F("Sleep\r")); //Put sensor to sleep
-    
+
     sensor.end();
 }
 #endif
@@ -216,6 +216,28 @@ void remoteSensors::read(uint8_t* dataArr) {
         #endif
 
         //Should probably handle default
+        
+        #ifdef Temperature_Comp
+        if (Temperature_Comp == i) {
+            uint8_t backAmount = 4;
+            #ifdef Temperature_Comp_Index
+            backAmount += 4 * Temperature_Comp_Index;
+            #endif
+            
+            memcpy(&lastTemp, &dataArr[curr - backAmount], sizeof(float));
+        }
+        #endif
+        
+        #ifdef Salinity_Comp
+        if (Salinity_Comp == i) {
+            uint8_t backAmount = 4;
+            #ifdef Salinity_Comp_Index
+            backAmount += 4 * Salinity_Comp_Index;
+            #endif
+            
+            memcpy(&lastSal, &dataArr[curr - backAmount], sizeof(float));
+        }
+        #endif
     }
 }
 
@@ -225,6 +247,20 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
     //Initialise the sensor's software serial
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
+    
+    //Wake the sensor up
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    
+    #ifdef Salinity_Comp
+    //Compensate for salinity
+    sensor.print(F("S,"));
+    sensor.print(lastSal);
+    sensor.print('\r');
+    ASWait(sensor);
+    #endif
     
     float ans = readAtlas(sensor);
     
@@ -254,6 +290,12 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
     
+    //Wake the sensor up
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    
     float ans = readAtlas(sensor);
     
     #ifdef DEBUG
@@ -279,10 +321,13 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
 #if defined(AS_DO_Sensor) || defined(AS_EC_Sensor)
 //Read data from an Atlas Scientific sensor at index i
 float remoteSensors::readAtlas(Stream& sensor) {
-    //Compensate for temp(both) and salinity(DO)??
-    
-    //Wake the sensor up
-    sensor.print(F("R\r"));
+    #ifdef Temperature_Comp
+    //Compensate for temperature
+    sensor.print(F("T,"));
+    sensor.print(lastTemp);
+    sensor.print('\r');
+    ASWait(sensor);
+    #endif
     
     float data = 0.0; //Data for this sensor
     
