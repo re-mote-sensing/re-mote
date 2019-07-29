@@ -36,6 +36,11 @@
 
 ![alt-text][Moteino Specs]
 
+![alt-text][Moteino Pinout]
+
+* LED is on pin D9
+* 
+
 
 ## Moteino M0
 
@@ -89,6 +94,8 @@ There are now a few compact low-power sensor breakouts available that can flat-m
 [Moteino]: https://lowpowerlab.com/guide/moteino/
 [Moteino Board]: https://i.ibb.co/vdd2MXs/Moteino-Board.png
 [Moteino Specs]:https://i.ibb.co/6Jp4CgZ/Moteino-Specs.png
+[Moteino Pinout]: https://i.ibb.co/CvqnCWh/Moteino-Pinout.png
+
 [MoteinoMEGA Board]: https://i.ibb.co/9bF4cCT/Moteino-MEGA-Board.png
 [MoteinoMEGA Specs]: https://i.ibb.co/Ss6jM74/Moteino-MEGA-Specs.png
 [Moteino M0]: https://i.ibb.co/dr53PPF/Moteino-M0-Board.png
