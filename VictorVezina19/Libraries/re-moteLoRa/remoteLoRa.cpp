@@ -1,6 +1,6 @@
 /*
 Library for using a LoRa mesh module (https://www.dfrobot.com/product-1670.html), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 25, 2019
+Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 29, 2019
 Released into the public domain
 */
 
@@ -80,7 +80,7 @@ void remoteLoRa::readConfig() {
 }
 
 //Write config parameters to the LoRa module
-void remoteLoRa::writeConfig(uint16_t netID, uint16_t nodeID) {
+bool remoteLoRa::writeConfig(uint16_t netID, uint16_t nodeID) {
     //Start LoRa software serial
     NeoSWSerial port(LORA_RX, LORA_TX);
     port.begin(9600);
@@ -136,23 +136,27 @@ void remoteLoRa::writeConfig(uint16_t netID, uint16_t nodeID) {
 
 	free(payload);
     
-    #ifdef DEBUG
 	uint8_t frameType = 0;
 	uint8_t cmdType = 0;
 	uint8_t * responsePayload = NULL;
     int len = readFrame(port, &frameType, &cmdType, &responsePayload);
-
+    
+    bool ans = false;
 	if (len != -1 && frameType == 0x01 && cmdType == 0x81) {
 		// Application data sending response
 		uint8_t status = responsePayload[0];
+        if (status == 0) {
+            ans = true;
+        }
+        #ifdef DEBUG
 		Serial.print("status ="); printByte(status);
 		Serial.println();
+        #endif
 	}
     
 	free(responsePayload);
-    #endif
-    
     port.end();
+    return ans;
 }
 
 //Send a message and wait for an acknowledgement
@@ -168,7 +172,7 @@ uint8_t* remoteLoRa::sendReceive(uint16_t target, uint8_t dataLen, uint8_t* data
     uint8_t* ans = NULL; //The message received
     
     //Loop until an acknowledgement is received or timeout time has passed
-    while ((millis() >= before) ? ((millis() - before) < timeout) : ((millis() + (4294967295 - before)) < timeout)) { //Accounts for overflow
+    while ((millis() - before) < timeout) {
         uint8_t* data = readData(port); //Read from the LoRa module
         if (data != NULL) { //If a LoRa message was received
             uint16_t dataAdd; //The address the message was received from
@@ -432,7 +436,7 @@ uint8_t remoteLoRa::readByte(Stream& port, bool* error) {
     if (*error) return -1;
     unsigned long start = millis();
     while (!port.available()) {
-        if ((millis() >= start) ? ((millis() - start) > LoRa_Read_Timeout) : ((millis() + (4294967295 - start)) > LoRa_Read_Timeout)) {
+        if ((millis() - start) > LoRa_Read_Timeout) {
             (*error) = true;
             return -1;
         }

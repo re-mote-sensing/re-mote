@@ -1,11 +1,7 @@
 /*
 Library for using a LoRa mesh module (https://www.dfrobot.com/product-1670.html), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 25, 2019
+Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 29, 2019
 Released into the public domain
-*/
-
-/* To do:
-- Add success/error answer to write config, to ensure that it works
 */
 
 #ifndef remoteLoRa_h
@@ -17,7 +13,7 @@ class remoteLoRa {
     public:
         remoteLoRa();
         void readConfig();
-        void writeConfig(uint16_t netID, uint16_t nodeID);
+        bool writeConfig(uint16_t netID, uint16_t nodeID);
         uint8_t* sendReceive(uint16_t target, uint8_t dataLen, uint8_t* data, unsigned long timeout = 5000);
         uint8_t* readData();
         void sendData(uint16_t target, uint8_t dataLen, uint8_t* data);

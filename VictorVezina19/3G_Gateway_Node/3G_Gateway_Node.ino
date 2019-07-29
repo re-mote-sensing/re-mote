@@ -1,6 +1,5 @@
 /*
 Things to do:
-- Don't just sit there waiting, sleep and check every second for lora
 - Check for SD card being full
 - Change code structure to use event loop
 - Robustify
@@ -30,7 +29,6 @@ Things to do:
 #include <MemoryFree.h>
 #endif
 
-
 /*------------------------CONSTRUCTORS--------------------------*/
 
 remoteLoRa LoRa;
@@ -54,7 +52,9 @@ void setup() {
     delay(180);
     digitalWrite(FONA_EN, LOW);
     
+    #ifdef DEBUG
     Serial.begin(9600);
+    #endif
     
     //testFona();
     
@@ -66,13 +66,15 @@ void setup() {
     #ifdef DEBUG
     Serial.println(F("Initialising LoRa"));
     #endif
-    LoRa.writeConfig(NETWORK_ID, GATEWAY_ID);
+    while (!LoRa.writeConfig(NETWORK_ID, GATEWAY_ID)) {
+        delay(2500);
+    }
     
     #ifdef DEBUG
     Serial.println(F("Waiting for input..."));
     Serial.println(freeMemory());
-    while (!Serial.available()) ; //Useful for testing
     #endif
+    while (!Serial.available()) ; //Useful for testing
     
     #ifdef DEBUG
     //Data.reset(true);
@@ -93,9 +95,8 @@ void setup() {
 /*----------------------------LOOP------------------------------*/
 
 void loop() {
+    unsigned long lastPost = millis(); //Get post time before we start to read sensors and post
     readSensors();
-    
-    unsigned long lastPost = millis(); //Get post time before we actually post, this ensures that the posting starts exactly every hour
     postData(); //Post the saved data
     
     #ifdef DEBUG
@@ -104,7 +105,7 @@ void loop() {
     #endif
 
     //Just keep checking the LoRa module until the right amount of time has passed
-    while ((millis() >= lastPost) ? ((millis() - lastPost) < Post_Time) : ((millis() + (4294967295 - lastPost)) < Post_Time)) { //Makes sure to check for overflow
+    while ((millis() - lastPost) < Post_Time) {
         uint8_t* loraData = LoRa.readData(); //Read the LoRa module
         
         if (loraData != NULL) { //If the LoRa module received a message
@@ -192,6 +193,10 @@ void registerThisNode() {
 
 //Read the sensors and the GPS and save the data
 void readSensors() {
+    #ifdef DEBUG
+    Serial.println(F("Reading sensors"));
+    #endif
+    
     unsigned long time;// = 1563816782 + millis()/1000;
     float lat;// = 43;
     float lon;// = -79;

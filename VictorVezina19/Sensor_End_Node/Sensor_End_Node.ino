@@ -120,7 +120,9 @@ float longitude = 0;
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
+    #ifdef DEBUG
     Serial.begin(9600); //Begin usb serial for debug print statements
+    #endif
     
     #ifdef DEBUG
     Serial.println(F("Initialising GPS"));
@@ -140,17 +142,20 @@ void setup() {
     #ifdef DEBUG
     Serial.println(F("Initialising LoRa"));
     #endif
-    LoRa.writeConfig(NETWORK_ID, NODE_ID); //Write the config parameters to the LoRa module
+    //Write the config parameters to the LoRa module
+    while (!LoRa.writeConfig(NETWORK_ID, NODE_ID)) {
+        delay(2500);
+    }
     
     #ifdef DEBUG
     Serial.println(F("Waiting for input..."));
-    while (!Serial.available()) ; //Useful for testing
     #endif
+    while (!Serial.available()) ; //Useful for testing
     
     #ifdef DEBUG
     Serial.println(F("Registering node"));
     #endif
-    registerNode(); //Register this node with the gateway
+    //registerNode(); //Register this node with the gateway
     
     #ifdef DEBUG
     //Resets saved data, used in testing
@@ -281,9 +286,9 @@ void registerNode() {
 
 //Read data from the GPS and the sensors
 uint8_t* readGPSSensors() {
-    unsigned long time;
-    float lat;
-    float lon;
+    unsigned long time = 0;
+    float lat = 0;
+    float lon = 0;
     
     #ifdef DEBUG
     Serial.println();
@@ -294,7 +299,7 @@ uint8_t* readGPSSensors() {
     #endif
     
     //Try to update gps data for GPS_Time time
-    GPS.getData(&time, &lat, &lon, GPS_Time);
+    //GPS.getData(&time, &lat, &lon, GPS_Time);
     
     #ifdef DEBUG
     Serial.println(F("GPS data:"));
