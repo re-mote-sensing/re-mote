@@ -155,7 +155,7 @@ void setup() {
     #ifdef DEBUG
     Serial.println(F("Registering node"));
     #endif
-    //registerNode(); //Register this node with the gateway
+    registerNode(); //Register this node with the gateway
     
     #ifdef DEBUG
     //Resets saved data, used in testing
@@ -286,9 +286,9 @@ void registerNode() {
 
 //Read data from the GPS and the sensors
 uint8_t* readGPSSensors() {
-    unsigned long time = 0;
-    float lat = 0;
-    float lon = 0;
+    unsigned long time;
+    float lat;
+    float lon;
     
     #ifdef DEBUG
     Serial.println();
@@ -299,7 +299,7 @@ uint8_t* readGPSSensors() {
     #endif
     
     //Try to update gps data for GPS_Time time
-    //GPS.getData(&time, &lat, &lon, GPS_Time);
+    GPS.getData(&time, &lat, &lon, GPS_Time);
     
     #ifdef DEBUG
     Serial.println(F("GPS data:"));
