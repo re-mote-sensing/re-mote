@@ -1,11 +1,10 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 29, 2019
 Released into the public domain
 */
 
 /* To do:
-- Add support for EC enable pin
 - Add temperature and salinity compensation to Atlas Scientific sensors
 */
 
@@ -24,6 +23,7 @@ class remoteSensors {
         void initialiseASDO(uint8_t index);
         void initialiseASEC(uint8_t index);
         void initialiseAtlas(Stream& sensor);
+        void ASWait(Stream& sensor);
         void initialiseDFTB(uint8_t index);
         void initialiseDFTemp(uint8_t index);
         void initialiseDHT22(uint8_t index);

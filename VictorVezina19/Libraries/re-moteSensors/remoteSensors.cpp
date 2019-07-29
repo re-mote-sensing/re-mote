@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 29, 2019
 Released into the public domain
 */
 
@@ -9,8 +9,6 @@ Released into the public domain
 #include <OneWire.h>
 #include <DHT.h>
 #include <remoteConfig.h>
-
-//#define EN false
 
 remoteSensors::remoteSensors() {
 }
@@ -63,19 +61,13 @@ void remoteSensors::initialiseASDO(uint8_t index) {
     
     //Set proper reading outputs
     sensor.print(F("O,DO,1\r")); //For older firmware versions
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
     sensor.print(F("O,mg,1\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
     sensor.print(F("O,%,0\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
     
     
     sensor.print(F("Sleep\r")); //Put sensor to sleep
@@ -87,6 +79,11 @@ void remoteSensors::initialiseASDO(uint8_t index) {
 #ifdef AS_EC_Sensor
 //Initialise an Atlas Scientific Conductivity sensor at index index
 void remoteSensors::initialiseASEC(uint8_t index) {
+    #if AS_EC_Sensor == true
+    pinMode(sensorPorts[index][2], OUTPUT);
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+    
     //Initialise the software serial for this sensor
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
@@ -97,40 +94,29 @@ void remoteSensors::initialiseASEC(uint8_t index) {
     
     //Set proper probe type
     sensor.print(F("K,1.0\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
 
     //Set proper reading outputs (Only needed for older firmware version)
     sensor.print(F("O,EC,1\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
     sensor.print(F("O,TDS,0\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
     sensor.print(F("O,S,0\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
-
+    ASWait(sensor);
+    
     sensor.print(F("O,SG,0\r"));
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
+    
 
-
-    //Put sensor to sleep or turn it off
-    if (AS_EC_Sensor) {
-        Serial.println(F("This hasn't been implemented yet"));
-        while (true) ;
-    } else {
-        sensor.print(F("Sleep\r")); //Put sensor to sleep
-    }
+    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    
+    //If it can be turned off, turn it off
+    #if AS_EC_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
     
     sensor.end();
 }
@@ -142,30 +128,26 @@ void remoteSensors::initialiseAtlas(Stream& sensor) {
     //For some reason it seems you have to send arandom command at startup
     sensor.print(F("R\r"));
     
-    //Wait for response and get rid of it
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
     
     sensor.print(F("OK,1\r")); //Turn on OK responses (does nothing on older firmware)
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
     
     sensor.print(F("C,0\r")); //Turn off continous mode
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
     
     sensor.print(F("Plock,1\r")); //Lock to UART mode
-    while (!(sensor.available())) ;
-    delay(100);
-    while (sensor.available()) sensor.read() ;
+    ASWait(sensor);
     
     sensor.print(F("L,0\r")); //Turn off LEDs
-    while (!(sensor.available())) ;
+    ASWait(sensor);
+}
+
+//Waits for an AS sensor to return a response and dumps it
+void remoteSensors::ASWait(Stream& sensor) {
+    while (!sensor.available());
     delay(100);
-    while (sensor.available()) sensor.read() ;
+    while (sensor.available()) sensor.read();
 }
 #endif
 
@@ -264,6 +246,10 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
 #ifdef AS_EC_Sensor
 //Read data from an Atlas Scientific Conductivity sensor at index i
 uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
+    #if AS_EC_Sensor == true
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+    
     //Initialise the sensor's software serial
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
@@ -275,17 +261,17 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     Serial.println(ans);
     #endif
     
-    //Put sensor to sleep or turn it off
-    if (AS_EC_Sensor) {
-        Serial.println(F("This hasn't been implemented yet"));
-        while (true) ;
-    } else {
-        sensor.print(F("Sleep\r"));
-    }
+
+    sensor.print(F("Sleep\r")); //Put sensor to sleep
     
-    memcpy(data, &ans, sizeof(float));
+    //If it can be turned off, turn it off
+    #if AS_EC_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
     
     sensor.end();
+    
+    memcpy(data, &ans, sizeof(float));
     return 4;
 }
 #endif
@@ -310,7 +296,7 @@ float remoteSensors::readAtlas(Stream& sensor) {
         do {
             delay(900); //Delay to not flood sensor (only 1 reading/sec)
             sensor.print(F("R\r")); //Send the read command to the sensor
-            while (sensor.available() <= 0); //Wait for it's response
+            while (!sensor.available()); //Wait for it's response
             delay(100); //Delay to wait for the entire response to be ready
 
             int dataIndex = sensor.readBytesUntil('\r', buf, 40); //Read the response
