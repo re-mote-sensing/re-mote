@@ -4,13 +4,14 @@
 	* GPS
 	* Micro-controller
 	* Casing
+* Pinout
 * Waterproofing methods
 	* 3D Printing
 
 
 # Hardware Specs
 ## Lithium Ion Battery - 400mAh
-
+### Dimensions
 [Dimensions][Battery Dimensions Source]: 26.5mm x 36.9mm x 5mm  
 [Weight][Battery Weight Source]: 9g
 Order: https://lowpowerlab.com/shop/product/145
@@ -19,6 +20,7 @@ Order: https://lowpowerlab.com/shop/product/145
 ![alt-text][Battery Specs]
 
 ## GPS - GP-735
+### Dimensions
 
 [Dimensions][GPS Dimension Source]: 8(W) x 35(L) x 5.2(H) (mm)  
 [Weight][GPS Weight Source]: 4.3091275 g (0.1520 oz)
@@ -33,13 +35,58 @@ Order: https://lowpowerlab.com/shop/product/145
 	* yes
 * GPS needs full Position data before it saves the RTC and position. After that, Enable and Backup work as expected
 
-## Micro-controller + LoRa
 
+
+### Power Consumed
+
+
+
+### Average Fix Times
+
+Cold start (no RTC)
+Warm start (RTC) - 
+
+## Micro-controller + LoRa
+### Dimensions
 [Dimensions][Board Dimension Source]: 22.86 (W) x 50.8 (L) x 1.6 (H) (mm) (2 x 0.9 inch) (Height from CAD File)  
 [Weight][Board Weight Source]: ???
 
 Specs for the board can be found [here][Board Specs]. The specs are in the form of a CAD file.
 
+### Power Consumed
+* rfm95 put to sleep for these tests (i.e. negligible current drawn by it)
+* Voltage - 3V3
+
+Idle (Empty setup + Loop) - 6.35mA
+Low Power - 83uA
+
+
+## Pinout
+
+
+Moteino | RFM95
+D2 -> Interupt  
+D8 -> ?  
+D9 -> LED  
+D10 -> Slave (?)  
+D11 - D13 -> SPI  
+
+
+
+Moteino | GPS  
+
+D9 -> RX  
+D8 -> TX  
+ -> VCC  
+ -> GND  
+ -> EN  
+ -> B_Bat  
+
+
+Moteino | Battery  
+
+ -> VCC  
+ -> GND  
 
 ## Casing
 
