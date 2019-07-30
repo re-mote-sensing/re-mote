@@ -22,7 +22,7 @@ The setup consists of three components; End-Node, Relay-Node, and a Gateway.
 
 End-Node - To conserve power, the MESH Modules are powered off when not used. When ready to transmit data, the moduels are powered on, and data is transmitted to the desired Gateway.
 
-Relay-Node - Due to the Modules having their own processor, the Relayer's do not require an Arduino to run. After an intila configuration, these modules simply need an antenna and battery to receive and forward data. THe main issue is the large power drawn when idle. (However, the Relayer's do are not limited in weight and/or size, so a larger batter and solar panels may be employed)
+Relay-Node - Due to the Modules having their own processor, the Relayer's do not require an Arduino to run. After an initial configuration, these modules simply need an antenna and battery to receive and forward data. The main issue is the large power drawn when idle. (However, the Relayer's do are not limited in weight and/or size, so a larger batter and solar panels may be employed)
 
 Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
 
@@ -125,8 +125,8 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 ## Setup 2 Outline - RFM95 Flooding
 ### Setup Outline
 
-The End-Node broadcasts its message, and all relayer's within range rebroadcast the message. Eventually, the message will be received by the Gateway.
-The Gatetway then sends an ACK back. Precations are taken to avoid broadcast storms and discard stale messages.
+The End-Node broadcasts its message, and all Relayer's within range rebroadcast the message. Eventually, the message will be received by the Gateway.
+The Gateway then sends an ACK back. Precautions are taken to avoid broadcast storms and discard stale messages.
 
 Message Format - [ACK]|[Lifespan]|[Message ID]|[Message Data]
 ACK - 0 or 1 ( 0 = not an ACK, 1 = is an ACK)
@@ -153,7 +153,7 @@ Gateway -  Stays in the CAD loop until a message is detected. When a message is 
 	* If a node has already received the ACK for a message it is suppose to re-transmit, do not re-transmit the message
 	* Potential issue with multiple Gateways receiving the same message	
 
-* End-Nodes broadcast the message, but relayer’s have a specific, predetermined route (similar to what Emil mentioned in his email)
+* End-Nodes broadcast the message, but Relayer’s have a specific, predetermined route (similar to what Emil mentioned in his email)
 	* Issue of a node fails (cuts of connection for that "branch")
 
 * MESH network flow
