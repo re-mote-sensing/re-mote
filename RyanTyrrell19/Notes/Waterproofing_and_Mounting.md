@@ -39,7 +39,7 @@
 	
 * Top and bottom attachment ideas
 	* Screw the top case into the bottom case
-		* ** Can use a tap to create the thread fr the hole (rather then printing the thread)**
+		* **Can use a tap to create the thread for the hole (rather then printing the thread)**
 		* Metal screws may heat up and melt the plastic in the sun (or corrode in the water)
 	* Permanent solution; gluing the two together
 	* Attach using joints; snap-fit joint
