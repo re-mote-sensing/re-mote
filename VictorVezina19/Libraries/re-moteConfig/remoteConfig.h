@@ -20,7 +20,7 @@ Released into the public domain
 #endif
 
 /*---------Overall Network Settings---------*/
-#define GATEWAY_ID 0x1000               //LoRa ID of the Gateway Node
+#define GATEWAY_ID 0x2000               //LoRa ID of the Gateway Node
 #define NETWORK_ID 0x01                 //LoRa Network ID
 
 #define URL_Host "www.cas.mcmaster.ca"  //Host of the URL to post data to
@@ -43,8 +43,8 @@ Released into the public domain
     #define GPS_EN 10               //Pin that the GPS EN pin is connected to
 
     /*---------Sensor definitions---------*/
-    #define NUMBER_SENSOR_NAMES 4
-    #define NUMBER_SENSOR_TYPES 4
+    #define NUMBER_SENSOR_NAMES 3
+    #define NUMBER_SENSOR_TYPES 3
     #define MAX_NUMBER_PINS 2
 
     extern const char* sensorNames[NUMBER_SENSOR_NAMES];
@@ -75,14 +75,14 @@ Released into the public domain
     #define Fail_Sleep_Time (Sleep_Time * 3) / 4    //Time that this node sleeps on fail
     #define Sleep_Type SLEEP_MODE_PWR_DOWN          //Type of sleep this node uses
 
-    //#define DEBUG                                   //Put code in debug mode
+    #define DEBUG                                   //Put code in debug mode
 #endif
 
 #ifdef Gateway
     /*---------Gateway settings---------*/
 
     /*---------Base Parameters---------*/
-    #define NAME "Gateway"          //Name of this gateway
+    #define NAME "Gateway_2"        //Name of this gateway
     #define LORA_RX 6               //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
     #define LORA_TX 7               //Pin that the LoRa RXD pin is connected to
     #define FONA_RX 4               //Pin that the FONA TX pin is connected to
@@ -90,24 +90,24 @@ Released into the public domain
     #define FONA_EN 8               //Pin that the FONA KEY pin is connected to
 
     /*---------Sensor definitions---------*/
-    #define NUMBER_SENSOR_NAMES 2
-    #define NUMBER_SENSOR_TYPES 1
-    #define MAX_NUMBER_PINS 2
+    #define NUMBER_SENSOR_NAMES 0
+    #define NUMBER_SENSOR_TYPES 0
+    #define MAX_NUMBER_PINS 0
 
     extern const char* sensorNames[NUMBER_SENSOR_NAMES];
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
     extern const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS];
     #ifdef MAIN
-        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Air_Temperature", "Humidity"};
-        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DHT22"};
-        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS]= { {2, 0} };
+        const char* sensorNames[NUMBER_SENSOR_NAMES] = {/*"Air_Temperature", "Humidity"*/};
+        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {/*"DHT22"*/};
+        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS]= {/* {2}*/ };
     #endif
 
     //#define AS_DO_Sensor
     //#define AS_EC_Sensor false      //Set this value to if the EC sensor has an enable pin or not
     //#define DF_TB_Sensor
     //#define DF_Temp_Sensor
-    #define DHT22_Sensor
+    //#define DHT22_Sensor
 
     /*---------Extra Parameters---------*/
     #define Data_Type SD_Type                   //Data storage type being used
@@ -115,6 +115,8 @@ Released into the public domain
     #define GPS_Time 60000                      //Time this node will try the GPS every time it takes a measurement
     #define LoRa_Read_Timeout 5000              //Time that it will try to read from LoRa before giving up
     #define Fona_Make Tinysine                  //The make of the 3G Fona module being used
+    #define SD_CS 10                            //The pin that cs on the sd card module is connected to
+
 
     //#define DEBUG                   //Put code in debug mode
 #endif

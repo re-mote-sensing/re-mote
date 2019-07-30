@@ -1,6 +1,6 @@
 /*
 Library for saving the data of a gateway, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated July 30, 2019
 Released into the public domain
 */
 
@@ -80,7 +80,7 @@ void remoteGatewayData::initialiseSD() {
     
     //Initialise the SD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -110,7 +110,7 @@ void remoteGatewayData::resetSD(bool hard) {
     
     //Initialise the SD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -137,7 +137,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -247,7 +247,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -342,24 +342,27 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
                 file.seekCur(-1);
                 file.print('\n');
             }
+            
+            file.close();
+            
             //See if the node already has data to be sent in ToSend.csv
-            SdFile toSendFile;
-            toSendFile.open("ToSend.csv", FILE_WRITE);
-            toSendFile.seekSet(0);
+            //SdFile toSendFile;
+            file.open("ToSend.csv", FILE_WRITE);
+            file.seekSet(0);
             
             bool notFound = false;
             uint16_t currId;
             
             do { //While the node id on the current line isn't the node id we're looking for
-                while (toSendFile.read() != 10); //Go to end of line (skips first line)
+                while (file.read() != 10); //Go to end of line (skips first line)
                 
-                if (!toSendFile.available()) { //If we reach the end of ToSend.csv without finding the id of the node
+                if (!file.available()) { //If we reach the end of ToSend.csv without finding the id of the node
                     notFound = true;
                     break;
                 }
                 
                 //Get the id of the node on the current line
-                currId = (uint16_t) fileReadInt(&toSendFile);
+                currId = (uint16_t) fileReadInt(&file);
                 
             } while (currId != add);
             
@@ -367,26 +370,24 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
                 //Print the node's info into the file
                 char str[26];
                 sprintf(str, "%u,%.3hu,%.3hu,%lu\n", add, numData, numLoc, position);
-                toSendFile.print(str);
+                file.print(str);
             } else { //If the node is already in ToSend.csv
                 //Change the number of data points and locations
                 
                 //Read the current amount of data points ready to be sent for the current node
-                uint8_t numPointsData = (uint8_t) fileReadInt(&toSendFile);
+                uint8_t numPointsData = (uint8_t) fileReadInt(&file);
                 
                 //Read the current amount of locations ready to be sent for the current node
-                uint8_t numPointsLoc = (uint8_t) fileReadInt(&toSendFile, ',', -7);
+                uint8_t numPointsLoc = (uint8_t) fileReadInt(&file, ',', -7);
                 
                 char str[8];
                 sprintf(str, "%.3hu,%.3hu", numPointsData + numData, numPointsLoc + numLoc);
-                toSendFile.print(str);
+                file.print(str);
             }
-
-            toSendFile.close(); //Close ToSend.csv
             
             ans = 0x00;
         }
-        file.close(); //Close the node's file
+        file.close(); //Close the open file
     }
     free(fileName); //Free allocated memory
     
@@ -448,10 +449,16 @@ char* remoteGatewayData::getPostSD(uint8_t numLoops) {
     //Get info on what we need to post
     uint8_t* sendInfo = (uint8_t*) malloc(sizeof(uint8_t) * (8 * nodes));
     if (sendInfo == NULL) {
+        if (nodes == 1) {
+            resetSD(false);
+        }
         return NULL;
     }
     if (!getSendInfo(sendInfo, nodes)) {
         free(sendInfo);
+        if (nodes == 1) {
+            resetSD(false);
+        }
         return NULL;
     }
     
@@ -459,6 +466,9 @@ char* remoteGatewayData::getPostSD(uint8_t numLoops) {
     unsigned int dataSize = getDataSize(sendInfo, nodes);
     if (dataSize == -1) {
         free(sendInfo);
+        if (nodes == 1) {
+            resetSD(false);
+        }
         return NULL;
     }
     
@@ -472,6 +482,9 @@ char* remoteGatewayData::getPostSD(uint8_t numLoops) {
     //Get the HTTPS request we need to post
     char* request = (char*) malloc(sizeof(char) * dataSize);
     if (request == NULL) {
+        if (nodes == 1) {
+            resetSD(false);
+        }
         return NULL;
     }
     
@@ -483,6 +496,9 @@ char* remoteGatewayData::getPostSD(uint8_t numLoops) {
     if (!buildRequest(request, sendInfo, nodes)) {
         free(sendInfo);
         free(request);
+        if (nodes == 1) {
+            resetSD(false);
+        }
         return NULL;
     }
     
@@ -495,7 +511,7 @@ char* remoteGatewayData::getPostSD(uint8_t numLoops) {
 uint8_t remoteGatewayData::countNodesToSend() {
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -523,7 +539,7 @@ uint8_t remoteGatewayData::countNodesToSend() {
 bool remoteGatewayData::getSendInfo(uint8_t* ans, uint8_t nodes) {
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -615,7 +631,7 @@ unsigned int remoteGatewayData::getDataSize(uint8_t* sendInfo, uint8_t nodes) {
 bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -717,7 +733,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     
     //Initialise the microSD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif
@@ -883,7 +899,7 @@ float remoteGatewayData::fileReadFloat(SdFile* file, char end, uint8_t bufferSiz
 void remoteGatewayData::messageSuccessSD() {
     //Initialise the SD card
     SdFat sd;
-    if (!sd.begin()) {
+    if (!sd.begin(SD_CS)) {
         #ifdef DEBUG
         Serial.println(F("Error initialising sd card"));
         #endif

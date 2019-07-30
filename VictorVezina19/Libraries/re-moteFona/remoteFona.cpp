@@ -39,6 +39,8 @@ void remoteFona::initialise() {
 bool remoteFona::post(char* request, const char* host, int portNum) {
     #if Fona_Make == Adafruit
     bool err = toggle(true);
+    #else
+    bool err = false;
     #endif
     
     //Initialise the FONA software serial
@@ -106,6 +108,8 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
     
     #if Fona_Make == Adafruit
     bool err = toggle(true);
+    #else
+    bool err = false;
     #endif
     
     //Start Fona
