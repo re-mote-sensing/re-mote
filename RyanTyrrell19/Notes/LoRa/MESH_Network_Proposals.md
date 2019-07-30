@@ -20,9 +20,9 @@ Three proposals will be put forth regarding possible setups for the MESH Network
 ### Setup
 The setup consists of three components; End-Node, Relay-Node, and a Gateway. 
 
-End-Node - To conserve power, the MESH Modules are powered off when not used. When ready to transmit data, the moduels are powered on, and data is transmitted to the desired Gateway.
+End-Node - To conserve power, the MESH Modules are powered off when not used. When ready to transmit data, the modules are powered on, and data is transmitted to the desired Gateway.
 
-Relay-Node - Due to the Modules having their own processor, the Relayer's do not require an Arduino to run. After an initial configuration, these modules simply need an antenna and battery to receive and forward data. The main issue is the large power drawn when idle. (However, the Relayer's do are not limited in weight and/or size, so a larger batter and solar panels may be employed)
+Relay-Node - Due to the Modules having their own processor, the Relayer's do not require an Arduino to run. After an initial configuration, these modules simply need an antenna and battery to receive and forward data. The main issue is the large power drawn when idle. (However, the Relayer's are not limited in weight and/or size, so a larger battery and/or solar panels may be employed)
 
 Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
 
@@ -60,7 +60,7 @@ Relay-Node - The Relay-Node's will run through the following loop; Sleep the RFM
 Gateway - acts just like a Relay-Node, only it will determine that it's own ID is the target ID and process the message accordingly
 
 Requirements:
-* The message preamble **must be greater than** the sleep time during the CAD cycle
+* The message preamble **must be greater than** the sleep time during the CAD cycle (the preamble is what the CAD looks for to see if a message is available)
 * The timeout values for finding a valid route & waiting for message Acknowledgement must be changed to reflect the air time of the message and the number of nodes in the network
 
 1. End-Node requests to send a message. A valid route must be determined. This is essentially done by broadcasting to all Relay-Nodes, and having the Relay-Nodes re-broadcast until the Gateway is found. The route to the Gateway is send back to the End-Node
@@ -128,11 +128,11 @@ Identical to Node, only the data will be processed upon realizing it's ID matche
 The End-Node broadcasts its message, and all Relayer's within range rebroadcast the message. Eventually, the message will be received by the Gateway.
 The Gateway then sends an ACK back. Precautions are taken to avoid broadcast storms and discard stale messages.
 
-Message Format - [ACK]|[Lifespan]|[Message ID]|[Message Data]
-ACK - 0 or 1 ( 0 = not an ACK, 1 = is an ACK)
-Lifespan - Exceeding a threshold will result in the message being terminated
-Message ID - Uniquely determined using the Node ID, # of nodes in the network, and the # of messages the node has sent
-Message Data - Reason for the message transmission. This data could be GPS coordinates, commands, etc.
+Message Format - [ACK]|[Lifespan]|[Message ID]|[Message Data]  
+ACK - 0 or 1 ( 0 = not an ACK, 1 = is an ACK)  
+Lifespan - Exceeding a threshold will result in the message being terminated  
+Message ID - Uniquely determined using the Node ID, # of nodes in the network, and the # of messages the node has sent  
+Message Data - Reason for the message transmission. This data could be GPS coordinates, commands, etc.  
 
 
 End-Node - Constructs and broadcast the message. Enters the CAD loop and, when a message is detected, checks if it matched the assigned message ID of the message it sent, and whether it is the acknowledgement or not
@@ -141,8 +141,15 @@ Relay-Node - Stays in the CAD loop until a message is detected. When a message i
 
 ![alt-text][Flooding Relay Condition Table]
 
+* If seen before, should not relay!
+* Note - Messages include an id in the header. Custom made DI not needed
+
+
 Gateway -  Stays in the CAD loop until a message is detected. When a message is received, it checks whether it has already seen the message. If not, it saves the message ID, resets the Lifespan count, Sets the ACK TO 1, and broadcasts the message
-## Other Potential Setup Ideas
+
+
+* Main issue is message collisions. [This][LoRa Scalability: A Simulation Model Based on Interference Measurements] paper has some interesting notes regarding message collision between LoRa Modules
+## Other Potential Setup Ideas (some are repeats of above)
 
 
 * Currently have the Relay-Nodes and Gateway break the CAD cycle and run in receiver mode for a set amount of time. Instead, have them break the CAD cycle, process the message, then re-enter the CAD cycle. Whether it's a broadcast to find a route, the actual data being sent, or the Acknowledgement; as long as the preamble is set long enough, the Relay-Nodes & Gateway should have enough time to exit the loop and receive the message.
@@ -154,7 +161,7 @@ Gateway -  Stays in the CAD loop until a message is detected. When a message is 
 	* Potential issue with multiple Gateways receiving the same message	
 
 * End-Nodes broadcast the message, but Relayer’s have a specific, predetermined route (similar to what Emil mentioned in his email)
-	* Issue of a node fails (cuts of connection for that "branch")
+	* Issue of a node fails (cuts off connection for that "branch")
 
 * MESH network flow
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
@@ -174,3 +181,5 @@ Gateway -  Stays in the CAD loop until a message is detected. When a message is 
 
 [Flooding]:https://en.wikipedia.org/wiki/Flooding_(computer_networking)
 [Flooding Relay Condition Table]:https://i.ibb.co/QDZJ7xx/Flooding-Relay-Condition-Table.png
+
+[LoRa Scalability: A Simulation Model Based on Interference Measurements]: https://www.mdpi.com/1424-8220/17/6/1193
