@@ -1,1 +1,5 @@
 remoteFona	KEYWORD1
+initialise	KEYWORD2
+post	KEYWORD2
+offsetTime	KEYWORD2
+getGPSData	KEYWORD2

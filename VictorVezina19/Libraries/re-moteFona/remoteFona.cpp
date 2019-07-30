@@ -1,6 +1,6 @@
 /*
 Library for using a Fona module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on July 25, 2019
+Created by Victor Vezina, last modified on July 30, 2019
 Released into the public domain
 */
 
@@ -15,10 +15,30 @@ Released into the public domain
 
 //Start the Fona
 remoteFona::remoteFona() {
+    pinMode(FONA_EN, OUTPUT);
+}
+
+//Initialise the Fona module
+void remoteFona::initialise() {
+    #if Fona_Make == Tinysine
+    //Turn on the 3G chip on the Tinysine Fona
+    digitalWrite(FONA_EN, HIGH);
+    delay(180);
+    digitalWrite(FONA_EN, LOW);
+    
+    #elif Fona_Make == Adafruit
+    //Set the key pin to the default, the 3G chip will stay off
+    digitalWrite(FONA_EN, HIGH);
+    
+    #endif
 }
 
 //Post a given HTTP request through the Fona
 bool remoteFona::post(char* request, const char* host, int portNum) {
+    #if Fona_Make == Adafruit
+    toggle();
+    #endif
+    
     //Initialise the FONA software serial
     NeoSWSerial fonaSS(FONA_RX, FONA_TX);
     fonaSS.begin(9600);
@@ -66,6 +86,10 @@ bool remoteFona::post(char* request, const char* host, int portNum) {
     
     fonaSS.end();
     
+    #if Fona_Make == Adafruit
+    toggle();
+    #endif
+    
     return err; //Return if there was an error or not
 }
 
@@ -77,6 +101,10 @@ void remoteFona::offsetTime(long offset) {
 //Get GPS data from the Fona, returns if it was successful
 bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigned long timeout) {
     unsigned long start = millis();
+    
+    #if Fona_Make == Adafruit
+    toggle();
+    #endif
     
     //Start Fona
     NeoSWSerial fonaSS(FONA_RX, FONA_TX);
@@ -108,7 +136,7 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
     bool force = unixTime == 0;
     
     //Try to get GPS data for timeout amount of time
-    while (!err && (force || ((millis() >= start) ? ((millis() - start) < timeout) : ((millis() + (4294967295 - start)) < timeout)))) {
+    while (!err && (force || ((millis() - start) < timeout))) {
         if (sendGetReply(fonaSS, F("AT+CGPSINFO"), 5000, response, 80)) {
             if (response[10] == ',' || response[5] != 'I') { //Means data isn't ready yet
                 delay(2000); //Don't flood FONA
@@ -182,12 +210,25 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
 
     (*lon) = longitude;
 
-    (*time) = unixTime + ((millis() >= timeLastUpdated) ? ((millis() - timeLastUpdated)/1000) : ((millis() + (4294967295 - timeLastUpdated))/1000));
+    (*time) = unixTime + (millis() - timeLastUpdated)/1000;
+    
+    #if Fona_Make == Adafruit
+    toggle();
+    #endif
     
     return !err;
 }
 
 /*---------------------------------PRIVATE---------------------------------*/
+#if Fona_Make == Adafruit
+//Toggle the Fona on/off
+void remoteFona::toggle() {
+    digitalWrite(FONA_EN, LOW);
+    delay(4000);
+    digitalWrite(FONA_EN, HIGH);
+}
+#endif
+
 //Check if Fona has started correctly
 bool remoteFona::checkFona(Stream& port) {
     return SCRTries(port, "AT", "OK", 1000, 20);
@@ -228,7 +269,7 @@ bool remoteFona::sendCheckReply(Stream& port, const char* command, const char* r
     bool reset = false; //If the current command is done
     
     //While timeout time hasn't passed yet
-    while ((millis() >= start) ? ((millis() - start) < timeout) : ((millis() + (4294967295 - start)) < timeout)) { //Checks for overflow
+    while ((millis() - start) < timeout) {
         if (port.available()) {
             char c = port.read(); //Read the available character
             
@@ -279,24 +320,15 @@ bool remoteFona::sendGetReply(Stream& port, const __FlashStringHelper* command, 
     uint8_t curr = 0; //Index for the ans char array
     
     //While timeout time hasn't passed yet
-    while ((millis() >= start) ? ((millis() - start) < timeout) : ((millis() + (4294967295 - start)) < timeout)) { //Checks for overflow
+    while ((millis() - start) < timeout) {
         if (port.available()) {
             char c = port.read(); //Read the available character
-            
-            #ifdef DEBUG
-            //Serial.println((uint8_t) c);
-            #endif
 
             if (c > 25 && curr < length-1) { //If it's an actual character (not '\n' or '\r')
                 ans[curr++] = c;
             } else {
                 if (curr != 0) {
                     ans[curr] = 0;
-                    
-                    #ifdef DEBUG
-                    Serial.println(ans);
-                    //Serial.println((uint8_t) c);
-                    #endif
                     
                     return true;
                 }

@@ -1,6 +1,6 @@
 /*
 Header for some config parameters, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 29, 2019
+Created by Victor Vezina, last updated July 30, 2019
 Released into the public domain
 */
 
@@ -12,8 +12,8 @@ Released into the public domain
 #define remoteConfig_h
 
 /*---------Type of node---------*/
-#define End_Node
-//#define Gateway
+//#define End_Node
+#define Gateway
 
 #if (defined(End_Node) && defined(Gateway)) || (!defined(End_Node) && !defined(Gateway))
     #error Please set compilation to either End_Node or Gateway mode
@@ -75,7 +75,7 @@ Released into the public domain
     #define Fail_Sleep_Time (Sleep_Time * 3) / 4    //Time that this node sleeps on fail
     #define Sleep_Type SLEEP_MODE_PWR_DOWN          //Type of sleep this node uses
 
-    #define DEBUG                                   //Put code in debug mode
+    //#define DEBUG                                   //Put code in debug mode
 #endif
 
 #ifdef Gateway
@@ -114,12 +114,16 @@ Released into the public domain
     #define Post_Time 240000                    //Time interval that the gateway will post at
     #define GPS_Time 60000                      //Time this node will try the GPS every time it takes a measurement
     #define LoRa_Read_Timeout 5000              //Time that it will try to read from LoRa before giving up
-    
+    #define Fona_Make Tinysine                  //The make of the 3G Fona module being used
+
     //#define DEBUG                   //Put code in debug mode
 #endif
 
 //Some defines used for internal comparisons
 #define EEPROM_Type 0
 #define SD_Type 1
+
+#define Tinysine 0
+#define Adafruit 1
 
 #endif

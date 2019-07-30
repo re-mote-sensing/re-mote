@@ -46,12 +46,6 @@ float longitude = 0;
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
-    //Turn on the 3G chip on the fona
-    pinMode(FONA_EN, OUTPUT);
-    digitalWrite(FONA_EN, HIGH);
-    delay(180);
-    digitalWrite(FONA_EN, LOW);
-    
     #ifdef DEBUG
     Serial.begin(9600);
     #endif
@@ -71,10 +65,15 @@ void setup() {
     }
     
     #ifdef DEBUG
+    Serial.println(F("Initialising Fona"));
+    #endif
+    Fona.initialise();
+    
+    #ifdef DEBUG
     Serial.println(F("Waiting for input..."));
     Serial.println(freeMemory());
-    #endif
     while (!Serial.available()) ; //Useful for testing
+    #endif
     
     #ifdef DEBUG
     //Data.reset(true);
