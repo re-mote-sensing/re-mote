@@ -21,7 +21,7 @@ class remoteFona {
         unsigned long timeLastUpdated = 0;
         float latitude = 0.0;
         float longitude = 0.0;
-        void toggle();
+        bool toggle(bool on = false);
         bool checkFona(Stream& port);
         void closeHTTPS(Stream& port);
         bool SCRTries(Stream& port, const char* command, const char* reply, unsigned long timeout, uint8_t tries = 3);

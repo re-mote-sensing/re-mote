@@ -27,8 +27,10 @@ void remoteFona::initialise() {
     digitalWrite(FONA_EN, LOW);
     
     #elif Fona_Make == Adafruit
-    //Set the key pin to the default, the 3G chip will stay off
+    //Turn the 3G chip off
     digitalWrite(FONA_EN, HIGH);
+    
+    toggle();
     
     #endif
 }
@@ -36,7 +38,7 @@ void remoteFona::initialise() {
 //Post a given HTTP request through the Fona
 bool remoteFona::post(char* request, const char* host, int portNum) {
     #if Fona_Make == Adafruit
-    toggle();
+    bool err = toggle(true);
     #endif
     
     //Initialise the FONA software serial
@@ -44,7 +46,7 @@ bool remoteFona::post(char* request, const char* host, int portNum) {
     fonaSS.begin(9600);
     
     //First send an AT command to make sure the FONA is working
-    bool err = checkFona(fonaSS);
+    if (!err) err = checkFona(fonaSS);
     
     closeHTTPS(fonaSS); //Make sure there isn't an active HTTPS session
     
@@ -103,7 +105,7 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
     unsigned long start = millis();
     
     #if Fona_Make == Adafruit
-    toggle();
+    bool err = toggle(true);
     #endif
     
     //Start Fona
@@ -113,7 +115,7 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
     //The way the commands are sent are all the same, so I'll only comment one
     
     //First send an AT command to make sure the Fona is working
-    bool err = checkFona(fonaSS);
+    if (!err) err = checkFona(fonaSS);
     
     char response[80];
     
@@ -138,6 +140,11 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
     //Try to get GPS data for timeout amount of time
     while (!err && (force || ((millis() - start) < timeout))) {
         if (sendGetReply(fonaSS, F("AT+CGPSINFO"), 5000, response, 80)) {
+            
+            #ifdef DEBUG
+            Serial.println(response);
+            #endif
+            
             if (response[10] == ',' || response[5] != 'I') { //Means data isn't ready yet
                 delay(2000); //Don't flood FONA
                 continue;
@@ -222,10 +229,22 @@ bool remoteFona::getGPSData(unsigned long* time, float* lat, float* lon, unsigne
 /*---------------------------------PRIVATE---------------------------------*/
 #if Fona_Make == Adafruit
 //Toggle the Fona on/off
-void remoteFona::toggle() {
+bool remoteFona::toggle(bool on) {
     digitalWrite(FONA_EN, LOW);
     delay(4000);
     digitalWrite(FONA_EN, HIGH);
+    
+    bool err = false;
+    if (on) {
+        //Initialise the FONA software serial
+        NeoSWSerial fonaSS(FONA_RX, FONA_TX);
+        fonaSS.begin(9600);
+        
+        err = checkFona(fonaSS);
+        if (!err) err = SCRTries(fonaSS, "ATE0", "OK", 1000);
+    }
+    
+    return err;
 }
 #endif
 
