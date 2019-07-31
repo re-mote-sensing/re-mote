@@ -163,6 +163,8 @@ Gateway -  Stays in the CAD loop until a message is detected. When a message is 
 * End-Nodes broadcast the message, but Relayer’s have a specific, predetermined route (similar to what Emil mentioned in his email)
 	* Issue of a node fails (cuts off connection for that "branch")
 
+* **Basic MESH Netwrok setup, but collect data for the day and send in one go (data dump).**
+
 * MESH network flow
 	* Sends broadcast to find route, broadcast is received and forwarded until it reaches the Gateway. The final route is forwarded back. (I think) Each broadcast should have the same air time and preamble length (data sent by gateway may be longer since it sends the routing table)
 
