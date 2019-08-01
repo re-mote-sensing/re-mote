@@ -5,10 +5,25 @@
 
 # 3D Printing Notes
 
+## Desirable Qualities
+* Water resistent or waterproof (turtle underwater)
+	* If only water resistent, may be better off not worrying about this and just waterproofing it with a spray
+* Impact resistent
+* Heat resistent (turtle sunbathing)
+* Does not warp (coule expose insides to water)
+* Relatively cheap
+* Relatively light
+
+* Material selected depends on other, external alterations made to the case
+	* Such as waterproofing it with a spray
+
 ## Printing Material
 
 * Materials available - PLA (Makerspace & Mills)
 	* tend to soften and eventually dissolve if exposed to water for any length of time. [[2]]
+
+PETG: [[4]]
+*  known for their ease of printability, smooth surface finish, and water resistance
 
 ## Waterproofing
 
@@ -154,6 +169,8 @@ of the cantilever
 [1]: https://community.smartthings.com/t/how-to-seal-weatherproof-a-sensor-device-anything-better-than-silicone/93594/12
 [2]: https://www.fabbaloo.com/blog/2017/10/19/waterproofing-your-3d-prints
 [3]: http://fab.cba.mit.edu/classes/S62.12/people/vernelle.noel/Plastic_Snap_fit_design.pdf
+
+[4]: https://www.simplify3d.com/support/materials-guide/petg/
 
 [Good Design Practice 1]: https://i.ibb.co/Rg6QJYH/Good-Design-Practice-1.png
 [Good Design Practice 2]: https://i.ibb.co/Q9vY8bf/Good-Design-Practice-2.png
