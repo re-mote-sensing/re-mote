@@ -66,7 +66,7 @@ Low Power - 83uA
 
 Moteino | RFM95
 D2 -> Interupt  
-D8 -> ?  
+D8 -> Reset (?)  
 D9 -> LED  
 D10 -> Slave (?)  
 D11 - D13 -> SPI  
@@ -75,18 +75,18 @@ D11 - D13 -> SPI
 
 Moteino | GPS  
 
-D9 -> RX  
-D8 -> TX  
- -> VCC  
- -> GND  
- -> EN  
- -> B_Bat  
+D3 -> RX  
+D4 -> TX  
+3V3 -> VCC  
+GND -> GND  
+5 -> EN  
+6 -> B_Bat  
 
 
 Moteino | Battery  
 
- -> VCC  
- -> GND  
+Vin -> VCC  
+GND -> GND  
 
 ## Casing
 
