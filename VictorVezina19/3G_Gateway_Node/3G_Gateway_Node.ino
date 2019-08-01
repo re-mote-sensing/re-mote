@@ -20,6 +20,8 @@ Things to do:
 #error Please put the config file into Gateway mode
 #endif
 
+//#define DEBUG
+
 #include <remoteLoRa.h>
 #include <remoteFona.h>
 #include <remoteSensors.h>
@@ -49,8 +51,6 @@ void setup() {
     #ifdef DEBUG
     Serial.begin(9600);
     #endif
-    
-    //testFona();
     
     #ifdef DEBUG
     Serial.println(F("Initialising Sensors"));
@@ -197,8 +197,8 @@ void readSensors() {
     #endif
     
     unsigned long time;// = 1563816782 + millis()/1000;
-    float lat;// = 43;
-    float lon;// = -79;
+    float lat;// = 43 - num;
+    float lon;// = -79 + num++;
     
     Fona.getGPSData(&time, &lat, &lon, GPS_Time);
     
@@ -272,16 +272,26 @@ void postData() {
     //Loop until there's no data left to send
     while (true) {
         //If it fails, then it will try to send less data
-        for (uint8_t loops = 0;;loops++) {
+        for (unsigned int loops = 0; ; loops++) {
+            #ifdef DEBUG
+            Serial.println(F("Getting new request"));
+            #endif
+            
             char* request = Data.getPost(loops);
             
             //If it ran out of RAM space
             if (request == NULL) {
+                #ifdef DEBUG
+                Serial.println(F("Ran out of space making post"));
+                #endif
                 continue;
             }
             
             //If there's no data left to send
             if (request[0] == 0) {
+                #ifdef DEBUG
+                Serial.println(F("No data to post"));
+                #endif
                 free(request);
                 return;
             }
@@ -323,8 +333,15 @@ void testFona() {
     while (true) {
         while (Serial.available()) {
             char c = Serial.read();
-            fonaSS.write(c);
-            Serial.write(c);
+            if (c == '-') {
+                toggle();
+            } else if (c == '\r') {
+                fonaSS.write(c);
+                Serial.println();
+            } else {
+                fonaSS.write(c);
+                Serial.write(c);
+            }
         }
         while (fonaSS.available()) {
             Serial.write(fonaSS.read());
@@ -332,6 +349,12 @@ void testFona() {
     }
     
     fonaSS.end();
+}
+
+void toggle() {
+    digitalWrite(FONA_EN, LOW);
+    delay(4000);
+    digitalWrite(FONA_EN, HIGH);
 }*/
 
 #ifdef DEBUG

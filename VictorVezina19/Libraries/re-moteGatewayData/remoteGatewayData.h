@@ -1,6 +1,6 @@
 /*
 Library for saving the data of a gateway, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated August 1, 2019
 Released into the public domain
 */
 
@@ -24,28 +24,29 @@ class remoteGatewayData {
         void reset(bool hard);
         uint8_t saveRegistration(uint8_t* data);
         uint8_t saveData(uint8_t* data);
-        char* getPost(uint8_t arg);
+        char* getPost(unsigned int arg);
         void messageSuccess();
     
     private:
         /*----------SD Card----------*/
         #if Data_Type == SD_Type
-            uint8_t numNodes = 0;
+            uint8_t loops = 0;
             void initialiseSD();
             void resetSD(bool hard);
             uint8_t saveRegSD(uint8_t* data);
             uint8_t saveDataSD(uint8_t* data);
             uint8_t filePrintFloat(SdFile* file, uint8_t* arr, uint8_t num);
             uint32_t fileReadInt(SdFile* file, char end = ',', int8_t move = 1);
-            char* getPostSD(uint8_t numLoops);
-            uint8_t countNodesToSend();
-            bool getSendInfo(uint8_t* ans, uint8_t nodes);
-            void fileGoBack(SdFile* file, int8_t move = 0);
-            unsigned int getDataSize(uint8_t* sendInfo, uint8_t nodes);
+            char* getPostSD(unsigned int numLoops);
+            unsigned int getSendInfoSize(unsigned int numLoops);
+            bool getToSendData(SdFile* file, unsigned int numLoops, uint8_t* numNodes = NULL, uint8_t* lastNum = NULL);
+            bool getSendInfo(uint8_t* ans, unsigned int numLoops);
+            uint8_t getNumberLocations(SdFile* file, uint8_t numData, unsigned long position);
+            unsigned int getDataSize(uint8_t* sendInfo);
             bool getTypesInfo(uint8_t* typesInfo, uint16_t id);
             void skipConstTypes(SdFile* file);
-            bool buildRequest(char* request, uint8_t* sendInfo, uint8_t nodes);
-            bool getNodeData(char* request, uint16_t* curr, uint16_t id,  uint8_t locations, uint32_t position);
+            bool buildRequest(char* request, uint8_t* sendInfo);
+            bool getNodeData(char* request, uint16_t* curr, uint16_t id, uint8_t numData, uint8_t locations, uint32_t position);
             float fileReadFloat(SdFile* file, char end = ',', uint8_t bufferSize = 15);
             void messageSuccessSD();
         #endif
