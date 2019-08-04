@@ -40,6 +40,11 @@ Order: https://lowpowerlab.com/shop/product/145
 ### Power Consumed
 
 
+Voltage - 3V3 & 5V(Voltage Regulator Used)
+* On - 42-47mA
+* Off - 32.9uA
+* Battery Backup - ?
+	
 
 ### Average Fix Times
 
@@ -55,10 +60,15 @@ Specs for the board can be found [here][Board Specs]. The specs are in the form 
 
 ### Power Consumed
 * rfm95 put to sleep for these tests (i.e. negligible current drawn by it)
-* Voltage - 3V3
 
-Idle (Empty setup + Loop) - 6.35mA
-Low Power - 83uA
+Voltage - 3V3 (Voltage Regulator Used)
+* Idle (Empty setup + Loop) - 6.67mA
+* Low Power - ~8.0uA
+
+Voltage - 5V (Voltage Regulator NOT Used)
+* Idle (Empty setup + Loop) - 5.32mA
+* Low Power - ~1.324uA
+
 
 
 ## Pinout
