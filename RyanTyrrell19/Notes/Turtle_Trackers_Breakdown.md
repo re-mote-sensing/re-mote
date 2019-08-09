@@ -22,6 +22,11 @@ This outline provides a condensed overview of all the research that has been don
 4. With everything set in stone, calculations can be made, and parameters altered to optimize transmission and power consumption
 3. Design a waterproof casing that encompasses the Tracker while maintaining a small and streamline shape
 
+5. Alter/fine tune the Encosure
+6. Iron out any other bugs in the code
+7. Run tests to verfy all aspects of the code work (especially LoRa)
+8. Write up a report describing all aspects of the Trackers, including specs (lifespan, range, etc.)
+
 	
 # Hardware Breakdown
 ## GPS
