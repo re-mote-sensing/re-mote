@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{4b5d03e5-d927-4f16-8437-0e8bd8f9f07f}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\DMS.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\GPSTime.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\Location.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\NeoTime.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\NMEAGPS.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\Streamers.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\Garmin\GrmNMEA.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ublox\ubxGPS.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ublox\ubxmsg.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)src\ublox\ubxNMEA.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\CosaCompat.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\DMS.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\GPSfix.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\GPSfix_cfg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\GPSport.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\GPSTime.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Location.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\NeoGPS_cfg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\NeoTime.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\NMEAGPS.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\NMEAGPSprivate.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\NMEAGPS_cfg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Streamers.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Garmin\GrmNMEA.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\Garmin\PGRM_cfg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ublox\PUBX_cfg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ublox\ubxGPS.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ublox\ubxmsg.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ublox\ubxNMEA.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)src\ublox\ubx_cfg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
+<Text Include="$(MSBuildThisFileDirectory)vs-readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory).gitattributes" />
+<None Include="$(MSBuildThisFileDirectory).gitignore" />
+<None Include="$(MSBuildThisFileDirectory)LICENSE" />
+<None Include="$(MSBuildThisFileDirectory)README.md" />
+  </ItemGroup>
+</Project>

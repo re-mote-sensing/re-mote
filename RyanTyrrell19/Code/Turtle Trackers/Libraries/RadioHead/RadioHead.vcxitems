@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding ="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" >
+  <PropertyGroup Label="Globals" >
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{936a5701-8504-4053-9a94-d0f3b3b41121}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)RHCRC.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHDatagram.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHEncryptedDriver.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHGenericDriver.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHGenericSPI.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHHardwareSPI.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHMesh.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHNRFSPIDriver.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHReliableDatagram.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHRouter.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHSoftwareSPI.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RHSPIDriver.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_ASK.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_CC110.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_E32.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_MRF89.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_NRF24.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_NRF51.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_NRF905.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_RF22.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_RF24.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_RF69.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)rh_rf95.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_Serial.cpp" />
+<ClCompile Include="$(MSBuildThisFileDirectory)RH_TCP.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)RadioHead.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHCRC.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHDatagram.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHEncryptedDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHGenericDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHGenericSPI.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHHardwareSPI.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHMesh.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHNRFSPIDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHReliableDatagram.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHRouter.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHSoftwareSPI.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHSPIDriver.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RHTcpProtocol.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_ASK.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_CC110.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_E32.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_MRF89.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_NRF24.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_NRF51.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_NRF905.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_RF22.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_RF24.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_RF69.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)rh_rf95.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_Serial.h" />
+<ClInclude Include="$(MSBuildThisFileDirectory)RH_TCP.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)vs-readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)LICENSE" />
+<None Include="$(MSBuildThisFileDirectory)MANIFEST" />
+<None Include="$(MSBuildThisFileDirectory)project.cfg" />
+  </ItemGroup>
+</Project>
