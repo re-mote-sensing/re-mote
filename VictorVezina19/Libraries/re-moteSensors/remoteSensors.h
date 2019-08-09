@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 29, 2019
+Created by Victor Vezina, last updated August 9, 2019
 Released into the public domain
 */
 
@@ -27,6 +27,7 @@ class remoteSensors {
         //Initialisation functions
         void initialiseASDO(uint8_t index);
         void initialiseASEC(uint8_t index);
+        void initialiseASpH(uint8_t index);
         void initialiseAtlas(Stream& sensor);
         void ASWait(Stream& sensor);
         void initialiseDFTB(uint8_t index);
@@ -36,6 +37,7 @@ class remoteSensors {
         //Reading functions
         uint8_t readASDO(uint8_t index, uint8_t* data);
         uint8_t readASEC(uint8_t index, uint8_t* data);
+        uint8_t readASpH(uint8_t index, uint8_t* data);
         float readAtlas(Stream& sensor);
         uint8_t readDFTB(uint8_t index, uint8_t* data);
         uint8_t readDFTemp(uint8_t index, uint8_t* data);

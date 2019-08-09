@@ -1,6 +1,6 @@
 /*
 Header for some config parameters, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 30, 2019
+Created by Victor Vezina, last updated August 9, 2019
 Released into the public domain
 */
 
@@ -12,8 +12,8 @@ Released into the public domain
 #define remoteConfig_h
 
 /*---------Type of node---------*/
-//#define End_Node
-#define Gateway
+#define End_Node
+//#define Gateway
 
 #if (defined(End_Node) && defined(Gateway)) || (!defined(End_Node) && !defined(Gateway))
     #error Please set compilation to either End_Node or Gateway mode
@@ -51,20 +51,27 @@ Released into the public domain
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
     extern const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS];
     #ifdef MAIN
+/*
         const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Water_Temperature", "Conductivity", "Dissolved_Oxygen", "Turbidity"};
         const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DF_Temp", "AS_EC", "AS_DO", "DF_TB"};
         const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {4}, {14, 15, 13}, {9, 8}, {5, 20} };
+*/
+        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Water_Temperature", "pH", "Dissolved_Oxygen", "Turbidity"};
+        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DF_Temp", "AS_pH", "AS_DO", "DF_TB"};
+        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {4}, {14, 15, 13}, {9, 8}, {5, 20} };
+
     #endif
 
     #define AS_DO_Sensor
-    #define AS_EC_Sensor true      //Set this value to if the EC sensor has an enable pin or not
+    //#define AS_EC_Sensor true       //Set this value to if the EC sensor has an enable pin or not
+    #define AS_pH_Sensor true       //Set this value to if the pH sensor has an enable pin or not
     #define DF_TB_Sensor
     #define DF_Temp_Sensor
     //#define DHT22_Sensor
 
     #define Temperature_Comp 0
     //#define Temperature_Comp_Index 0
-    #define Salinity_Comp 1
+    //#define Salinity_Comp 1
     //#define Salinity_Comp_Index 0
 
     /*---------Extra Parameters---------*/

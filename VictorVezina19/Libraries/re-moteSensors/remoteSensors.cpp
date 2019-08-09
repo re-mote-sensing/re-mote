@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 29, 2019
+Created by Victor Vezina, last updated August 9, 2019
 Released into the public domain
 */
 
@@ -25,6 +25,12 @@ void remoteSensors::initialise() {
         #ifdef AS_EC_Sensor
         if (strcmp(sensorTypes[i], "AS_EC") == 0) {
             initialiseASEC(i);
+        }
+        #endif
+        
+        #ifdef AS_pH_Sensor
+        if (strcmp(sensorTypes[i], "AS_pH") == 0) {
+            initialiseASpH(i);
         }
         #endif
         
@@ -122,12 +128,37 @@ void remoteSensors::initialiseASEC(uint8_t index) {
 }
 #endif
 
-#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor)
+#ifdef AS_pH_Sensor
+//Initialise an Atlas Scientific pH sensor at index index
+void remoteSensors::initialiseASpH(uint8_t index) {
+    #if AS_pH_Sensor == true
+    pinMode(sensorPorts[index][2], OUTPUT);
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+    
+    //Initialise the software serial for this sensor
+    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    sensor.begin(9600);
+    
+    //Itialise common Atlas Scientific settings
+    initialiseAtlas(sensor);
+    
+    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    
+    //If it can be turned off, turn it off
+    #if AS_pH_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
+    
+    sensor.end();
+}
+#endif
+
+#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor) || defined(AS_pH_Sensor)
 //Initialise an Atlas Scientific sensor at index index
 void remoteSensors::initialiseAtlas(Stream& sensor) {
     //For some reason it seems you have to send arandom command at startup
     sensor.print(F("R\r"));
-    
     ASWait(sensor);
     
     sensor.print(F("OK,1\r")); //Turn on OK responses (does nothing on older firmware)
@@ -194,6 +225,12 @@ void remoteSensors::read(uint8_t* dataArr) {
         #ifdef AS_EC_Sensor
         if (strcmp(sensorTypes[i], "AS_EC") == 0) {
             curr += readASEC(i, &dataArr[curr]);
+        }
+        #endif
+
+        #ifdef AS_pH_Sensor
+        if (strcmp(sensorTypes[i], "AS_pH") == 0) {
+            curr += readASpH(i, &dataArr[curr]);
         }
         #endif
 
@@ -318,7 +355,46 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
 }
 #endif
 
-#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor)
+#ifdef AS_pH_Sensor
+//Read data from an Atlas Scientific pH sensor at index i
+uint8_t remoteSensors::readASpH(uint8_t index, uint8_t* data) {
+    #if AS_pH_Sensor == true
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+    
+    //Initialise the sensor's software serial
+    NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
+    sensor.begin(9600);
+    
+    //Wake the sensor up
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    sensor.print(F("R\r"));
+    ASWait(sensor);
+    
+    float ans = readAtlas(sensor);
+    
+    #ifdef DEBUG
+    Serial.print(F("Read pH sensor: "));
+    Serial.println(ans);
+    #endif
+    
+
+    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    
+    //If it can be turned off, turn it off
+    #if AS_pH_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
+    
+    sensor.end();
+    
+    memcpy(data, &ans, sizeof(float));
+    return 4;
+}
+#endif
+
+#if defined(AS_DO_Sensor) || defined(AS_EC_Sensor) || defined(AS_pH_Sensor)
 //Read data from an Atlas Scientific sensor at index i
 float remoteSensors::readAtlas(Stream& sensor) {
     #ifdef Temperature_Comp
