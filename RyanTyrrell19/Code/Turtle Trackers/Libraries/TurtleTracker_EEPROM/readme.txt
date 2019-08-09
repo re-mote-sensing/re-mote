@@ -1,0 +1,1 @@
+This library is used to save an data that has been sen unsuccessfully. It is currently untested.
