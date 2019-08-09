@@ -142,8 +142,6 @@ Relay-Node - Stays in the CAD loop until a message is detected. When a message i
 ![alt-text][Flooding Relay Condition Table]
 
 * If seen before, should not relay!
-* Note - Messages include an id in the header. Custom made DI not needed
-
 
 Gateway -  Stays in the CAD loop until a message is detected. When a message is received, it checks whether it has already seen the message. If not, it saves the message ID, resets the Lifespan count, Sets the ACK TO 1, and broadcasts the message
 
