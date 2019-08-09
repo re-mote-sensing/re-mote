@@ -1,0 +1,1 @@
+The header file of this library contains all configurable varaibles used within the "Turtle Trackers" Project
