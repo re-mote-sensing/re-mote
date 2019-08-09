@@ -20,7 +20,7 @@ Things to do:
 #error Please put the config file into Gateway mode
 #endif
 
-#define DEBUG
+//#define DEBUG
 
 #include <remoteLoRa.h>
 #include <remoteFona.h>
@@ -197,8 +197,8 @@ void readSensors() {
     #endif
     
     unsigned long time;// = 1563816782 + millis()/1000;
-    float lat;// = 43;
-    float lon;// = -79;
+    float lat;// = 43 - num;
+    float lon;// = -79 + num++;
     
     Fona.getGPSData(&time, &lat, &lon, GPS_Time);
     
@@ -269,21 +269,15 @@ void postData() {
     Serial.println(F("Posting data"));
     #endif
     
-    if (Fona.startHTTPS()) return;
-    
     //Loop until there's no data left to send
     while (true) {
         //If it fails, then it will try to send less data
         for (unsigned int loops = 0; ; loops++) {
             #ifdef DEBUG
             Serial.println(F("Getting new request"));
-            Serial.println(freeMemory());
             #endif
             
-            void* toFree; //Data that needs to be freed after the request
-            
-            //Get the request
-            char* request = Data.getPost(loops, &toFree);
+            char* request = Data.getPost(loops);
             
             //If it ran out of RAM space
             if (request == NULL) {
@@ -299,32 +293,13 @@ void postData() {
                 Serial.println(F("No data to post"));
                 #endif
                 free(request);
-                Fona.stopHTTPS();
                 return;
             }
-            
-            #ifdef DEBUG
-            Serial.println(F("About to post request"));
-            Serial.println(freeMemory());
-            #endif
 
             //Post the valid post through the Fona
             bool error = Fona.post(request, URL_Host, URL_Port);
-            
-            #ifdef DEBUG
-            Serial.print(F("Error: "));
-            Serial.println(error);
-            Serial.println(freeMemory());
-            #endif
-            
-            //Free allocated data
+
             free(request);
-            free(toFree);
-            
-            #ifdef DEBUG
-            Serial.println(F("After freeing"));
-            Serial.println(freeMemory());
-            #endif
 
             //If it was successful, let the storage know and restart the posting process
             if (!error) {

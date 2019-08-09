@@ -1,6 +1,6 @@
 /*
 Library for sleeping, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 26, 2019
+Created by Victor Vezina, last updated July 25, 2019
 Released into the public domain
 */
 
@@ -12,7 +12,17 @@ Released into the public domain
 remoteSleep::remoteSleep() {
 }
 
-long remoteSleep::sleep(unsigned long sleepTime) {
+//Sleep for a certain amount of time, accounting for the time since start
+long remoteSleep::sleep(unsigned long time, unsigned long start) {
+    long sleepTime; //The amount of time to sleep
+    
+    //Get how long to sleep, accounts for overflow
+    if (millis() < start) {
+        sleepTime = time - (millis() + (4294967295-start));
+    } else {
+        sleepTime = time - (millis() - start);
+    }
+    
     #ifdef DEBUG
     Serial.print(F("Sleeping for "));
     Serial.print(sleepTime);
@@ -95,13 +105,6 @@ long remoteSleep::sleep(unsigned long sleepTime) {
     
     //Return the actual amount of time slept
     return ans - sleepTime;
-}
-
-//Sleep for a certain amount of time, accounting for the time since start
-long remoteSleep::sleep(unsigned long time, unsigned long start) {
-    long sleepTime = time - (millis() - start); //The amount of time to sleep
-    
-    return sleep(sleepTime);
 }
 
 // When WatchDog timer causes Arduino to wake it comes here

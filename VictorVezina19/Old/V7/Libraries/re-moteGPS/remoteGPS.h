@@ -5,6 +5,7 @@ Released into the public domain
 */
 
 /* To do:
+- Add other kinds of GPS support (notably FONA GPS)
 - Add support to use built-in RTC
 */
 

@@ -360,7 +360,7 @@ float remoteSensors::readAtlas(Stream& sensor) {
 uint8_t remoteSensors::readDFTB(uint8_t index, uint8_t* data) {
     digitalWrite(sensorPorts[index][0], HIGH); //Turn on the sensor
     
-    int ansData = analogRead(sensorPorts[index][1]); //Read the sensor
+    float ansData = analogRead(sensorPorts[index][1]); //Read the sensor
     
     digitalWrite(sensorPorts[index][0], LOW); //Turn off the sensor
     

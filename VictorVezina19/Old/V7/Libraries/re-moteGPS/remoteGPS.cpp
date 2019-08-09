@@ -47,13 +47,12 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
     #ifdef DEBUG
     Serial.println(F("About to wait for GPS"));
     Serial.println(freeMemory());
-    delay(100);
     #endif
     
     bool first = false;
     
     //Try for timeout time
-    while (force || ((millis() - start) < timeout)) {
+    while (force || ((millis() >= start) ? (millis() - start) : (millis() + (4294967295 - start))) < timeout) {
         if (gotLoc && gotTime) { //If everything has been updated
             break;
         }
@@ -145,6 +144,6 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
         (*lon) = longitude;
     
     if (time != NULL) {
-        (*time) = unixTime + (millis() - timeLastUpdated)/1000;
+        (*time) = unixTime + ((millis() >= timeLastUpdated) ? (millis() - timeLastUpdated) : (millis() + (4294967295 - timeLastUpdated)))/1000;
     }
 }

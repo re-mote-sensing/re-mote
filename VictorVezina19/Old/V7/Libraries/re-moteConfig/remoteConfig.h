@@ -34,8 +34,8 @@ Released into the public domain
     /*---------End Node settings---------*/
 
     /*---------Base Parameters---------*/
-    #define NAME "Weekend_Endnode"           //Name of this end node
-    #define NODE_ID 0x0100          //ID of this end node
+    #define NAME "Office"           //Name of this end node
+    #define NODE_ID 0x0000          //ID of this end node
     #define LORA_RX 7               //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
     #define LORA_TX 6               //Pin that the LoRa RXD pin is connected to
     #define GPS_RX 2                //Pin that the GPS TXD pin is connected to
@@ -43,28 +43,28 @@ Released into the public domain
     #define GPS_EN 10               //Pin that the GPS EN pin is connected to
 
     /*---------Sensor definitions---------*/
-    #define NUMBER_SENSOR_NAMES 4
-    #define NUMBER_SENSOR_TYPES 4
-    #define MAX_NUMBER_PINS 3
+    #define NUMBER_SENSOR_NAMES 3
+    #define NUMBER_SENSOR_TYPES 3
+    #define MAX_NUMBER_PINS 2
 
     extern const char* sensorNames[NUMBER_SENSOR_NAMES];
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
     extern const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS];
     #ifdef MAIN
-        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Water_Temperature", "Conductivity", "Dissolved_Oxygen", "Turbidity"};
-        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DF_Temp", "AS_EC", "AS_DO", "DF_TB"};
-        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {4}, {14, 15, 13}, {9, 8}, {5, 20} };
+        const char* sensorNames[NUMBER_SENSOR_NAMES] = {"Water_Temperature", /*"Conductivity",*/ "Dissolved_Oxygen", "Turbidity"};
+        const char* sensorTypes[NUMBER_SENSOR_TYPES] = {"DF_Temp", /*"AS_EC",*/ "AS_DO", "DF_TB"};
+        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS] = { {4}, /*{12, 11, 13},*/ {9, 8}, {5, 20} };
     #endif
 
     #define AS_DO_Sensor
-    #define AS_EC_Sensor true      //Set this value to if the EC sensor has an enable pin or not
+    //#define AS_EC_Sensor true      //Set this value to if the EC sensor has an enable pin or not
     #define DF_TB_Sensor
     #define DF_Temp_Sensor
     //#define DHT22_Sensor
 
     #define Temperature_Comp 0
     //#define Temperature_Comp_Index 0
-    #define Salinity_Comp 1
+    //#define Salinity_Comp 1
     //#define Salinity_Comp_Index 0
 
     /*---------Extra Parameters---------*/
@@ -82,7 +82,7 @@ Released into the public domain
     /*---------Gateway settings---------*/
 
     /*---------Base Parameters---------*/
-    #define NAME "Weekend_Gateway"  //Name of this gateway
+    #define NAME "Gateway_2"        //Name of this gateway
     #define LORA_RX 6               //Pin that the LoRa TXD pin is connected to (it's opposite because the output of the LoRa module is the input into the Arduino, and vice-versa)
     #define LORA_TX 7               //Pin that the LoRa RXD pin is connected to
     #define FONA_RX 4               //Pin that the FONA TX pin is connected to
@@ -100,8 +100,7 @@ Released into the public domain
     #ifdef MAIN
         const char* sensorNames[NUMBER_SENSOR_NAMES] = {/*"Air_Temperature", "Humidity"*/};
         const char* sensorTypes[NUMBER_SENSOR_TYPES] = {/*"DHT22"*/};
-        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS]= {/* {2} */};
-        
+        const uint8_t sensorPorts[NUMBER_SENSOR_TYPES][MAX_NUMBER_PINS]= {/* {2}*/ };
     #endif
 
     //#define AS_DO_Sensor

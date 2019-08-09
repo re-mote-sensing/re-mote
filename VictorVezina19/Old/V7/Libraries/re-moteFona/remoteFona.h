@@ -1,6 +1,6 @@
 /*
 Library for using a Fona module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 9, 2019
+Created by Victor Vezina, last modified on July 30, 2019
 Released into the public domain
 */
 
@@ -13,9 +13,7 @@ class remoteFona {
     public:
         remoteFona();
         void initialise();
-        bool startHTTPS();
         bool post(char* request, const char* host, int portNum);
-        void stopHTTPS();
         void offsetTime(long offset);
         bool getGPSData(unsigned long* time, float* lat, float* lon, unsigned long timeout = 0);
     private:
@@ -26,9 +24,7 @@ class remoteFona {
         bool toggle(bool on = false);
         bool checkFona(Stream& port);
         void closeHTTPS(Stream& port);
-        bool SCRTries(Stream& port, const __FlashStringHelper* command, const char* reply, unsigned long timeout, uint8_t tries = 3);
         bool SCRTries(Stream& port, const char* command, const char* reply, unsigned long timeout, uint8_t tries = 3);
-        bool sendCheckReply(Stream& port, const __FlashStringHelper* command, const char* reply, unsigned long timeout);
         bool sendCheckReply(Stream& port, const char* command, const char* reply, unsigned long timeout);
         bool sendGetReply(Stream& port, const __FlashStringHelper* command, unsigned long timeout, char* ans, uint8_t length);
         unsigned long getUnixTime(char* str);

@@ -1,6 +1,6 @@
 /*
 Library for sleeping, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 26, 2019
+Created by Victor Vezina, last updated July 25, 2019
 Released into the public domain
 */
 
@@ -12,7 +12,6 @@ Released into the public domain
 class remoteSleep {
     public:
         remoteSleep();
-        long sleep(unsigned long time);
         long sleep(unsigned long time, unsigned long start);
     private:
         void sleep8000();

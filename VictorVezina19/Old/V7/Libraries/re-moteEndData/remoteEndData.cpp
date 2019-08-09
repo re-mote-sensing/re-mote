@@ -145,7 +145,7 @@ uint8_t* remoteEndData::getEEPROMMessage() {
     uint8_t currDataNum = 0;
     
     #ifdef DEBUG
-    //Serial.println(F("Reading from EEPROM:"));
+    Serial.println(F("Reading from EEPROM:"));
     #endif
     
     //Read data from EEPROM into the LoRa message
@@ -191,6 +191,11 @@ void remoteEndData::getEEPROMMessageInfo(unsigned int validToAddress, unsigned i
 
         //Has location byte
         uint8_t hasLocation = EEPROM.read(curr++);
+        
+        #ifdef DEBUG
+        Serial.print(F("EEPROM hasLocation: "));
+        Serial.println(hasLocation);
+        #endif
 
         //Time
         curr += 4;
@@ -202,6 +207,11 @@ void remoteEndData::getEEPROMMessageInfo(unsigned int validToAddress, unsigned i
             (*messageSize) += 9;
 
             (*numLocations)++; //Number of locations counter
+            
+            #ifdef DEBUG
+            Serial.print(F("Total locations now: "));
+            Serial.println(*numLocations);
+            #endif
         }
 
         //Sensor data
@@ -216,6 +226,13 @@ void remoteEndData::getEEPROMMessageInfo(unsigned int validToAddress, unsigned i
     if ((*messageSize) > 111) { //Check what caused loop exit
         (*messageSize) = lastSize;
         (*numLocations) = lastLocations;
+        
+        #ifdef DEBUG
+        Serial.print(F("Setting size to: "));
+        Serial.println(lastSize);
+        Serial.print(F("Setting locations to: "));
+        Serial.println(lastLocations);
+        #endif
     }
 }
 
@@ -225,8 +242,8 @@ void remoteEndData::readEEPROM(uint8_t* message, uint8_t* messageIndex, unsigned
         message[(*messageIndex)++] = EEPROM.read((*memAddress)++);
         
         #ifdef DEBUG
-        //Serial.print(EEPROM.read((*memAddress) - 1));
-        //Serial.print(F(" "));
+        Serial.print(EEPROM.read((*memAddress) - 1));
+        Serial.print(F(" "));
         #endif
 
         if (*memAddress > EEPROM.length()) {

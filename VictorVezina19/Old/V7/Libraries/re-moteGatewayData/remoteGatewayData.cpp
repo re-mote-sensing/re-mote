@@ -1,6 +1,6 @@
 /*
 Library for saving the data of a gateway, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 8, 2019
+Created by Victor Vezina, last updated August 1, 2019
 Released into the public domain
 */
 
@@ -52,9 +52,9 @@ uint8_t remoteGatewayData::saveData(uint8_t* data) {
 }
 
 //Get a LoRa data message
-char* remoteGatewayData::getPost(unsigned int arg, void** toFree) {
+char* remoteGatewayData::getPost(unsigned int arg) {
     #if Data_Type == SD_Type
-    return getPostSD(arg, toFree);
+    return getPostSD(arg);
     #endif
     
     return NULL;
@@ -95,13 +95,7 @@ void remoteGatewayData::initialiseSD() {
         #endif
         
         SdFile file;
-        if (!file.open("ToSend.csv", FILE_WRITE)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening ToSend.csv"));
-            #endif
-            return;
-        }
-        
+        file.open("ToSend.csv", FILE_WRITE);
         //Print the column headers
         file.print("NodeID,Data Points,Position\n");
         file.close();
@@ -125,19 +119,11 @@ void remoteGatewayData::resetSD(bool hard) {
     }
     
     if (hard) {
-        //Remove everything on the sd card
         (*sd.vwd()).rmRfStar();
     } else {
-        //Delete the data in ToSend.csv
         if (sd.exists("ToSend.csv")) {
             SdFile file;
-            if (!file.open("ToSend.csv", FILE_WRITE)) {
-                #ifdef DEBUG
-                Serial.println(F("Error opening ToSend.csv"));
-                #endif
-                return;
-            }
-            
+            file.open("ToSend.csv", FILE_WRITE);
             file.seekSet(0);
             while (file.read() != 10) ;
             file.truncate(file.curPosition());
@@ -164,12 +150,6 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     
     uint8_t nameLen = data[curr++];
     char* name = (char*) malloc(sizeof(char) * (nameLen + 1));
-    if (name == NULL) {
-        #ifdef DEBUG
-        Serial.println(F("Ran out of memory making node name"));
-        #endif
-        return ans;
-    }
     
     name[nameLen] = 0;
     memcpy(name, &data[curr], sizeof(char) * nameLen);
@@ -181,16 +161,6 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     for (uint8_t i = 0; i < numSensors; i++) { //Get the sensor types from the message
         uint8_t len = data[curr++]; //Get length of type
         types[i] = (char*) malloc(sizeof(char) * (len + 1)); //Allocate current char array
-        if (types[i] == NULL) {
-            #ifdef DEBUG
-            Serial.println(F("Ran out of memory making type name"));
-            #endif
-            for (uint8_t i = 0; i < numSensors; i++) {
-                free(types[i]);
-            }
-            free(name);
-            return ans;
-        }
         
         types[i][len] = 0;
         memcpy(types[i], &data[curr], len);
@@ -203,41 +173,10 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     
     //Get the file name for that node
     char* fileName = (char*) malloc(sizeof(char) * 13);
-    if (fileName == NULL) {
-        #ifdef DEBUG
-        Serial.println(F("Ran out of memory making file name"));
-        #endif
-        for (uint8_t i = 0; i < numSensors; i++) {
-            free(types[i]);
-        }
-        free(name);
-        return ans;
-    }
-    
-    if (sprintf(fileName, "node%u.csv", add) < 0) {
-        #ifdef DEBUG
-        Serial.println(F("Error printing to node file name"));
-        #endif
-        free(fileName);
-        for (uint8_t i = 0; i < numSensors; i++) {
-            free(types[i]);
-        }
-        free(name);
-        return ans;
-    }
+    sprintf(fileName, "node%u.csv", add);
 
     if (sd.exists(fileName)) { //Receiving registration from already registered node, check to see if good or not
-        if (!file.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening node file"));
-            #endif
-            free(fileName);
-            for (uint8_t i = 0; i < numSensors; i++) {
-                free(types[i]);
-            }
-            free(name);
-            return ans;
-        }
+        file.open(fileName, FILE_READ);
         
         bool err = false;
         
@@ -276,17 +215,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
             ans = 0x01;
         }
     } else { //Registering new node
-        if (!file.open(fileName, FILE_WRITE)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening node file"));
-            #endif
-            free(fileName);
-            for (uint8_t i = 0; i < numSensors; i++) {
-                free(types[i]);
-            }
-            free(name);
-            return ans;
-        }
+        file.open(fileName, FILE_WRITE);
         
         //Print the name and the set columns
         file.print(name);
@@ -332,20 +261,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     
     //Get the file name for that node
     char* fileName = (char*) malloc(sizeof(char) * 13);
-    if (fileName == NULL) {
-        #ifdef DEBUG
-        Serial.println(F("Ran out of memory making node name"));
-        #endif
-        return ans;
-    }
-    
-    if (sprintf(fileName, "node%u.csv", add) < 0) {
-        #ifdef DEBUG
-        Serial.println(F("Error printing to node file name"));
-        #endif
-        free(fileName);
-        return ans;
-    }
+    sprintf(fileName, "node%u.csv", add);
     
     //Get some useful information from the message data
     uint8_t payloadLen = data[2] + 3;
@@ -360,13 +276,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
         ans = 0x01;
     } else {
         SdFile file;
-        if (!file.open(fileName, FILE_WRITE)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening node file"));
-            #endif
-            free(fileName);
-            return ans;
-        }
+        file.open(fileName, FILE_WRITE);
 
         //Check the data to make sure it matches the node's registration
         
@@ -437,14 +347,8 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
             file.close();
             
             //See if the node already has data to be sent in ToSend.csv
-            if (!file.open("ToSend.csv", FILE_WRITE)) {
-                #ifdef DEBUG
-                Serial.println(F("Error opening ToSend.csv"));
-                #endif
-                free(fileName);
-                return ans;
-            }
-            
+            //SdFile toSendFile;
+            file.open("ToSend.csv", FILE_WRITE);
             file.seekSet(0);
             
             bool notFound = false;
@@ -507,25 +411,29 @@ uint8_t remoteGatewayData::filePrintFloat(SdFile* file, uint8_t* arr, uint8_t nu
 
 //Reads an unsigned int from a file and returns the uint32_t representation of it
 uint32_t remoteGatewayData::fileReadInt(SdFile* file, char end, int8_t move) {
-    uint32_t ans = 0;
-    char c = (*file).read();
-    
-    while (c != end) {
-        ans *= 10;
-        ans += ((uint8_t) c) - 48;
-        c = (*file).read();
+    uint8_t len = 0;
+    while ((*file).available()) {
+        len++;
+        if ((*file).read() == end) break;
     }
     
-    (*file).seekCur(move - 1);
+    (*file).seekCur(-(len--));
+    
+    uint32_t ans = 0;
+    for (uint8_t i = 1; i <= len; i++) {
+        ans += ((*file).read() - 48) * pow10(len - i);
+    }
+    
+    (*file).seekCur(move);
     
     return ans;
 }
 
 //Gets the HTTPS post request based on SD card data
-char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
+char* remoteGatewayData::getPostSD(unsigned int numLoops) {
     #ifdef DEBUG
     Serial.println(F("Getting post"));
-    //delay(250);
+    delay(250);
     #endif
     
     //Get the size required for sendInfo
@@ -539,9 +447,9 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
     }
     
     #ifdef DEBUG
-    Serial.println(F("Mem: "));
+    Serial.print(F("Mem: "));
     Serial.println(freeMemory());
-    //delay(250);
+    delay(250);
     #endif
     
     //Get info on what we need to post
@@ -555,9 +463,9 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
     }
     
     #ifdef DEBUG
-    Serial.println(F("Mem: "));
+    Serial.print(F("Mem: "));
     Serial.println(freeMemory());
-    //delay(250);
+    delay(250);
     #endif
     
     //Get the size of the data we need to post
@@ -570,9 +478,9 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
     #ifdef DEBUG
     Serial.print(F("Data size: "));
     Serial.println(dataSize);
-    Serial.println(F("Mem: "));
+    Serial.print(F("Mem: "));
     Serial.println(freeMemory());
-    //delay(250);
+    delay(250);
     #endif
     
     //Get the HTTPS request we need to post
@@ -583,24 +491,18 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
     }
     
     #ifdef DEBUG
-    Serial.println(F("Mem: "));
+    Serial.print(F("Mem: "));
     Serial.println(freeMemory());
-    //delay(250);
+    delay(250);
     #endif
     
     if (!buildRequest(request, sendInfo)) { //Ran out of memory
-        free(request);
         free(sendInfo);
+        free(request);
         return NULL;
     }
     
-    #ifdef DEBUG
-    Serial.println(F("Mem: "));
-    Serial.println(freeMemory());
-    //delay(250);
-    #endif
-    
-    (*toFree) = sendInfo;
+    free(sendInfo);
     loops = numLoops;
     return request;
 }
@@ -616,18 +518,12 @@ unsigned int remoteGatewayData::getSendInfoSize(unsigned int numLoops) {
         return -1;
     }
     
-    //Open ToSend.csv
+    //Open ToSend.csv and skip the first line
     SdFile file;
-    if (!file.open("ToSend.csv", FILE_READ)) {
-        #ifdef DEBUG
-        Serial.println(F("Error opening ToSend.csv"));
-        #endif
-        return -1;
-    }
+    file.open("ToSend.csv", FILE_READ);
     
     uint8_t nodes = 0;
     
-    //Get the number of nodes
     if (!getToSendData(&file, numLoops, &nodes)) {
         file.close();
         return 1;
@@ -635,7 +531,6 @@ unsigned int remoteGatewayData::getSendInfoSize(unsigned int numLoops) {
     
     file.close();
     
-    //Calculate and return the total size
     return 1 + 8 * nodes;
 }
 
@@ -696,14 +591,9 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
         return false;
     }
     
-    //Open ToSend.csv
+    //Open ToSend.csv and skip the first line
     SdFile file;
-    if (!file.open("ToSend.csv", FILE_READ)) {
-        #ifdef DEBUG
-        Serial.println(F("Error opening ToSend.csv"));
-        #endif
-        return false;
-    }
+    file.open("ToSend.csv", FILE_READ);
     
     uint8_t nodes;
     uint8_t numPoints;
@@ -722,7 +612,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
         memcpy(&ans[1 + (8 * i)], &currId, sizeof(uint16_t));
         
         if (i == 0) {
-             while (file.read() != ','); //Skip number of data points of first node
+             while (file.read() != ','); //Skip data points
         } else {
             //Get the number of data points that the current node has to send
             numPoints = (uint8_t) fileReadInt(&file);
@@ -740,25 +630,9 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
             file.close();
             return false;
         }
-        
-        if (sprintf(fileName, "node%u.csv", currId) < 0) {
-            #ifdef DEBUG
-            Serial.println(F("Error printing to node file name"));
-            #endif
-            free(fileName);
-            file.close();
-            return false;
-        }
-        
+        sprintf(fileName, "node%u.csv", currId);
         SdFile nodeFile;
-        if (!nodeFile.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening node file"));
-            #endif
-            free(fileName);
-            file.close();
-            return false;
-        }
+        nodeFile.open(fileName, FILE_READ);
         free(fileName);
         
         //Get the number of locations that the current node has to send
@@ -787,7 +661,7 @@ uint8_t remoteGatewayData::getNumberLocations(SdFile* file, uint8_t numPoints, u
     
     uint8_t locations = 0;
     
-    //Go through the number of data points and count the number of locations
+    //Go through the number of data points and count the nnumber of locations
     for (uint8_t i = 0; i < numPoints; i++) {
         while ((*file).read() != 44) ; //Skip time
         
@@ -854,28 +728,11 @@ bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     //Open the given node's file
     char* fileName = (char*) malloc(sizeof(char) * 13);
     if (fileName == NULL) {
-        #ifdef DEBUG
-        Serial.println(F("Ran out of memory making file name"));
-        #endif
         return false;
     }
-        
-    if (sprintf(fileName, "node%u.csv", id) < 0) {
-        #ifdef DEBUG
-        Serial.println(F("Error printing to node file name"));
-        #endif
-        free(fileName);
-        return false;
-    }
-
+    sprintf(fileName, "node%u.csv", id);
     SdFile file;
-    if (!file.open(fileName, FILE_READ)) {
-        #ifdef DEBUG
-        Serial.println(F("Error opening node file"));
-        #endif
-        free(fileName);
-        return false;
-    }
+    file.open(fileName, FILE_READ);
     free(fileName);
     
     //Get length of name
@@ -957,14 +814,6 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     Serial.println(id);
     #endif
     
-    //Test to make sure there is enough memory for this function to run 
-    //(only way I could figure out how to ensure there wasn't an error)
-    uint8_t* memTest = (uint8_t*) malloc(sizeof(uint8_t) * 21);
-    if (memTest == NULL) {
-        return false;
-    }
-    free(memTest);
-    
     //Copy the current node's id into the answer array
     strPrintShort(&request[*curr], id);
     (*curr) += 4;
@@ -989,24 +838,9 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
         #endif
         return false;
     }
-        
-    if (sprintf(fileName, "node%u.csv", id) < 0) {
-        #ifdef DEBUG
-        Serial.println(F("Error printing to node file name"));
-        #endif
-        free(fileName);
-        return false;
-    }
-
+    sprintf(fileName, "node%u.csv", id);
     SdFile file;
-    if (!file.open(fileName, FILE_READ)) {
-        #ifdef DEBUG
-        Serial.println(F("Error opening node file"));
-        #endif
-        free(fileName);
-        return false;
-    }
-    
+    file.open(fileName, FILE_READ);
     free(fileName);
     
     //Copy in some location info
@@ -1043,9 +877,9 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     //Copy in sensor types
     
     //Variables needed to copy in the sensor type names
-    unsigned int numPos = *curr; //Position where the total number of types needs to go
+    unsigned int numPos = *curr; //Posistion where the total number of types needs to go
     uint8_t currTypeLen = 0; //Length of the current sensor type
-    uint8_t types = 0; //Number of sensor types
+    uint8_t types = 0; //Number of sensor types (won't count the last one, so add one)
     (*curr) += 2;
     
     while (true) {
@@ -1055,7 +889,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
         if (c == 10) { //If it's a newline
             if (currTypeLen != 0) {
                 //Put in the length of the type name that was just copied in
-                strPrintByte(&request[place - (2*(currTypeLen + 1))], currTypeLen);
+                strPrintByte(&request[(*curr) - (2*(currTypeLen + 1))], currTypeLen);
             }
             break;
         } else if (c == 44) { //If it's a comma
@@ -1088,7 +922,9 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     
     //Go through each data point and copy in time, location, and sensor readings
     
-    for (uint8_t i = 1; i <= numData; i++) { //Loop through the number of data points to send
+    for (uint8_t i = 0; i < numData;) { //Loop through the number of data points to send
+        i++; //New data point
+        
         //Put the current time into the answer array
         uint32_t currTime = fileReadInt(&file);
         strPrintLongP(&request[*curr], &currTime);
@@ -1111,9 +947,9 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
         //Copy in sensor values
         
         char end = ',';
-        uint8_t floats = types + extra; //How many times to loop
-        for (uint8_t j = 1; j <= floats; j++) {
-            if (j == floats) {
+        uint8_t loops = types + extra; //How many times to loop
+        for (uint8_t i = 1; i <= loops; i++) {
+            if (i == loops) {
                 end = '\n';
             }
             
@@ -1134,10 +970,13 @@ float remoteGatewayData::fileReadFloat(SdFile* file, char end, uint8_t bufferSiz
     char str[bufferSize];
     uint8_t curr = 0;
     
-    char c = (*file).read();
-    while (c != end) {
-        str[curr++] = c;
-        c = (*file).read();
+    while ((*file).available()) {
+        char c = (*file).read();
+        if (c == end) {
+            break;
+        } else {
+            str[curr++] = c;
+        }
     }
     str[curr] = 0;
     
@@ -1156,12 +995,7 @@ void remoteGatewayData::messageSuccessSD() {
     }
     
     SdFile file;
-    if (!file.open("ToSend.csv", FILE_WRITE)) {
-        #ifdef DEBUG
-        Serial.println(F("Error openening ToSend.csv"));
-        #endif
-        return;
-    }
+    file.open("ToSend.csv", FILE_WRITE);
     
     uint8_t numPoints;
     
@@ -1170,8 +1004,6 @@ void remoteGatewayData::messageSuccessSD() {
         file.close();
         return;
     }
-    
-    loops = -1;
     
     uint16_t id = (uint16_t) fileReadInt(&file);
     uint8_t oldNumPoints = (uint8_t) fileReadInt(&file);
@@ -1192,23 +1024,9 @@ void remoteGatewayData::messageSuccessSD() {
             #endif
             return;
         }
-        
-        if (sprintf(fileName, "node%u.csv", id) < 0) {
-            #ifdef DEBUG
-            Serial.println(F("Error printing to node file name"));
-            #endif
-            free(fileName);
-            return;
-        }
-        
+        sprintf(fileName, "node%u.csv", id);
         SdFile nodeFile;
-        if (!nodeFile.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
-            Serial.println(F("Error opening node file"));
-            #endif
-            free(fileName);
-            return;
-        }
+        nodeFile.open(fileName, FILE_READ);
         free(fileName);
 
         //Go to old file position
@@ -1247,17 +1065,27 @@ void remoteGatewayData::messageSuccessSD() {
 
 
 /*--------------------------General--------------------------*/
-//Print a byte as hex into a string
-void remoteGatewayData::strPrintByte(char* str, uint8_t data) {
-    char c = str[2]; //Used to remove trailing null
-    sprintf(str, "%02X", data);
-    str[2] = c;
+
+//Calculates 10^pow (less flash than using pow or lookup table)
+uint32_t remoteGatewayData::pow10(uint8_t pow) {
+    uint32_t ans = 1;
+    for (uint8_t i = 0; i < pow; i++) {
+        ans *= 10;
+    }
+    return ans;
 }
 
 //Print a short as hex into a string (following little-endian)
 void remoteGatewayData::strPrintShort(char* str, uint16_t data) {
     strPrintByte(str, (uint8_t) (data & 0xFF));
     strPrintByte(&str[2], (uint8_t) (data >> 8));
+}
+
+//Print a byte as hex into a string
+void remoteGatewayData::strPrintByte(char* str, uint8_t data) {
+    char c = str[2]; //Used to remove trailing null
+    sprintf(str, "%02X", data);
+    str[2] = c;
 }
 
 //Print the value of a uint32_t* as hex into a string (following little-endian)

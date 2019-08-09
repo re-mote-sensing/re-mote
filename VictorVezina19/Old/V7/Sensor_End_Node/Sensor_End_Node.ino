@@ -149,8 +149,8 @@ void setup() {
     
     #ifdef DEBUG
     Serial.println(F("Waiting for input..."));
-    while (!Serial.available()) ; //Useful for testing
     #endif
+    while (!Serial.available()) ; //Useful for testing
     
     #ifdef DEBUG
     Serial.println(F("Registering node"));
@@ -159,7 +159,7 @@ void setup() {
     
     #ifdef DEBUG
     //Resets saved data, used in testing
-    //Data.reset(false);
+    Data.reset(false);
     #endif
 }
 
@@ -286,9 +286,9 @@ void registerNode() {
 
 //Read data from the GPS and the sensors
 uint8_t* readGPSSensors() {
-    unsigned long time;// = 9999999;
-    float lat;// = 42;
-    float lon;// = -80;
+    unsigned long time;
+    float lat;
+    float lon;
     
     #ifdef DEBUG
     Serial.println();

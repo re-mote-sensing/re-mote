@@ -1,6 +1,6 @@
 /*
 Library for saving the data of a gateway, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 8, 2019
+Created by Victor Vezina, last updated August 1, 2019
 Released into the public domain
 */
 
@@ -24,20 +24,20 @@ class remoteGatewayData {
         void reset(bool hard);
         uint8_t saveRegistration(uint8_t* data);
         uint8_t saveData(uint8_t* data);
-        char* getPost(unsigned int arg, void** toFree);
+        char* getPost(unsigned int arg);
         void messageSuccess();
     
     private:
         /*----------SD Card----------*/
         #if Data_Type == SD_Type
-            unsigned int loops = -1;
+            uint8_t loops = 0;
             void initialiseSD();
             void resetSD(bool hard);
             uint8_t saveRegSD(uint8_t* data);
             uint8_t saveDataSD(uint8_t* data);
             uint8_t filePrintFloat(SdFile* file, uint8_t* arr, uint8_t num);
             uint32_t fileReadInt(SdFile* file, char end = ',', int8_t move = 1);
-            char* getPostSD(unsigned int numLoops, void** toFree);
+            char* getPostSD(unsigned int numLoops);
             unsigned int getSendInfoSize(unsigned int numLoops);
             bool getToSendData(SdFile* file, unsigned int numLoops, uint8_t* numNodes = NULL, uint8_t* lastNum = NULL);
             bool getSendInfo(uint8_t* ans, unsigned int numLoops);
@@ -52,6 +52,7 @@ class remoteGatewayData {
         #endif
     
         /*----------General----------*/
+        uint32_t pow10(uint8_t pow);
         void strPrintShort(char* str, uint16_t data);
         void strPrintByte(char* str, uint8_t data);
         void strPrintLongP(char* str, uint32_t* data);

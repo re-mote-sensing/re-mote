@@ -1,6 +1,6 @@
 /*
 Library for using a Fona module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 9, 2019
+Created by Victor Vezina, last modified on July 30, 2019
 Released into the public domain
 */
 
@@ -35,7 +35,8 @@ void remoteFona::initialise() {
     #endif
 }
 
-bool remoteFona::startHTTPS() {
+//Post a given HTTP request through the Fona
+bool remoteFona::post(char* request, const char* host, int portNum) {
     #if Fona_Make == Adafruit
     bool err = toggle(true);
     #else
@@ -49,26 +50,12 @@ bool remoteFona::startHTTPS() {
     //First send an AT command to make sure the FONA is working
     if (!err) err = checkFona(fonaSS);
     
-    closeHTTPS(fonaSS); //Close HTTPS session
+    closeHTTPS(fonaSS); //Make sure there isn't an active HTTPS session
     
     //Send HTTP start command
     if (!err) err = SCRTries(fonaSS, "AT+CHTTPSSTART", "OK", 10000);
     
     delay(500);
-    
-    fonaSS.end();
-    
-    return err;
-}
-
-//Post a given HTTP request through the Fona
-bool remoteFona::post(char* request, const char* host, int portNum) {
-    //Initialise the FONA software serial
-    NeoSWSerial fonaSS(FONA_RX, FONA_TX);
-    fonaSS.begin(9600);
-    
-    //First send an AT command to make sure the FONA is working
-    bool err = checkFona(fonaSS);
     
     //Build HTTP open session command with the defined url and port
     char* httpsArr = (char*) malloc(sizeof(char) * (20 + strlen(host) + 5));
@@ -99,25 +86,15 @@ bool remoteFona::post(char* request, const char* host, int portNum) {
     //Send HTTP request
     if (!err) err = SCRTries(fonaSS, request, "OK", 10000);
     
-    sendCheckReply(fonaSS, "AT+CHTTPSCLSE", "OK", 1000); //Send close HTTPS session command
-    
-    fonaSS.end();
-    
-    return err; //Return if there was an error or not
-}
-
-void remoteFona::stopHTTPS() {
-    //Initialise the FONA software serial
-    NeoSWSerial fonaSS(FONA_RX, FONA_TX);
-    fonaSS.begin(9600);
-    
-    closeHTTPS(fonaSS); //Close HTTPS session
+    closeHTTPS(fonaSS);
     
     fonaSS.end();
     
     #if Fona_Make == Adafruit
     toggle();
     #endif
+    
+    return err; //Return if there was an error or not
 }
 
 //Offset the time that the GPS last updated (needed if you are sleeping the Arduino and millis() isn't incremented)
@@ -268,7 +245,7 @@ bool remoteFona::toggle(bool on) {
         fonaSS.begin(9600);
         
         err = checkFona(fonaSS);
-        if (!err) err = SCRTries(fonaSS, "ATE0", "OK", 2000);
+        if (!err) err = SCRTries(fonaSS, "ATE0", "OK", 1000);
     }
     
     return err;
@@ -282,23 +259,11 @@ bool remoteFona::checkFona(Stream& port) {
 
 //Close and stop the HTTPS session
 void remoteFona::closeHTTPS(Stream& port) {
-    sendCheckReply(port, "AT+CHTTPSCLSE", "OK", 1000); //Send close HTTP session command
+    sendCheckReply(port, "AT+CHTTPSCLSE", "OK", 2000); //Send close HTTP session command
     sendCheckReply(port, "AT+CHTTPSSTOP", "OK", 2000); //Send stop HTTP command
 }
 
 //Call sendCheckReply tries number of times and return if there was an error or not
-//Command is as a __FlashStringHelper*
-bool remoteFona::SCRTries(Stream& port, const __FlashStringHelper* command, const char* reply, unsigned long timeout, uint8_t tries) {
-    for (uint8_t i = 0; i < tries; i++) {
-        if (sendCheckReply(port, command, reply, timeout)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-//Call sendCheckReply tries number of times and return if there was an error or not
-//Command is as a char*
 bool remoteFona::SCRTries(Stream& port, const char* command, const char* reply, unsigned long timeout, uint8_t tries) {
     for (uint8_t i = 0; i < tries; i++) {
         if (sendCheckReply(port, command, reply, timeout)) {
@@ -306,59 +271,6 @@ bool remoteFona::SCRTries(Stream& port, const char* command, const char* reply, 
         }
     }
     return true;
-}
-
-//Send an AT command to the Fona and wait for a specific reply
-//Command is as a __FlashStringHelper*
-bool remoteFona::sendCheckReply(Stream& port, const __FlashStringHelper* command, const char* reply, unsigned long timeout) {
-    #ifdef DEBUG
-    Serial.print(F("Sending to fona: "));
-    Serial.println(command);
-    #endif
-    
-    port.flush();
-    
-    port.println(command); //Send the command to the Fona
-    
-    unsigned long start = millis(); //The time before we wait in the while loop
-    
-    char response[20]; //Char array for the response from the Fona
-    uint8_t curr = 0; //Index for the response char array
-    bool reset = false; //If the current command is done
-    
-    //While timeout time hasn't passed yet
-    while ((millis() - start) < timeout) {
-        if (port.available()) {
-            char c = port.read(); //Read the available character
-            
-            if (c > 25 && curr < 19) { //If it's an actual character (not '\n' or '\r')
-                response[curr++] = c;
-            } else {
-                reset = true;
-            }
-            
-            response[curr] = 0; //Add a terminating 0
-
-            if (strcmp(response, reply) == 0) { //If it's the response we're waiting for
-                #ifdef DEBUG
-                Serial.println(response);
-                #endif
-                
-                return true;
-            }
-            
-            if (reset) {
-                #ifdef DEBUG
-                if (curr != 0) Serial.println(response);
-                #endif
-                
-                curr = 0;
-                reset = false;
-            }
-        }
-    }
-    
-    return false;
 }
 
 //Send an AT command to the Fona and wait for a specific reply
