@@ -1,6 +1,6 @@
 /*
 Library for using a LoRa mesh module (https://www.dfrobot.com/product-1670.html), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 29, 2019
+Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on August 12, 2019
 Released into the public domain
 */
 
@@ -164,8 +164,11 @@ uint8_t* remoteLoRa::sendReceive(uint16_t target, uint8_t dataLen, uint8_t* data
     //Start the software serial for the module
     NeoSWSerial port(LORA_RX, LORA_TX);
     port.begin(9600);
-    
-    sendData(port, target, dataLen, data); //Send the data
+    //Send the data
+    if (!sendData(port, target, dataLen, data)) {
+        port.end();
+        return NULL;
+    }
     
     unsigned long before = millis(); //Time before waiting for the acknowledgement
     
@@ -237,7 +240,7 @@ uint8_t* remoteLoRa::readData(Stream& port) {
 
     if (len == -1 || frameType != 0x05 || cmdType != 0x82) {
         #ifdef DEBUG
-        Serial.println(F("Bad Message"));
+        Serial.println(F("Bad Message read"));
         #endif
         
         free(payload);
@@ -275,7 +278,7 @@ uint8_t* remoteLoRa::readData(Stream& port) {
 }
 
 //Send data through a given port
-void remoteLoRa::sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_t* data) {
+bool remoteLoRa::sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_t* data) {
     // We add 7 bytes to the head of data for this payload
     uint8_t payloadLen = 6 + dataLen;
     uint8_t* payload = (uint8_t *) malloc(sizeof(uint8_t) * payloadLen);
@@ -310,13 +313,15 @@ void remoteLoRa::sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_
 
     free(payload);
     
-    #ifdef DEBUG
     uint8_t frameType = 0;
     uint8_t cmdType = 0;
     uint8_t* responsePayload = NULL;
     int len = readFrame(port, &frameType, &cmdType, &responsePayload);
+    
+    bool ans = true;
 
     if (len != -1 && frameType == 0x5 && cmdType == 0x81) {
+        #ifdef DEBUG
         // Application data sending response
         uint16_t targetAddr = (responsePayload[0] << 8) | responsePayload[1];
         uint8_t status = responsePayload[2];
@@ -325,12 +330,33 @@ void remoteLoRa::sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_
         Serial.print(F(" status ="));
         printByte(status);
         Serial.println();
+        #endif
+    } else {
+        #ifdef DEBUG
+        Serial.print(F("Len: "));
+        Serial.println(len);
+        if (len != -1) {
+            uint16_t targetAddr = (responsePayload[0] << 8) | responsePayload[1];
+            uint8_t status = responsePayload[2];
+            Serial.println(F("Bad Message send"));
+            Serial.print(F("targetAddr =")); 
+            printShort(targetAddr);
+            Serial.print(F(" status ="));
+            printByte(status);
+            Serial.println();
+            for (uint8_t i = 0; i < responsePayload[3]; i++) {
+                printByte(responsePayload[4+i]);
+            }
+            Serial.println();
+            Serial.println();
+        }
+        #endif
+        ans = false;
     }
     
     free(responsePayload);
-    #endif
     
-    return;
+    return ans;
 }
 
 //Read a frame from the LoRa module
@@ -343,12 +369,13 @@ int remoteLoRa::readFrame(Stream& port, byte* rFrameType, byte* rCmdType, byte**
     uint8_t frameNum = readByte(port, &error);
     
     uint8_t cmdType = readByte(port, &error);
+    
     uint8_t payloadLen = readByte(port, &error);
     if (error) return -1;
 
     #ifdef DEBUG
-    Serial.print(F("Got: "));
-    Serial.println(error);
+    Serial.print(F("Got:"));
+    //Serial.println(error);
     printByte(frameType);
     printByte(frameNum);
     printByte(cmdType);

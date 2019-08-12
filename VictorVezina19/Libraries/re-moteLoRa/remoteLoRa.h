@@ -1,6 +1,6 @@
 /*
 Library for using a LoRa mesh module (https://www.dfrobot.com/product-1670.html), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on July 29, 2019
+Created by Spencer Park, Ryan Tyrell, and Victor Vezina, last modified on August 12, 2019
 Released into the public domain
 */
 
@@ -19,7 +19,7 @@ class remoteLoRa {
         void sendData(uint16_t target, uint8_t dataLen, uint8_t* data);
     private:
         uint8_t* readData(Stream& port);
-        void sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_t* data);
+        bool sendData(Stream& port, uint16_t target, uint8_t dataLen, uint8_t* data);
         int readFrame(Stream& port, byte* rFrameType, byte* rCmdType, byte** rPayload);
         void writeFrame(Stream& port, uint8_t frameType, uint8_t cmdType, uint8_t payloadLen, uint8_t* payload);
         uint8_t readByte(Stream& port, bool* error);
