@@ -67,7 +67,9 @@ void setup() {
     #ifdef DEBUG
     Serial.println(F("Initialising Fona"));
     #endif
-    Fona.initialise();
+    while (!Fona.initialise()) {
+        delay(2500);
+    }
     
     #ifdef DEBUG
     Serial.println(F("Waiting for input..."));
@@ -196,11 +198,11 @@ void readSensors() {
     Serial.println(F("Reading sensors"));
     #endif
     
-    unsigned long time;// = 1563816782 + millis()/1000;
-    float lat;// = 43;
-    float lon;// = -79;
+    unsigned long time = 1563816782 + millis()/1000;
+    float lat = 43;
+    float lon = -79;
     
-    Fona.getGPSData(&time, &lat, &lon, GPS_Time);
+    //Fona.getGPSData(&time, &lat, &lon, GPS_Time);
     
     uint8_t* data; //Array of data
     uint8_t timeIndex = 5;
