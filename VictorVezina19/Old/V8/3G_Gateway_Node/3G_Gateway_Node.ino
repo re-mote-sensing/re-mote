@@ -23,7 +23,7 @@ Things to do:
 #define DEBUG
 
 #include <remoteLoRa.h>
-#include <remote3G.h>
+#include <remoteFona.h>
 #include <remoteSensors.h>
 #include <remoteGatewayData.h>
 
@@ -34,7 +34,7 @@ Things to do:
 /*------------------------CONSTRUCTORS--------------------------*/
 
 remoteLoRa LoRa;
-remote3G cell3G;
+remoteFona Fona;
 remoteSensors Sensors;
 remoteGatewayData Data;
 
@@ -65,9 +65,9 @@ void setup() {
     }
     
     #ifdef DEBUG
-    Serial.println(F("Initialising 3G"));
+    Serial.println(F("Initialising Fona"));
     #endif
-    while (!cell3G.initialise()) {
+    while (!Fona.initialise()) {
         delay(2500);
     }
     
@@ -198,11 +198,11 @@ void readSensors() {
     Serial.println(F("Reading sensors"));
     #endif
     
-    unsigned long time;// = 1563816782 + millis()/1000;
-    float lat;// = 43;
-    float lon;// = -79;
+    unsigned long time = 1563816782 + millis()/1000;
+    float lat = 43;
+    float lon = -79;
     
-    cell3G.getGPSData(&time, &lat, &lon, GPS_Time);
+    //Fona.getGPSData(&time, &lat, &lon, GPS_Time);
     
     uint8_t* data; //Array of data
     uint8_t timeIndex = 5;
@@ -271,7 +271,7 @@ void postData() {
     Serial.println(F("Posting data"));
     #endif
     
-    if (cell3G.startHTTPS()) return;
+    if (Fona.startHTTPS()) return;
     
     //Loop until there's no data left to send
     while (true) {
@@ -301,7 +301,7 @@ void postData() {
                 Serial.println(F("No data to post"));
                 #endif
                 free(request);
-                cell3G.stopHTTPS();
+                Fona.stopHTTPS();
                 return;
             }
             
@@ -310,8 +310,8 @@ void postData() {
             Serial.println(freeMemory());
             #endif
 
-            //Post the valid post through the 3G
-            bool error = cell3G.post(request, URL_Host, URL_Port);
+            //Post the valid post through the Fona
+            bool error = Fona.post(request, URL_Host, URL_Port);
             
             #ifdef DEBUG
             Serial.print(F("Error: "));
@@ -350,11 +350,11 @@ void sendAck(uint8_t ack, uint8_t* data) {
 }
 /*---------------------------TESTING----------------------------*/
 /*
-//Function to test the 3G, not needed
-void test3G() {
-    NeoSWSerial ss(cell3G_RX, cell3G_TX);
+//Function to test the FONA, not needed
+void testFona() {
+    NeoSWSerial fonaSS(FONA_RX, FONA_TX);
     
-    ss.begin(9600);
+    fonaSS.begin(9600);
     delay(250);
     
     while (true) {
@@ -363,25 +363,25 @@ void test3G() {
             if (c == '-') {
                 toggle();
             } else if (c == '\r') {
-                ss.write(c);
+                fonaSS.write(c);
                 Serial.println();
             } else {
-                ss.write(c);
+                fonaSS.write(c);
                 Serial.write(c);
             }
         }
-        while (ss.available()) {
-            Serial.write(ss.read());
+        while (fonaSS.available()) {
+            Serial.write(fonaSS.read());
         }
     }
     
-    ss.end();
+    fonaSS.end();
 }
 
 void toggle() {
-    digitalWrite(cell3G_EN, LOW);
+    digitalWrite(FONA_EN, LOW);
     delay(4000);
-    digitalWrite(cell3G_EN, HIGH);
+    digitalWrite(FONA_EN, HIGH);
 }*/
 
 #ifdef DEBUG
