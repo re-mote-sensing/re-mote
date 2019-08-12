@@ -1,6 +1,6 @@
 /*
 Library for using a Fona module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 9, 2019
+Created by Victor Vezina, last modified on August 12, 2019
 Released into the public domain
 */
 
@@ -18,19 +18,34 @@ remoteFona::remoteFona() {
     pinMode(FONA_EN, OUTPUT);
 }
 
-//Initialise the Fona module
-void remoteFona::initialise() {
+//Initialise the 3G module
+bool remoteFona::initialise() {
     #if Fona_Make == Tinysine
-    //Turn on the 3G chip on the Tinysine Fona
+    //Turn on the 3G chip
     digitalWrite(FONA_EN, HIGH);
     delay(180);
     digitalWrite(FONA_EN, LOW);
     
     #elif Fona_Make == Adafruit
-    //Turn the 3G chip off
+    //Turn the 3G chip on
     digitalWrite(FONA_EN, HIGH);
     
+    //Check to see if the 3G chip is on
+    NeoSWSerial fonaSS(FONA_RX, FONA_TX);
+    fonaSS.begin(9600);
+    
+    if (checkFona(fonaSS)) { //If not
+        toggle();
+        if (checkFona(fonaSS)) { //If it still isn't working
+            fonaSS.end();
+            return false;
+        }
+    }
+    
+    //Turn the chip off
+    fonaSS.end();
     toggle();
+    return true;
     
     #endif
 }

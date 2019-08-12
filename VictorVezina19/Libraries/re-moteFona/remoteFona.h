@@ -1,6 +1,6 @@
 /*
 Library for using a Fona module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 9, 2019
+Created by Victor Vezina, last modified on August 12, 2019
 Released into the public domain
 */
 
@@ -12,7 +12,7 @@ Released into the public domain
 class remoteFona {
     public:
         remoteFona();
-        void initialise();
+        bool initialise();
         bool startHTTPS();
         bool post(char* request, const char* host, int portNum);
         void stopHTTPS();
