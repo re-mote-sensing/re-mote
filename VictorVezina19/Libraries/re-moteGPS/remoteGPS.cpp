@@ -1,6 +1,6 @@
 /*
 Library for reading from a GPS, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated August 12, 2019
 Released into the public domain
 */
 
@@ -13,13 +13,15 @@ Released into the public domain
 #include <MemoryFree.h>
 #endif
 
-//Set the pins for the GPS
+//Constructor
 remoteGPS::remoteGPS() {
+    //Set the enable pin to be an output
+    pinMode(GPS_EN, OUTPUT);
 }
 
 //Initialise the GPS
 void remoteGPS::initialise() {
-    pinMode(GPS_EN, OUTPUT);
+    //Set the enable pin to low (turn the GPS off)
     digitalWrite(GPS_EN, LOW);
 }
 
@@ -50,7 +52,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
     delay(100);
     #endif
     
-    bool first = false;
+    bool first = false; //If it's the first fix the GPS has gotten in the loop
     
     //Try for timeout time
     while (force || ((millis() - start) < timeout)) {
@@ -67,6 +69,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                 continue;
             }
             
+            //If we got a time and date
             if (fix.valid.time && fix.valid.date) {
                 unsigned long currTime = ((NeoGPS::clock_t) fix.dateTime) + 946684800; //Get Unix Time (946684800 is because conversion gives Y2K epoch)
                 bool err = false;
@@ -80,12 +83,13 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                     err = err || (currTime - unixTime > 2678400); //2678400 is a month
                 }
                 
-                if (!err) {
+                if (!err) { //If it's a valid time
                     #ifdef DEBUG
                     //Serial.print(F("Got time: "));
                     //Serial.println(currTime);
                     #endif
                     
+                    //Update the saved time and reset the last updated variable
                     unixTime = currTime;
                     timeLastUpdated = millis();
                     gotTime = true;
@@ -96,24 +100,30 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                 }
             }
             
+            //If we got a location
             if (fix.valid.location) {
+                //The location values from the GPS
                 float currLat = fix.latitude();
                 float currLon = fix.longitude();
                 bool err = false;
                 
                 //Check to make sure numbers make sense
                 
+                //Check to make sure not 0
                 err = err || abs(currLat) < 0.00001;
                 err = err || abs(currLon) < 0.00001;
+                
+                //Check to make sure they're within fixed bounds
                 err = err || (currLat < -90.0) || (currLat > 90.0);
                 err = err || (currLon < -180.0) || (currLon > 180.0);
                 
+                //Check to see that they aren't super far away from the last values we got
                 if (latitude != 0.0 && longitude != 0.0) {
                     err = err || abs(currLat - latitude) > 0.1; //0.1 degrees is about 11 km
                     err = err || abs(currLon - longitude) > 0.1;
                 }
                 
-                if (!err) {
+                if (!err) { //If it's a valid location
                     #ifdef DEBUG
                     Serial.print(F("Got location: "));
                     Serial.print(currLat, 6);
@@ -122,6 +132,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
                     delay(250);
                     #endif
                     
+                    //Set the location variables
                     latitude = currLat;
                     longitude = currLon;
                     gotLoc = true;
@@ -138,6 +149,7 @@ void remoteGPS::getData(unsigned long* time, float* lat, float* lon, unsigned lo
     digitalWrite(GPS_EN, LOW);
     gpsSS.end();
     
+    //Set the passed in parameters
     if (lat != NULL)
         (*lat) = latitude;
     

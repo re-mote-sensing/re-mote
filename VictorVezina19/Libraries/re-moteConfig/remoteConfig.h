@@ -43,9 +43,9 @@ Released into the public domain
     #define GPS_EN 10               //Pin that the GPS EN pin is connected to
 
     /*---------Sensor definitions---------*/
-    #define NUMBER_SENSOR_NAMES 4
-    #define NUMBER_SENSOR_TYPES 4
-    #define MAX_NUMBER_PINS 3
+    #define NUMBER_SENSOR_NAMES 4   //The number of sensor names on the end node
+    #define NUMBER_SENSOR_TYPES 4   //The number of sensor types on the end node
+    #define MAX_NUMBER_PINS 3       //The max number of pins that one sensor uses
 
     extern const char* sensorNames[NUMBER_SENSOR_NAMES];
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
@@ -62,13 +62,15 @@ Released into the public domain
 */
     #endif
 
+    //All the sensor types that are used in this end node
     #define AS_DO_Sensor
     #define AS_EC_Sensor true       //Set this value to if the EC sensor has an enable pin or not
-    #define AS_pH_Sensor true       //Set this value to if the pH sensor has an enable pin or not
+    //#define AS_pH_Sensor true     //Set this value to if the pH sensor has an enable pin or not
     #define DF_TB_Sensor
     #define DF_Temp_Sensor
     //#define DHT22_Sensor
 
+    //Temperature and salinity compensation defines
     #define Temperature_Comp 0
     //#define Temperature_Comp_Index 0
     #define Salinity_Comp 1
@@ -97,9 +99,9 @@ Released into the public domain
     #define cell3G_EN 8             //Pin that the 3G module KEY pin is connected to
 
     /*---------Sensor definitions---------*/
-    #define NUMBER_SENSOR_NAMES 0
-    #define NUMBER_SENSOR_TYPES 0
-    #define MAX_NUMBER_PINS 0
+    #define NUMBER_SENSOR_NAMES 0   //The number of sensor names on the gateway
+    #define NUMBER_SENSOR_TYPES 0   //The number of sensor types on the gateway
+    #define MAX_NUMBER_PINS 0       //The max number of pins that one sensor uses
 
     extern const char* sensorNames[NUMBER_SENSOR_NAMES];
     extern const char* sensorTypes[NUMBER_SENSOR_TYPES];
@@ -111,8 +113,10 @@ Released into the public domain
         
     #endif
 
+    //All the sensor types that are used in this end node
     //#define AS_DO_Sensor
     //#define AS_EC_Sensor false      //Set this value to if the EC sensor has an enable pin or not
+    //#define AS_pH_Sensor true     //Set this value to if the pH sensor has an enable pin or not
     //#define DF_TB_Sensor
     //#define DF_Temp_Sensor
     //#define DHT22_Sensor
@@ -122,7 +126,7 @@ Released into the public domain
     #define Post_Time 240000                    //Time interval that the gateway will post at
     #define GPS_Time 60000                      //Time this node will try the GPS every time it takes a measurement
     #define LoRa_Read_Timeout 10000             //Time that it will try to read from LoRa before giving up
-    #define cell3G_Make Tinysine                  //The make of the 3G module being used
+    #define cell3G_Make Tinysine                //The make of the 3G module being used
     #define SD_CS 10                            //The pin that cs on the sd card module is connected to
 
 

@@ -1,6 +1,6 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 9, 2019
+Created by Victor Vezina, last updated August 13, 2019
 Released into the public domain
 */
 
@@ -10,6 +10,7 @@ Released into the public domain
 #include <DHT.h>
 #include <remoteConfig.h>
 
+//Empty constructor
 remoteSensors::remoteSensors() {
 }
 
@@ -86,6 +87,7 @@ void remoteSensors::initialiseASDO(uint8_t index) {
 //Initialise an Atlas Scientific Conductivity sensor at index index
 void remoteSensors::initialiseASEC(uint8_t index) {
     #if AS_EC_Sensor == true
+    //Turn on the sensor
     pinMode(sensorPorts[index][2], OUTPUT);
     digitalWrite(sensorPorts[index][2], HIGH);
     #endif
@@ -132,6 +134,7 @@ void remoteSensors::initialiseASEC(uint8_t index) {
 //Initialise an Atlas Scientific pH sensor at index index
 void remoteSensors::initialiseASpH(uint8_t index) {
     #if AS_pH_Sensor == true
+    //Turn on the sensor
     pinMode(sensorPorts[index][2], OUTPUT);
     digitalWrite(sensorPorts[index][2], HIGH);
     #endif
@@ -176,9 +179,9 @@ void remoteSensors::initialiseAtlas(Stream& sensor) {
 
 //Waits for an AS sensor to return a response and dumps it
 void remoteSensors::ASWait(Stream& sensor) {
-    while (!sensor.available());
+    while (!sensor.available()); //Wait until a response is ready
     delay(100);
-    while (sensor.available()) sensor.read();
+    while (sensor.available()) sensor.read(); //Dump the response
 }
 #endif
 
@@ -254,24 +257,28 @@ void remoteSensors::read(uint8_t* dataArr) {
 
         //Should probably handle default
         
+        //Set the temperature compensation value if we can
         #ifdef Temperature_Comp
         if (Temperature_Comp == i) {
-            uint8_t backAmount = 4;
+            uint8_t backAmount = 4; //The amount to go backwards in the array
             #ifdef Temperature_Comp_Index
             backAmount += 4 * Temperature_Comp_Index;
             #endif
             
+            //Get the value from the array
             memcpy(&lastTemp, &dataArr[curr - backAmount], sizeof(float));
         }
         #endif
         
+        //Set the salinity compensation value if we can
         #ifdef Salinity_Comp
         if (Salinity_Comp == i) {
-            uint8_t backAmount = 4;
+            uint8_t backAmount = 4; //The amount to go backwards in the array
             #ifdef Salinity_Comp_Index
             backAmount += 4 * Salinity_Comp_Index;
             #endif
             
+            //Get the value from the array
             memcpy(&lastSal, &dataArr[curr - backAmount], sizeof(float));
         }
         #endif
@@ -299,6 +306,7 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
     ASWait(sensor);
     #endif
     
+    //Read a value from the sensor
     float ans = readAtlas(sensor);
     
     #ifdef DEBUG
@@ -309,9 +317,11 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
     //Put sensor to sleep
     sensor.print(F("Sleep\r"));
     
+    sensor.end();
+    
+    //Put the sensor value into the data array
     memcpy(data, &ans, sizeof(float));
     
-    sensor.end();
     return 4;
 }
 #endif
@@ -320,6 +330,7 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
 //Read data from an Atlas Scientific Conductivity sensor at index i
 uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     #if AS_EC_Sensor == true
+    //Turn on the sensor
     digitalWrite(sensorPorts[index][2], HIGH);
     #endif
     
@@ -333,6 +344,7 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     sensor.print(F("R\r"));
     ASWait(sensor);
     
+    //Read a value from the sensor
     float ans = readAtlas(sensor);
     
     #ifdef DEBUG
@@ -340,8 +352,8 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     Serial.println(ans);
     #endif
     
-
-    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    //Put sensor to sleep
+    sensor.print(F("Sleep\r"));
     
     //If it can be turned off, turn it off
     #if AS_EC_Sensor == true
@@ -350,7 +362,9 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
     
     sensor.end();
     
+    //Put the sensor value into the data array
     memcpy(data, &ans, sizeof(float));
+    
     return 4;
 }
 #endif
@@ -359,6 +373,7 @@ uint8_t remoteSensors::readASEC(uint8_t index, uint8_t* data) {
 //Read data from an Atlas Scientific pH sensor at index i
 uint8_t remoteSensors::readASpH(uint8_t index, uint8_t* data) {
     #if AS_pH_Sensor == true
+    //Turn on the sensor
     digitalWrite(sensorPorts[index][2], HIGH);
     #endif
     
@@ -372,6 +387,7 @@ uint8_t remoteSensors::readASpH(uint8_t index, uint8_t* data) {
     sensor.print(F("R\r"));
     ASWait(sensor);
     
+    //Read a value from the sensor
     float ans = readAtlas(sensor);
     
     #ifdef DEBUG
@@ -379,8 +395,8 @@ uint8_t remoteSensors::readASpH(uint8_t index, uint8_t* data) {
     Serial.println(ans);
     #endif
     
-
-    sensor.print(F("Sleep\r")); //Put sensor to sleep
+    //Put sensor to sleep
+    sensor.print(F("Sleep\r"));
     
     //If it can be turned off, turn it off
     #if AS_pH_Sensor == true
@@ -389,7 +405,9 @@ uint8_t remoteSensors::readASpH(uint8_t index, uint8_t* data) {
     
     sensor.end();
     
+    //Put the sensor value into the data array
     memcpy(data, &ans, sizeof(float));
+    
     return 4;
 }
 #endif
@@ -449,6 +467,7 @@ uint8_t remoteSensors::readDFTB(uint8_t index, uint8_t* data) {
         ans = ansData - (5.0 * factor);
     }
     
+    //Put the sensor value into the data array
     memcpy(data, &ans, sizeof(float));
     
     #ifdef DEBUG
@@ -513,6 +532,7 @@ uint8_t remoteSensors::readDFTemp(uint8_t index, uint8_t* data) {
         ans = tmp / 16;
     } while (ans == 85); //It returns 85 if the conversion isn't yet finished
     
+    //Put the sensor value into the data array
     memcpy(data, &ans, sizeof(float));
     
     #ifdef DEBUG
@@ -527,14 +547,17 @@ uint8_t remoteSensors::readDFTemp(uint8_t index, uint8_t* data) {
 #ifdef DHT22_Sensor
 //Read temperature and humidity from a DHT22 sensor
 uint8_t remoteSensors::readDHT22(uint8_t index, uint8_t* data) {
+    //Start the DHT interface
     DHT dht(sensorPorts[index][0], DHT22);
     dht.begin();
     
+    //Read the temperature from the sensor
     float ans;
     do {
         ans = dht.readTemperature();
     } while (isnan(ans));
     
+    //Put the temperature value into the data array
     memcpy(data, &ans, sizeof(uint32_t));
     
     #ifdef DEBUG
@@ -542,10 +565,12 @@ uint8_t remoteSensors::readDHT22(uint8_t index, uint8_t* data) {
     Serial.println(ans);
     #endif
     
+    //Read the humidity from the sensor
     do {
         ans = dht.readHumidity();
     } while (isnan(ans) || ans < 0 || ans > 100);
     
+    //Put the humidity value into the data array
     memcpy(&data[4], &ans, sizeof(uint32_t));
     
     #ifdef DEBUG

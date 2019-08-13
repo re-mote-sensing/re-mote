@@ -1,6 +1,6 @@
 /*
 Library for sleeping, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 26, 2019
+Created by Victor Vezina, last updated August 12, 2019
 Released into the public domain
 */
 
@@ -9,10 +9,12 @@ Released into the public domain
 #include <avr/wdt.h>
 #include <remoteConfig.h>
 
+//Empty initialisation function
 remoteSleep::remoteSleep() {
 }
 
-long remoteSleep::sleep(unsigned long sleepTime) {
+//Sleep for a set amount of time
+long remoteSleep::sleep(long sleepTime) {
     #ifdef DEBUG
     Serial.print(F("Sleeping for "));
     Serial.print(sleepTime);
@@ -98,13 +100,14 @@ long remoteSleep::sleep(unsigned long sleepTime) {
 }
 
 //Sleep for a certain amount of time, accounting for the time since start
-long remoteSleep::sleep(unsigned long time, unsigned long start) {
+long remoteSleep::sleep(long time, unsigned long start) {
     long sleepTime = time - (millis() - start); //The amount of time to sleep
     
+    //Sleep for that amount of time and return the amount of time slept
     return sleep(sleepTime);
 }
 
-// When WatchDog timer causes Arduino to wake it comes here
+//When WatchDog timer causes Arduino to wake it comes here
 ISR (WDT_vect) {
   wdt_disable(); //Turn off watchdog
 }

@@ -15,10 +15,11 @@ Released into the public domain
 
 //Start the 3G
 remote3G::remote3G() {
+    //Set the enable pin to output mode
     pinMode(cell3G_EN, OUTPUT);
 }
 
-//Initialise the 3G module
+//Initialise the 3G chip
 bool remote3G::initialise() {
     #if cell3G_Make == Tinysine
     //Turn on the 3G chip
@@ -51,11 +52,15 @@ bool remote3G::initialise() {
     return true;
 }
 
+//Start the HTTPS module on the 3G chip
 bool remote3G::startHTTPS() {
     #if cell3G_Make == Adafruit
+    //Turn on the 3G chip
     bool err = toggle(true);
+    
     #else
     bool err = false;
+    
     #endif
     
     //Initialise the 3G software serial
@@ -65,9 +70,9 @@ bool remote3G::startHTTPS() {
     //First send an AT command to make sure the 3G is working
     if (!err) err = check3G(ss);
     
-    closeHTTPS(ss); //Close HTTPS session
+    closeHTTPS(ss); //Close HTTPS session if it's open
     
-    //Send HTTP start command
+    //Send HTTPS start command
     if (!err) err = SCRTries(ss, "AT+CHTTPSSTART", "OK", 10000);
     
     delay(500);
@@ -122,6 +127,7 @@ bool remote3G::post(char* request, const char* host, int portNum) {
     return err; //Return if there was an error or not
 }
 
+//Stop the HTTPS module on the 3G chip
 void remote3G::stopHTTPS() {
     //Initialise the 3G software serial
     NeoSWSerial ss(cell3G_RX, cell3G_RX);
@@ -132,6 +138,7 @@ void remote3G::stopHTTPS() {
     ss.end();
     
     #if cell3G_Make == Adafruit
+    //Turn the 3G chip off
     toggle();
     #endif
 }
@@ -146,16 +153,17 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
     unsigned long start = millis();
     
     #if cell3G_Make == Adafruit
+    //Turn on the 3G chip
     bool err = toggle(true);
+    
     #else
     bool err = false;
+    
     #endif
     
-    //Start 3G
+    //Start the 3G chip
     NeoSWSerial ss(cell3G_RX, cell3G_RX);
     ss.begin(9600);
-    
-    //The way the commands are sent are all the same, so I'll only comment one
     
     //First send an AT command to make sure the 3G is working
     if (!err) err = check3G(ss);
@@ -164,7 +172,7 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
     
     //Check if GPS is already on
     if (!err && sendGetReply(ss, F("AT+CGPS?"), 2000, response, 80)) {
-        if (response[7] != '1') {
+        if (response[7] != '1') { //If not
             //Turn on GPS
             err = SCRTries(ss, "AT+CGPS=1", "OK", 5000);
         }
@@ -182,7 +190,7 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
     
     //Try to get GPS data for timeout amount of time
     while (!err && (force || ((millis() - start) < timeout))) {
-        if (sendGetReply(ss, F("AT+CGPSINFO"), 5000, response, 80)) {
+        if (sendGetReply(ss, F("AT+CGPSINFO"), 5000, response, 80)) { //Get GPS info from the 3G chip
             
             #ifdef DEBUG
             Serial.println(response);
@@ -193,47 +201,62 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
                 continue;
             }
             
+            //Get the latitude degrees as a string
             uint8_t curr = 10;
             char degStr[4] = {response[curr++], response[curr++], 0, 0};
             
+            //Convert it to an integer
             int deg = atoi(degStr);
             
+            //Get the latitude decimal minutes as a string
             uint8_t before = curr;
             while (response[curr] != ',') { curr++; }
             response[curr++] = 0;
             
+            //Convert it to a float
             float minute = atof(&response[before]);
             
+            //Add the minutes to the integer degrees to get decimal degrees
             latitude = deg + (minute/60);
             
+            //Add a - if it's needed
             if (response[curr++] == 'S') {
                 latitude *= -1;
             }
             curr++;
             
+            //Get the longitude degrees as a string
             degStr[0] = response[curr++];
             degStr[1] = response[curr++];
             degStr[2] = response[curr++];
             degStr[3] = 0;
+            
+            //Convert it to an integer
             deg = atoi(degStr);
             
+            //Get the longitude decimal minutes as a string
             before = curr;
             while (response[curr] != ',') { curr++; }
             response[curr++] = 0;
             
+            //Convert it into a float
             minute = atof(&response[before]);
             
+            //Add the minutes to the integer degrees to get decimal degrees
             longitude = deg + (minute/60);
             
+            //Add a - if it's needed
             if (response[curr++] == 'W') {
                 longitude *= -1;
             }
             curr++;
-                        
+            
+            //Get the string that represents the unix time
             before = curr;
             while (response[curr] != '.') { curr++; }
             response[curr] = 0;
             
+            //Get the integer unix time
             unixTime = getUnixTime(&response[before]);
             timeLastUpdated = millis();
             
@@ -252,20 +275,22 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
         }
     }
     
+    //Turn off the GPS
     err = SCRTries(ss, "AT+CGPS=0", "OK", 5000);
     
     ss.end();
     
+    //Set the passed in parameters
     (*lat) = latitude;
-
     (*lon) = longitude;
-
     (*time) = unixTime + (millis() - timeLastUpdated)/1000;
     
     #if cell3G_Make == Adafruit
+    //Turn off the 3G chip
     toggle();
     #endif
     
+    //Return if it was successful
     return !err;
 }
 
@@ -273,17 +298,22 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
 #if cell3G_Make == Adafruit
 //Toggle the 3G on/off
 bool remote3G::toggle(bool on) {
+    //Turn on/off the chip
     digitalWrite(cell3G_EN, LOW);
     delay(4000);
     digitalWrite(cell3G_EN, HIGH);
     
     bool err = false;
+    //If we're turning it on, turn off echo mode
     if (on) {
         //Initialise the 3G software serial
         NeoSWSerial ss(cell3G_RX, cell3G_RX);
         ss.begin(9600);
         
+        //Make sure the 3G chip is on
         err = check3G(ss);
+        
+        //Turn off echo mode
         if (!err) err = SCRTries(ss, "ATE0", "OK", 2000);
     }
     
@@ -293,7 +323,7 @@ bool remote3G::toggle(bool on) {
 
 //Check if 3G has started correctly
 bool remote3G::check3G(Stream& port) {
-    return SCRTries(port, "AT", "OK", 1000, 20);
+    return SCRTries(port, "AT", "OK", 1000, 20); //Basic command to see if 3G chip is working
 }
 
 //Close and stop the HTTPS session
@@ -305,22 +335,30 @@ void remote3G::closeHTTPS(Stream& port) {
 //Call sendCheckReply tries number of times and return if there was an error or not
 //Command is as a __FlashStringHelper*
 bool remote3G::SCRTries(Stream& port, const __FlashStringHelper* command, const char* reply, unsigned long timeout, uint8_t tries) {
+    //Try to send command tries number of times
     for (uint8_t i = 0; i < tries; i++) {
-        if (sendCheckReply(port, command, reply, timeout)) {
+        if (sendCheckReply(port, command, reply, timeout)) { //Send the command
+            //If we got a success
             return false;
         }
     }
+    
+    //If it didnt work
     return true;
 }
 
 //Call sendCheckReply tries number of times and return if there was an error or not
 //Command is as a char*
 bool remote3G::SCRTries(Stream& port, const char* command, const char* reply, unsigned long timeout, uint8_t tries) {
+    //Try to send command tries number of times
     for (uint8_t i = 0; i < tries; i++) {
-        if (sendCheckReply(port, command, reply, timeout)) {
+        if (sendCheckReply(port, command, reply, timeout)) { //Send the command
+            //If we got a success
             return false;
         }
     }
+    
+    //If it didnt work
     return true;
 }
 
@@ -332,7 +370,7 @@ bool remote3G::sendCheckReply(Stream& port, const __FlashStringHelper* command, 
     Serial.println(command);
     #endif
     
-    port.flush();
+    port.flush(); //Empty the software serial port
     
     port.println(command); //Send the command to the 3G
     
@@ -363,6 +401,7 @@ bool remote3G::sendCheckReply(Stream& port, const __FlashStringHelper* command, 
                 return true;
             }
             
+            //Reset the response string
             if (reset) {
                 #ifdef DEBUG
                 if (curr != 0) Serial.println(response);
@@ -374,6 +413,7 @@ bool remote3G::sendCheckReply(Stream& port, const __FlashStringHelper* command, 
         }
     }
     
+    //If it failed
     return false;
 }
 
@@ -416,6 +456,7 @@ bool remote3G::sendCheckReply(Stream& port, const char* command, const char* rep
                 return true;
             }
             
+            //Reset the response string
             if (reset) {
                 #ifdef DEBUG
                 if (curr != 0) Serial.println(response);
@@ -427,6 +468,7 @@ bool remote3G::sendCheckReply(Stream& port, const char* command, const char* rep
         }
     }
     
+    //If it failed
     return false;
 }
 
@@ -454,7 +496,7 @@ bool remote3G::sendGetReply(Stream& port, const __FlashStringHelper* command, un
             if (c > 25 && curr < length-1) { //If it's an actual character (not '\n' or '\r')
                 ans[curr++] = c;
             } else {
-                if (curr != 0) {
+                if (curr != 0) { //At the end of the response
                     ans[curr] = 0;
                     
                     return true;
@@ -463,6 +505,7 @@ bool remote3G::sendGetReply(Stream& port, const __FlashStringHelper* command, un
         }
     }
     
+    //If it failed
     return false;
 }
 

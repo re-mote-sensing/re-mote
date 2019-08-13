@@ -1,6 +1,6 @@
 /*
 Library for saving the data of an end node, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated July 25, 2019
+Created by Victor Vezina, last updated August 12, 2019
 Released into the public domain
 */
 
@@ -54,9 +54,13 @@ void remoteEndData::messageSuccess() {
 /*--------------------------EEPROM---------------------------*/
 //Initialise the EEPROM
 void remoteEndData::initialiseEEPROM() {
+    //Get the valuse at the begining of the EEPROM
     unsigned int initialCheck = 0;
     EEPROM.get(0, initialCheck);
+    
+    //Check to see if that value makes sense or if the EEPROM has never been used
     if (initialCheck >= EEPROM.length()) {
+        //Put the default values in
         unsigned int address = 4;
         EEPROM.put(0, address);
         EEPROM.put(2, address - 1);
@@ -65,12 +69,16 @@ void remoteEndData::initialiseEEPROM() {
 
 //Reset the EEPROM
 void remoteEndData::resetEEPROM(bool hard) {
+    //Set the default values at the begining of the EEPROM
     unsigned int i = 4;
     EEPROM.put(0, i);
     EEPROM.put(2, i - 1);
+    
+    //If it's a hard reset
     if (hard) {
+        //Go through every memory address in the EEPROM and set it to 255
         for (unsigned int i = 5; i < EEPROM.length(); i++) {
-            EEPROM.update(i, 0);
+            EEPROM.update(i, 255);
         }
     }
 }
@@ -221,7 +229,9 @@ void remoteEndData::getEEPROMMessageInfo(unsigned int validToAddress, unsigned i
 
 //Read numBytes from EEPROM starting at *memAddress into message starting at *messageIndex, incrementing everything accordingly and checking for EEPROM looping
 void remoteEndData::readEEPROM(uint8_t* message, uint8_t* messageIndex, unsigned int* memAddress, uint8_t numBytes) {
+    //Loop through the number of bytes provided
     for (uint8_t i = 0; i < numBytes; i++) {
+        //Read the EEPROM and put the value into the message
         message[(*messageIndex)++] = EEPROM.read((*memAddress)++);
         
         #ifdef DEBUG
@@ -229,6 +239,7 @@ void remoteEndData::readEEPROM(uint8_t* message, uint8_t* messageIndex, unsigned
         //Serial.print(F(" "));
         #endif
 
+        //Check if the address of the EEPROM has looped around
         if (*memAddress > EEPROM.length()) {
             *memAddress -= (EEPROM.length() - 4);
         }
