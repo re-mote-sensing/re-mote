@@ -144,7 +144,7 @@ void setup() {
     #endif
     //Write the config parameters to the LoRa module
     while (!LoRa.writeConfig(NETWORK_ID, NODE_ID)) {
-        delay(2500);
+        delay(2500); //If it fails wait 2.5 seconds then try again
     }
     
     #ifdef DEBUG
@@ -286,7 +286,7 @@ void registerNode() {
 
 //Read data from the GPS and the sensors
 uint8_t* readGPSSensors() {
-    unsigned long time;// = 9999999;
+    unsigned long time;// = 9999999 + millis();
     float lat;// = 42;
     float lon;// = -80;
     

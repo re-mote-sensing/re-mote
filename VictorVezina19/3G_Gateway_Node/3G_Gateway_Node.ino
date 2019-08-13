@@ -78,6 +78,7 @@ void setup() {
     #endif
     
     #ifdef DEBUG
+    //Resets the data on the sd card
     //Data.reset(true);
     #endif
     
@@ -202,11 +203,12 @@ void readSensors() {
     float lat;// = 43;
     float lon;// = -79;
     
+    //Get GPS data from the 3G chip
     cell3G.getGPSData(&time, &lat, &lon, GPS_Time);
     
     uint8_t* data; //Array of data
-    uint8_t timeIndex = 5;
-    uint8_t dataIndex = 9;
+    uint8_t timeIndex = 5; //Where in the array time should be inserted
+    uint8_t dataIndex = 9; //Where in the array data should be inserted
     
     if (abs(lat - latitude) > 0.00005 || abs(lon - longitude) > 0.00005) {
         //Update last saved latitude and longitude
@@ -223,6 +225,7 @@ void readSensors() {
         memcpy(&data[10], &latitude, sizeof(float));
         memcpy(&data[14], &longitude, sizeof(float));
         
+        //Update where time and data need to be inserted
         dataIndex = 18;
         timeIndex++;
     } else {
@@ -235,13 +238,16 @@ void readSensors() {
     uint16_t add = GATEWAY_ID;
     memcpy(data, &add, sizeof(uint16_t));
     
+    //The length of the array
     data[2] = dataIndex - 3 + (4 * NUMBER_SENSOR_NAMES);
     
+    //The message type
     data[3] = 0x10 | (uint8_t) NUMBER_SENSOR_NAMES;
     
     //Copy time into array
     memcpy(&data[timeIndex], &time, sizeof(unsigned long));
-        
+    
+    //Read the sensors
     Sensors.read(&data[dataIndex]);
     
     Data.saveData(data); //Save the data
@@ -251,15 +257,19 @@ void readSensors() {
 
 //Parse registration message and save new node information
 void parseRegistration(uint8_t* data) {
+    //Parse the registration according to the saved data type
     uint8_t ack = Data.saveRegistration(data);
     
+    //Send an acknowledgment
     sendAck(ack, data);
 }
 
 //Save the received data into the sd card
 void parseData(uint8_t* data) {
+    //Parse the data according to the saved data type
     uint8_t ack = Data.saveData(data);
     
+    //Send an acknowledgment
     sendAck(ack, data);
 }
 
@@ -271,6 +281,7 @@ void postData() {
     Serial.println(F("Posting data"));
     #endif
     
+    //Start the HTTPS module on the 3G chip
     if (cell3G.startHTTPS()) return;
     
     //Loop until there's no data left to send
@@ -301,7 +312,7 @@ void postData() {
                 Serial.println(F("No data to post"));
                 #endif
                 free(request);
-                cell3G.stopHTTPS();
+                cell3G.stopHTTPS(); //Stop the HTTPS
                 return;
             }
             
@@ -340,14 +351,20 @@ void postData() {
 
 //Send an acknowledgement
 void sendAck(uint8_t ack, uint8_t* data) {
+    //The address to send the acknowledgement to
     uint16_t add;
     memcpy(&add, data, sizeof(uint16_t));
     
+    //The data of the acknowledgement
     uint8_t* ackData = (uint8_t*) malloc(sizeof(uint8_t));
     ackData[0] = ack;
+    
+    //Send the acknowledgement
     LoRa.sendData(add, 1, ackData);
+    
     free(ackData);
 }
+
 /*---------------------------TESTING----------------------------*/
 /*
 //Function to test the 3G, not needed
