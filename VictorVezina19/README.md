@@ -60,6 +60,8 @@ A couple caveats:
 * Using multiple sensors on the Gateway may cause flash issues. If you plan on using lots of sensors on the Gateway, get a micro controller with enough flash (64kB+)
 * The DHT22 sensor is not weather proof, so you must make sure that your enclosure accounts for this
 
+You can also use your own sensors with this system, instructions on how to do this can be found [here]().
+
 ### Power options
 
 battery vs solar vs pluged in
@@ -117,10 +119,9 @@ Leaving this blank cause maybe cloud?
 Leaving this blank cause maybe cloud?
 
 
-## Gateway
+## Arduinos
 
-
-## End node
+The main configuration file, config.h, can be found under the re-moteConfig library file. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines 15 and 16 depending on if you're uploading to a Gateway or an End node. You then need to change the rest of the settings in that file to accomodate for your particular setup. The settings in the file all have clear comments that explain what that setting does.
 
 <br>  
 
