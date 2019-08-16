@@ -10,13 +10,15 @@ What you'll need will of course depend on what kind of setup you're trying to ac
 
 ### Server
 
-Leaving this blank cause maybe cloud?
+To setup your own server, the only hardware you'll need is a computer to act as the server. A [Raspberry Pi](https://www.buyapi.ca/product/raspberry-pi-4-model-b-1gb/) is cheap and works quite well for this purpose.
+
+Cloud??
 
 ### Gateway
 
 For each Gateway, you'll need:
 
-* One Arduino compatible micro controller. At least 32 kB of flash memory and 2kB of ram is highly recomended, although more is prefered. The [bla]() is a good option
+* One Arduino compatible micro controller. At least 32 kB of flash memory and 2kB of ram is highly recomended, although more is prefered. The [Arduino Uno](https://store.arduino.cc/usa/arduino-uno-rev3) seems to work well
 * A 3G module of some sort. The current two supported are the [Tinysine 3G shield](https://www.tinyosshop.com/3g-gprs-gsm-shield-for-arduino-sim5320a) and the [Adafruit FONA 3G](https://www.adafruit.com/product/3147)
 * A sim card with a data plan on it. Where to get this sim card will heavily depend on where you are
 * A [LoRa mesh module](https://www.dfrobot.com/product-1670.html)
@@ -32,9 +34,9 @@ As with everything in the setup, these parts could be changed out for others (ex
 
 For each End node, you'll need:
 
-* One Arduino compatible micro controller. At least 30kB of flash memory and 1.5kB of ram is highly recomended. The [bla]() is a good option
+* One Arduino compatible micro controller. At least 30kB of flash memory and 1.5kB of ram is highly recomended. The [Arduino Nano](https://store.arduino.cc/usa/arduino-nano) seems to work well
 * A [LoRa mesh module](https://www.dfrobot.com/product-1670.html)
-* A GPS module of some sort. The [bla]() is recomended
+* A GPS module of some sort. The [GP-735](https://www.sparkfun.com/products/13670) is very good, although expensive
 * Any sensors you want to connect to it, see the [sensor options section](#sensor-options) for more information
 * An appropriate power option, see the [power options section](#power-options) for more information
 * Some form of [eclosure](#enclosures)
@@ -73,9 +75,11 @@ What kinds, needs, how, etc.
 
 ## The Software You Need
 
-### Server stuff
+### Server
 
-Leaving this blank cause maybe cloud?
+For your own server, the software you need can all be found [here](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/tree/master/webserver).
+
+Cloud??
 
 ### Arduino IDE
 
@@ -102,7 +106,9 @@ If you wish to run the program in "debug mode", you'll need to download the [Mem
 
 ## Server
 
-Leaving this blank cause maybe cloud?
+For your own server, simply power up the computer you wish to use, that's about it.
+
+Cloud??
 
 
 ## Gateway
@@ -116,7 +122,9 @@ Leaving this blank cause maybe cloud?
 
 ## Server
 
-Leaving this blank cause maybe cloud?
+To setup your own server, follow the instructions [here]().
+
+Cloud??
 
 
 ## Arduinos
@@ -134,6 +142,10 @@ The main configuration file, config.h, can be found under the re-moteConfig libr
 <br>  
 
 # Using the website
+
+To use your website, either enter the IP address of your personal server into a web browser (for your own server), or go to the website that hosts your website (for a cloud service). You may need to add a /# after the IP/URL. Once there, you should be able to see a map with the locations of all the nodes you have setup. To select a node, click on its pin on the map or select it from the Location drop-down menu. You can then select the measurement you wish to see the data for in the Sensor Type drop-down menu. Sensor Types in black are available at that node, Sensor Types in gray are not.  
+To see a list of nodes that contain a certain measurement, first unselect a location from the Location drop-down menu, then select the measurement you wish to use. When you expand the Location drop-down menu, the locations in black contain that measurement, and the locations in gray do not.   You may also notice that when you have a location selected, it will create a path with circles on the map. Each circle represents GPS co-ordinates where that node was located.  
+Once you have both a Location and Sensor Type selected, a table containing the date, time, and value of every data point will appear under the map. Underneath the table you will see a graph representing the sensor data through time.
 
 <br>  
 
