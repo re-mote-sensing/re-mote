@@ -32,7 +32,7 @@ bool remote3G::initialise() {
     digitalWrite(cell3G_EN, HIGH);
     
     //Check to see if the 3G chip is on
-    NeoSWSerial ss(cell3G_RX, cell3G_RX);
+    NeoSWSerial ss(cell3G_RX, cell3G_TX);
     ss.begin(9600);
     
     if (check3G(ss)) { //If not
@@ -64,7 +64,7 @@ bool remote3G::startHTTPS() {
     #endif
     
     //Initialise the 3G software serial
-    NeoSWSerial ss(cell3G_RX, cell3G_RX);
+    NeoSWSerial ss(cell3G_RX, cell3G_TX);
     ss.begin(9600);
     
     //First send an AT command to make sure the 3G is working
@@ -85,7 +85,7 @@ bool remote3G::startHTTPS() {
 //Post a given HTTP request through the 3G
 bool remote3G::post(char* request, const char* host, int portNum) {
     //Initialise the 3G software serial
-    NeoSWSerial ss(cell3G_RX, cell3G_RX);
+    NeoSWSerial ss(cell3G_RX, cell3G_TX);
     ss.begin(9600);
     
     //First send an AT command to make sure the 3G is working
@@ -130,7 +130,7 @@ bool remote3G::post(char* request, const char* host, int portNum) {
 //Stop the HTTPS module on the 3G chip
 void remote3G::stopHTTPS() {
     //Initialise the 3G software serial
-    NeoSWSerial ss(cell3G_RX, cell3G_RX);
+    NeoSWSerial ss(cell3G_RX, cell3G_TX);
     ss.begin(9600);
     
     closeHTTPS(ss); //Close HTTPS session
@@ -162,7 +162,7 @@ bool remote3G::getGPSData(unsigned long* time, float* lat, float* lon, unsigned 
     #endif
     
     //Start the 3G chip
-    NeoSWSerial ss(cell3G_RX, cell3G_RX);
+    NeoSWSerial ss(cell3G_RX, cell3G_TX);
     ss.begin(9600);
     
     //First send an AT command to make sure the 3G is working
@@ -307,7 +307,7 @@ bool remote3G::toggle(bool on) {
     //If we're turning it on, turn off echo mode
     if (on) {
         //Initialise the 3G software serial
-        NeoSWSerial ss(cell3G_RX, cell3G_RX);
+        NeoSWSerial ss(cell3G_RX, cell3G_TX);
         ss.begin(9600);
         
         //Make sure the 3G chip is on
