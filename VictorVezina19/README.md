@@ -62,7 +62,7 @@ A couple caveats:
 * Using multiple sensors on the Gateway may cause flash issues. If you plan on using lots of sensors on the Gateway, get a micro controller with enough flash (64kB+)
 * The DHT22 sensor is not weather proof, so you must make sure that your enclosure accounts for this
 
-You can also use your own sensors with this system, instructions on how to do this can be found [here](./Custom_Sensors.md).
+You can also use your own sensors with this system, instructions on how to do this can be found [here](Documentation/Custom_Sensors.md).
 
 ### Power options
 
