@@ -87,7 +87,7 @@ First, you'll need the [Arduino IDE](https://www.arduino.cc/en/main/software). T
 
 ### Program file
 
-Next, you'll need to download [bla.ino]() from this repository. This is the main program that runs on the Arduino.
+Next, you'll need to download [remoteNode.ino](remoteNode/remoteNode.ino) from this repository. This is the main program that runs on the Arduino.
 
 ### Libraries
 
