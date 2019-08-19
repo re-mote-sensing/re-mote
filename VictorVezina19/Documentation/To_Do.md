@@ -19,6 +19,7 @@ This is a list of things that need to be done in this project, in no particular 
 * Add verification to ensure that data coming from an end node is legitimate, same for gateway to server
 * Document how to change all modules on nodes (ex: data saving, communication method, etc.)
 * Combine code from VictorVezina19 and RyanTyrell19 together (combine Turtle tracker project with this one)
+	* Namely the EndData/EEPROM, Sleep/LowPower, Config, and GPS/UBX+NeoGPS libraries
 * Add data point validation to the server (remove outliers)
 * Add server alerts for important data changes (spikes, dips, etc.)
 * Add data analysis capabilities to the server
