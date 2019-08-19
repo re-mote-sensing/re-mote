@@ -1,0 +1,4 @@
+remoteGPS	KEYWORD1
+initialise	KEYWORD2
+offsetTime	KEYWORD2
+getData	KEYWORD2
