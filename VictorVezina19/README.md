@@ -57,7 +57,7 @@ There are quite a few currently supported sensors, including some for water and 
 
 A couple caveats: 
 
-* When using any two (or more) Atlas Scientific sensors together, any Conductivity and pH sensors should use a [voltage isolator](https://www.atlas-scientific.com/product_pages/circuits/basic-ezo.html). A caveat to the caveat: when using a pH and Conductivity sensor together, only the pH sensor needs to be isolated. Read the EZO data sheets provided by Atlas Scientific for more information.
+* When using any two (or more) Atlas Scientific sensors together, any Conductivity and pH sensors should use a [voltage isolator](https://www.atlas-scientific.com/product_pages/circuits/basic-ezo.html). A caveat to the caveat: when using a pH and Conductivity sensor together, only the pH sensor needs to be isolated. Read the EZO data sheets provided by [Atlas Scientific](https://www.atlas-scientific.com/) for more information.
 * The software is currently setup to where if you are using pH or Conductivity sensors, multiple sensors of the same type must either all be isolated or all not isolated (this should be respected through the first caveat anyway)
 * Using multiple sensors on the Gateway may cause flash issues. If you plan on using lots of sensors on the Gateway, get a micro controller with enough flash (64kB+)
 * The DHT22 sensor is not weather proof, so you must make sure that your enclosure accounts for this
@@ -135,18 +135,30 @@ The main configuration file, config.h, can be found under the re-moteConfig libr
 
 # Testing
 
+It's important to test your setup at every stage of this document to make sure everything is functioning correctly. It is also highly recommended that once everything is finished, you run a full test over the course of a few days. This will ensure that everything is functioning as expected. If at some stage in the setup proccess something does not work, please refer to the [Troubleshooting section](#troubleshooting).
+
 <br>  
 
 # Deploying
+
+Once everything is completely ready to be deployed, it is important to deploy them correctly. The first step is to choose your deployment location carefully. The LoRa mesh modules used allow for your nodes to be set up in a mesh configuration, which means that as long as a node (node 1) is within range of any other node (node2) that is connected to a gateway, the first node (node 1) will be able to connect to the gateway. This allows for a long string of end nodes connected to each other and only one gateway. The tested range of these LoRa mesh modules is about 200m through heavy obstruction (hill, buildings, etc.), about 500m through light obstruction (trees, etc.), and 650m through very light obstruction (chain link fences, nothing, etc.). This range can be improved by lifting the antenna, but by how much depends heavily on your circumstances (tested up to about +100m). It is also important to consider the legality of your deployment locations; you must ensure that you are not breaking any laws by deploying your nodes in the locations.
+
+The next thing to consider when deploying your nodes is hardware safety. It is important to make sure that your nodes will not be dislodged or washed array by heavy rains, strong winds, or snow (depending on the weather where you're deploying). Depending on your deployment locations, it may also be important to consider hiding/securing your nodes in some way to prevent vandalism. This could be done by burying your nodes (although this may affect GPS and LoRa connectivity), painting them to blend in, or covering them with something (could be leaves, or even trash, etc.).
+
+Once the nodes have been secured, it is important to deploy the sensors so that they are secure. For us, this involved putting a large steel pole into the water, and securing the sensor probes to it using water proof tape. The steps to do this will depend on the location and sensor probes you are using.
 
 <br>  
 
 # Using the website
 
-To use your website, either enter the IP address of your personal server into a web browser (for your own server), or go to the website that hosts your website (for a cloud service). You may need to add a /# after the IP/URL. Once there, you should be able to see a map with the locations of all the nodes you have setup. To select a node, click on its pin on the map or select it from the Location drop-down menu. You can then select the measurement you wish to see the data for in the Sensor Type drop-down menu. Sensor Types in black are available at that node, Sensor Types in gray are not.  
-To see a list of nodes that contain a certain measurement, first unselect a location from the Location drop-down menu, then select the measurement you wish to use. When you expand the Location drop-down menu, the locations in black contain that measurement, and the locations in gray do not.   You may also notice that when you have a location selected, it will create a path with circles on the map. Each circle represents GPS co-ordinates where that node was located.  
+To use your website, either enter the IP address of your personal server into a web browser (for your own server), or go to the website that hosts your website (for a cloud service). You may need to add a /# after the IP/URL. Once there, you should be able to see a map with the locations of all the nodes you have setup. To select a node, click on its pin on the map or select it from the Location drop-down menu. You can then select the measurement you wish to see the data for in the Sensor Type drop-down menu. Sensor Types in black are available at that node, Sensor Types in gray are not.
+
+To see a list of nodes that contain a certain measurement, first unselect a location from the Location drop-down menu, then select the measurement you wish to use. When you expand the Location drop-down menu, the locations in black contain that measurement, and the locations in gray do not.   You may also notice that when you have a location selected, it will create a path with circles on the map. Each circle represents GPS co-ordinates where that node was located.
+
 Once you have both a Location and Sensor Type selected, a table containing the date, time, and value of every data point will appear under the map. Underneath the table you will see a graph representing the sensor data through time.
 
 <br>  
 
-# Troubleshooting?
+# Troubleshooting
+
+This section isn't finished yet.
