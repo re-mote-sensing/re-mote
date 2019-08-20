@@ -23,3 +23,5 @@ This is a list of things that need to be done in this project, in no particular 
 * Add data point validation to the server (remove outliers)
 * Add server alerts for important data changes (spikes, dips, etc.)
 * Add data analysis capabilities to the server
+* Add ability to download all web data into a .csv
+* Add ability to upload data from a .csv (like the one the gateway saves) onto the website

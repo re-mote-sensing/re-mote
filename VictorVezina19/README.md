@@ -2,17 +2,17 @@
 
 This file describes how to get this setup working properly, from the hardware to the software.
 
+# Setting up the server
+
+To setup a custom server on a [Raspberry Pi](https://www.buyapi.ca/product/raspberry-pi-4-model-b-1gb/), follow the instructions found [here](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/RaspberryPi%20Setup%20-%20Step%20by%20Step%20Instructions.md).
+
+For instruction on using a cloud service, look [here]().
+
 # What You Need
 
 ## The Hardware You Need
 
 What you'll need will of course depend on what kind of setup you're trying to achieve.
-
-### Server
-
-To setup your own server, the only hardware you'll need is a computer to act as the server. A [Raspberry Pi](https://www.buyapi.ca/product/raspberry-pi-4-model-b-1gb/) is cheap and works quite well for this purpose.
-
-Cloud??
 
 ### Gateway
 
@@ -75,12 +75,6 @@ What kinds, needs, how, etc.
 
 ## The Software You Need
 
-### Server
-
-For your own server, the software you need can all be found [here](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/tree/master/webserver).
-
-Cloud??
-
 ### Arduino IDE
 
 First, you'll need the [Arduino IDE](https://www.arduino.cc/en/main/software). This will be used to upload the code from your computer to the Arduino compatible micro controller. If you want, you could also use the Arduino web editor, or any other IDE that supports uploading .ino files to Arduinos.
@@ -104,13 +98,6 @@ If you wish to run the program in "debug mode", you'll need to download the [Mem
 
 # Assembling the Hardware
 
-## Server
-
-For your own server, simply power up the computer you wish to use, that's about it.
-
-Cloud??
-
-
 ## Gateway
 
 
@@ -120,14 +107,7 @@ Cloud??
 
 # Configuring and Uploading the Software
 
-## Server
-
-To setup your own server, follow the instructions [here]().
-
-Cloud??
-
-
-## Arduinos
+## Gateway and End Node
 
 The main configuration file, config.h, can be found under the re-moteConfig library file. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines 15 and 16 depending on if you're uploading to a Gateway or an End node. You then need to change the rest of the settings in that file to accomodate for your particular setup. The settings in the file all have clear comments that explain what that setting does.
 
