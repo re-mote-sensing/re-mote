@@ -66,11 +66,11 @@ You can also use your own sensors with this system, instructions on how to do th
 
 ### Power options
 
-battery vs solar vs pluged in
+Details on power consumption of [End-Node](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/HarneetSingh19/Power%20Consumption%20Analysis%20of%20Nodes/End-Node_POWER_CONSUMPTION.md) and [Gateway-Node](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/HarneetSingh19/Power%20Consumption%20Analysis%20of%20Nodes/Gateway_Node_POWER_CONSUMPTION.md).
 
 ### Enclosures
 
-What kinds, needs, how, etc.
+Check out the details of [solar panel](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/tree/master/HarneetSingh19/Enclosure%20-%203D%20Printing%20Model/Solar%20Power%20Enclosure), [end-node](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/tree/master/HarneetSingh19/Enclosure%20-%203D%20Printing%20Model/End%20Node) and [gateway-node](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/tree/master/HarneetSingh19/Enclosure%20-%203D%20Printing%20Model/Gateway%20Node) housing units. Download .stl files [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/tree/master/HarneetSingh19/Enclosure%20-%203D%20Printing%20Model).
 
 
 ## The Software You Need
