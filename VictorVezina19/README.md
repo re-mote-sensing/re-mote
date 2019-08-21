@@ -4,7 +4,7 @@ This file describes how to get this setup working properly, from the hardware to
 
 # Setting up the server
 
-To setup a custom server on a [Raspberry Pi](https://www.buyapi.ca/product/raspberry-pi-4-model-b-1gb/), follow the instructions found [here](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/RaspberryPi%20Setup%20-%20Step%20by%20Step%20Instructions.md).
+To setup a custom server on a [Raspberry Pi](https://www.buyapi.ca/product/raspberry-pi-4-model-b-1gb/), follow the instructions found [here](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md).
 
 For instruction on using a cloud service, look [here]().
 
