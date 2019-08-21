@@ -23,5 +23,6 @@ This is a list of things that need to be done in this project, in no particular 
 * Add data point validation to the server (remove outliers)
 * Add server alerts for important data changes (spikes, dips, etc.)
 * Add data analysis capabilities to the server
-* Add ability to download all web data into a .csv
 * Fix floating point rounding causing weird values
+* Change names in data post to gateway to use actual chars instead of hex representation of chars
+* Reorganize entire arduino-motes repository to make more sense and combine similar code
