@@ -98,12 +98,13 @@ If you wish to run the program in "debug mode", you'll need to download the [Mem
 
 # Assembling the Hardware
 
-## Gateway
-
-
 ## End node
 
 Read about the setup by clicking [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md).
+
+## Gateway
+
+Read about the set-up and battery optimization by clicking [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md).
 
 <br>  
 
