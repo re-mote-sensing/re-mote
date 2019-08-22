@@ -8,9 +8,9 @@ This article makes use of the following products:
 4. LoRA Mesh Module
 5. DHT22 Sensor - Temperature and Humidity Sensor
 
-```
+
 To order the correct products, please read the article [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Setup/Water_Quality_Setup.md) and read the 'The Hardware You Need' section.
-```
+
 
 ###### 
 
