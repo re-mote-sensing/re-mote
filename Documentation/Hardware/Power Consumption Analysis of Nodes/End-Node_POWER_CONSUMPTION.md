@@ -8,6 +8,7 @@ The following measurements were obtained with the following modules attached to 
 5. GPS Module
 6. LoRA Module
 
+To order the correct products, please read the article [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Setup/Water_Quality_Setup.md) and read the 'The Hardware You Need' section.
 
 
 **Key Points to Remember:**
