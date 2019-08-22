@@ -25,11 +25,11 @@ Aside from LoRA, Arduino Nano, Turbidity, Temperature, GPS, EC and DO sensors, y
   Detailed explanation of pin connections on these two images is given in the later part of this article. 
 
 **Image#1** (Simple Version):
-![Simple End Node](./)
+![Simple End Node](./EndNode_Simple.JPG)
 
 **Image#2:**
 
-![End Node Complicated](./Desktop\MacWater Documentation\.md Files to be uploaded\End Node Complicated.JPG)
+![End Node Complicated](./End_Node_Complicated.JPG)
 
 
 
