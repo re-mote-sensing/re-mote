@@ -6,6 +6,7 @@ Gateway Node consists of the following:
 4. DHT Sensor
 5. LoRA Mesh
 
+To order the correct products, please read the article [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Setup/Water_Quality_Setup.md) and read the 'The Hardware You Need' section.
 
 
 **Key Points to Remember:**
