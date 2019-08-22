@@ -1,4 +1,4 @@
-Before reading this article, please read the setup procedure of sensor End Node.
+Before reading this article, please read the [setup procedure of sensor End Node](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md).
 
 This article makes use of the following products:
 
