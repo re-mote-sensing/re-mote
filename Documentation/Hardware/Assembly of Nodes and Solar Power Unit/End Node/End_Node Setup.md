@@ -8,7 +8,7 @@ Aside from LoRA, Arduino Nano, Turbidity, Temperature, GPS, EC and DO sensors, y
 
 - Extension Cables - [30m](https://www.amazon.ca/iCreating-100ft-Extension-Changing-Flexible/dp/B07BJJK863/ref=sr_1_1_sspa?keywords=3+cable+pins+extension+cord&qid=1565811677&s=kitchen&sr=1-1-spons&psc=1&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEyQzJENlpNMkQ0UFNCJmVuY3J5cHRlZElkPUEwMzAxNzk1MldKQ0hFUTlESU1MMSZlbmNyeXB0ZWRBZElkPUEwOTU4NzQ1MVFGVllLM0lYU0tYVyZ3aWRnZXROYW1lPXNwX2F0ZiZhY3Rpb249Y2xpY2tSZWRpcmVjdCZkb05vdExvZ0NsaWNrPXRydWU=), [10m](https://www.amazon.ca/JACKYLED-Extension-32-8ft-Splitter-connectors/dp/B075YG2B18/ref=pd_sbs_107_5/154-2633804-7590013?_encoding=UTF8&pd_rd_i=B075YG2B18&pd_rd_r=53c70ff6-961d-4914-8689-a62aaece5d66&pd_rd_w=173ag&pd_rd_wg=5qHDi&pf_rd_p=5dcda75b-8643-4da3-9bb1-5c0233790500&pf_rd_r=9M1SQYYH0Z4JRXS7B4DG&psc=1&refRID=9M1SQYYH0Z4JRXS7B4DG=) (Based on your requirement)
 
-- Wrapping Wire - [Link to order](https://www.amazon.ca/Breadboard-B-30-1000-Plated-Copper-Wrapping/dp/B008AGUAII/ref=asc_df_B008AGUAII/?tag=googleshopc0c-20&linkCode=df0&hvadid=335174690103&hvpos=1o6&hvnetw=g&hvrand=12611580164319843966&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9000871&hvtargid=pla-421501630000&psc=1)
+- [Wrapping Wire](https://www.amazon.ca/Breadboard-B-30-1000-Plated-Copper-Wrapping/dp/B008AGUAII/ref=asc_df_B008AGUAII/?tag=googleshopc0c-20&linkCode=df0&hvadid=335174690103&hvpos=1o6&hvnetw=g&hvrand=12611580164319843966&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9000871&hvtargid=pla-421501630000&psc=1)
 
 - [Screws](https://www.homedepot.ca/product/paulin-8-32x1-4-ss-pan-phillips-mach-screw/1000423510) to bolt together the lid and box parts, size approximately between 3mm to 4mm
 
@@ -24,11 +24,12 @@ Aside from LoRA, Arduino Nano, Turbidity, Temperature, GPS, EC and DO sensors, y
 
   Detailed explanation of pin connections on these two images is given in the later part of this article. 
 
-**Image#1** (Simple Version):![EndNode_Simple](C:\Users\harne\Desktop\MacWater Documentation\.md Files to be uploaded\EndNode_Simple.JPG)
+**Image#1** (Simple Version):
+![Simple End Node](./)
 
 **Image#2:**
 
-![End Node Complicated](C:\Users\harne\Desktop\MacWater Documentation\.md Files to be uploaded\End Node Complicated.JPG)
+![End Node Complicated](./Desktop\MacWater Documentation\.md Files to be uploaded\End Node Complicated.JPG)
 
 
 
