@@ -70,7 +70,7 @@ Details on power consumption of [End-Node](../Hardware/Power%20Consumption%20Ana
 
 ### Enclosures
 
-Check out the details of [solar panel](../Hardware/Enclosure%20-%203D%20Printing%20Model/Solar%20Power%20Enclosure), [end-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/End%20Node) and [gateway-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/Gateway%20Node) housing units. Download .stl files [here](../Hardware/Enclosure%20-%203D%20Printing%20Model/STL%20Files).
+Check out the design of [solar panel](../Hardware/Enclosure%20-%203D%20Printing%20Model/Solar%20Power%20Enclosure), [end-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/End%20Node) and [gateway-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/Gateway%20Node) housing units. Download .stl files [here](../Hardware/Enclosure%20-%203D%20Printing%20Model/STL%20Files).
 
 
 ## The Software You Need
@@ -102,6 +102,8 @@ If you wish to run the program in "debug mode", you'll need to download the [Mem
 
 
 ## End node
+
+Read about the setup by clicking [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md).
 
 <br>  
 
