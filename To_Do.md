@@ -25,9 +25,8 @@ This is a list of things that need to be done in this project, in no particular 
 * Add data analysis capabilities to the server
 * Fix floating point rounding causing weird values
 * Change names in data post to gateway to use actual chars instead of hex representation of chars
-* Combine similar libraries together
-	* Namely the EndData/EEPROM, Sleep/LowPower, Config, and GPS/UBX+NeoGPS libraries
-* Combine turtle tracker node code and Node_Code.ino
+* Combine similar libraries from Libraries\_Victor and Libraries\_Ryan together
+	* Namely the EndData/EEPROM, Sleep/LowPower, and GPS/UBX+NeoGPS libraries
 * Add one time 3G module setup code to gateway
 	* .setGPRSNetworkSettings("pda.bell.ca");
 	* .setHTTPSRedirect(true);
