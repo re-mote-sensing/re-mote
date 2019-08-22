@@ -1,7 +1,0 @@
-remote3G	KEYWORD1
-initialise	KEYWORD2
-startHTTPS	KEYWORD2
-post	KEYWORD2
-stopHTTPS	KEYWORD2
-offsetTime	KEYWORD2
-getGPSData	KEYWORD2

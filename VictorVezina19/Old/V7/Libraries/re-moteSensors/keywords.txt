@@ -1,3 +1,0 @@
-remoteSensors	KEYWORD1
-initialise	KEYWORD2
-read	KEYWORD2

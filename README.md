@@ -1,5 +1,5 @@
 # re:mote
 
-To setup the water quality project, see the [VictorVezina19 file](VictorVezina19), specifically its README
+To setup the water quality project, see the [Water Quality Setup file](Documentation/Water_Quality/Water_Quality_Setup.md)
 
-To setup the turtle tracker project, see the [RyanTyrrell19 file](RyanTyrrell19)
+To setup the turtle tracker project, see the [Ryan Tyrrell's notes](Documentation/Ryan_Notes)
