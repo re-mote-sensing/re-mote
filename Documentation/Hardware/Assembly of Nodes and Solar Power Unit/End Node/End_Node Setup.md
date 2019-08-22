@@ -1,4 +1,5 @@
-This article assumes some knowledge of soldering and of electrical pin connections on all modules. Please refer to README.md file under VictorVezina19 folder to order parts for End and Gateway Nodes. These parts will be needed to accomplish the assembly task. 
+This article assumes some knowledge of soldering and of electrical pin connections on all modules. 
+To order the correct products, please read the article [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Setup/Water_Quality_Setup.md) and read the 'The Hardware You Need' section. These parts will be needed to accomplish the assembly task. 
 
 Aside from LoRA, Arduino Nano, Turbidity, Temperature, GPS, EC and DO sensors, you will need the following items as well:
 
