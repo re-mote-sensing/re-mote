@@ -14,15 +14,15 @@ This is a list of things that need to be done in this project, in no particular 
 * Add remoteConfig.h configurator to the website to make configuration a lot easier
 * Robustify both the Gateway and End Node to ensure proper handling of errors
 * Add ability to send error to website from node
-* Add ability to change the time period that you're viewing data for to the server
+* Add ability to change the time period that you're viewing data for to the website
 * Add encryption for messages between nodes
 * Add encryption to saved data on server
 * Add ability to add login page to view data on the website, maybe with different amounts of power (ex: view data vs. change node settings)
 * Add verification to ensure that data coming from an end node is legitimate, same for gateway to server
 * Document how to change all modules on nodes (ex: data saving, communication method, etc.)
 * Add data point validation to the server (remove outliers)
-* Add server alerts for important data changes (spikes, dips, etc.)
-* Add data analysis capabilities to the server
+* Add website alerts for important data changes (spikes, dips, etc.)
+* Add data analysis capabilities to the website
 * Fix floating point rounding causing weird values
 * Change names in data post to gateway to use actual chars instead of hex representation of chars
 * Combine similar libraries from Libraries\_Victor and Libraries\_Ryan together
