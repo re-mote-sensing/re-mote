@@ -62,15 +62,15 @@ A couple caveats:
 * Using multiple sensors on the Gateway may cause flash issues. If you plan on using lots of sensors on the Gateway, get a micro controller with enough flash (64kB+)
 * The DHT22 sensor is not weather proof, so you must make sure that your enclosure accounts for this
 
-You can also use your own sensors with this system, instructions on how to do this can be found [here](Custom_Sensors.md).
+You can also use your own sensors with this system, instructions on how to do this can be found [here](../Software/Custom_Sensors.md).
 
 ### Power options
 
-Details on power consumption of [End-Node](../Power%20Consumption%20Analysis%20of%20Nodes/End-Node_POWER_CONSUMPTION.md) and [Gateway-Node](../Power%20Consumption%20Analysis%20of%20Nodes/Gateway_Node_POWER_CONSUMPTION.md).
+Details on power consumption of [End-Node](../Hardware/Power%20Consumption%20Analysis%20of%20Nodes/End-Node_POWER_CONSUMPTION.md) and [Gateway-Node](../Hardware/Power%20Consumption%20Analysis%20of%20Nodes/Gateway_Node_POWER_CONSUMPTION.md).
 
 ### Enclosures
 
-Check out the details of [solar panel](../Enclosure%20-%203D%20Printing%20Model/Solar%20Power%20Enclosure), [end-node](../Enclosure%20-%203D%20Printing%20Model/End%20Node) and [gateway-node](../Enclosure%20-%203D%20Printing%20Model/Gateway%20Node) housing units. Download .stl files [here](../Enclosure%20-%203D%20Printing%20Model/STL%20Files).
+Check out the details of [solar panel](../Hardware/Enclosure%20-%203D%20Printing%20Model/Solar%20Power%20Enclosure), [end-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/End%20Node) and [gateway-node](../Hardware/Enclosure%20-%203D%20Printing%20Model/Gateway%20Node) housing units. Download .stl files [here](../Hardware/Enclosure%20-%203D%20Printing%20Model/STL%20Files).
 
 
 ## The Software You Need

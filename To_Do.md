@@ -28,3 +28,6 @@ This is a list of things that need to be done in this project, in no particular 
 * Combine similar libraries together
 	* Namely the EndData/EEPROM, Sleep/LowPower, Config, and GPS/UBX+NeoGPS libraries
 * Combine turtle tracker node code and Node_Code.ino
+* Add one time 3G module setup code to gateway
+	* .setGPRSNetworkSettings("pda.bell.ca");
+	* .setHTTPSRedirect(true);
