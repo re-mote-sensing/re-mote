@@ -27,7 +27,7 @@ Aside from LoRA, Arduino Nano, Turbidity, Temperature, GPS, EC and DO sensors, y
 **Image#1** (Simple Version):
 ![Simple End Node](./EndNode_Simple.JPG)
 
-**Image#2:**
+**Image#2:** (Pictures are shown at the end of this article)
 
 ![End Node Complicated](./End_Node_Complicated.JPG)
 
@@ -146,3 +146,18 @@ If your set-up is failing, its better to check the connections thoroughly, and t
 - For maintenance checks, try not to fix the Arduino Nano to the protoboard as it might be extremely difficult to undo the soldering connections. 
 
   After properly verifying the set-up, you should solder the Arduino board to the proto-board.
+  
+  
+
+------
+
+###### Images:
+
+Complicated Node's Top-Side:
+![Top Side](./Top_SIDE-Complicated.jpg)
+
+Complicated Node's Bottom-Side:
+![Bottom Side](./Bottom_SIDE-Complicated.jpg)
+  
+  
+  
