@@ -123,11 +123,7 @@ This GPS module continues to appear as an excellent choice for low-power, low-co
 * designed with u-blox’s latest 7th generation single chip
 * Fairly small and long. 
 
-
-
-
-
-
+* Average current draw of 37 mA
 
 # Notes about to GPS Units in General
 
