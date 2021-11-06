@@ -14,6 +14,7 @@ NeoSWSerial ss(SIM3G_TX, SIM3G_RX);
 String host = "65.93.37.156";
 String altHost = "turtletracker.ddns.net";
 String endpoint = "/data";
+int port = 80;
 
 void setup() {
   pinMode(SIM3G_EN, OUTPUT);
@@ -60,7 +61,7 @@ void loop() {
     Serial.println(result);
 
     start3G();
-    postToServer(host, 8080, sender, msgNum, result);
+    postToServer(host, port, sender, msgNum, result);
     stop3G();
   }
 }

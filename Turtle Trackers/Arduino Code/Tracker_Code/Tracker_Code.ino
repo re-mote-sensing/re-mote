@@ -10,6 +10,8 @@
 
 #define GPS_TIMEOUT 40000
 
+#define SLEEP_CYCLES 5 // Number of loops the tracker will sleep for 112 is ~15min
+
 NeoSWSerial gpsPort(GPS_TX, GPS_RX);
 
 NMEAGPS gps;
@@ -58,7 +60,7 @@ void loop() {
 
 lowPowerMode:
   LoRa.sleep();
-  for (int i = 0; i < 112; i++) {
+  for (int i = 0; i < SLEEP_CYCLES; i++) {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);     // Sleeps the tracker for ~15 mins
   }
 }
