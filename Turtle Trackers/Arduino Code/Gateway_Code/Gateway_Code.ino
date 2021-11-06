@@ -11,8 +11,8 @@
 
 NeoSWSerial ss(SIM3G_TX, SIM3G_RX);
 
-String host = "65.93.37.156";
-String altHost = "turtletracker.ddns.net";
+String host = "<REPLACE WITH PUBLIC IP ADDRESS>";		// Change this to the public IP addres of the server's network
+String altHost = "turtletracker.ddns.net";				// Dynamic DNS hostname, currently not working
 String endpoint = "/data";
 int port = 80;
 
