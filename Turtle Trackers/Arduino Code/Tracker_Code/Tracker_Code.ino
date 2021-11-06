@@ -10,7 +10,7 @@
 
 #define GPS_TIMEOUT 40000
 
-#define SLEEP_CYCLES 5 // Number of loops the tracker will sleep for 112 is ~15min
+#define SLEEP_CYCLES 112 // Number of loops the tracker will sleep for 112 is ~15min
 
 NeoSWSerial gpsPort(GPS_TX, GPS_RX);
 
