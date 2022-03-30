@@ -1,4 +1,5 @@
 ## Turtle Tracker Remote Node
+### number of remote node built already: 1
 
 | Part | in use | in stock | order link | 
 | ---      | ---      | ---      | ---      |
@@ -11,6 +12,7 @@
 
 
 ## Turtle Tracker Gateway Node
+### number of gateway node built already: 1
 
 | Part | in use | in stock | order link |
 | ---      | ---      | ---      | ---      |
@@ -18,7 +20,10 @@
 | tiny shield 3g module SIM5320a | 1 | 1 | https://www.tinyosshop.com/3g-gprs-gsm-shield-for-arduino-sim5320a |
 | LoRa module | 1 | 3 | https://www.amazon.ca/Dragino-Compatible-Arduino-Leonardo-Consumption/dp/B07HD1MH3J/ref=sr_1_5?crid=2EP9EDGHNH0G7&keywords=lora+shield&qid=1648497660&sprefix=lora+shield%2Caps%2C64&sr=8-5 |
 | SIM card with data plan | 1 | 0 | |
+
 ## Turtle Tracker Server Node
+### number of server node built already: 1
+
 | Part | in use | in stock | order link |
 | ---      | ---      | ---      | ---      |
 | raspberry pi 4 | 1 | 0 | https://www.raspberrypi.com/products/raspberry-pi-4-model-b/ |
