@@ -26,5 +26,5 @@
 
 | Part | in use | in stock | order link |
 | ---      | ---      | ---      | ---      |
-| raspberry pi 4 | 1 | 0 | https://www.raspberrypi.com/products/raspberry-pi-4-model-b/ |
+| raspberry pi 4 | 1 | 2 | https://www.raspberrypi.com/products/raspberry-pi-4-model-b/ |
 | SD card 32 GB | 1 | 0 | https://www.amazon.ca/SanDisk-128GB-microSDXC-Memory-Adapter/dp/B08GY9NYRM/ref=sr_1_5?crid=50QIW0ERO0MQ&keywords=sd%2Bcard&qid=1648492307&sprefix=sd%2Bcard%2Caps%2C67&sr=8-5&th=1 |
