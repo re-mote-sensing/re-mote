@@ -4,4 +4,3 @@ To setup the water quality project, see the [Water Quality Setup file](Documenta
 
 To setup the turtle tracker project, see [Ryan Tyrrell's notes](Documentation/Ryan_Notes)
 
-To see the item inventory, see [parts_inventory](parts_inventory.md)
