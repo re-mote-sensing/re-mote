@@ -47,13 +47,21 @@ void setup() {
 }
 
 void loop() {
+  // ------- core part ------ //
+  // LoRa.parsePacket()
+  // Check if a packet has been received.
+  // Returns the packet size in bytes or 0 if no packet was received.
   int packetSize = LoRa.parsePacket();
   String result;
   if (packetSize) {
+    // LoRa.read()
+    // Read the next byte from the packet.
     byte sender = LoRa.read();
     byte msgNum = LoRa.read();
     byte msgLen = LoRa.read();
-
+    // LoRa.available()
+    // Returns number of bytes available for reading.
+    // read the message
     while (LoRa.available()) {
       result += (char)LoRa.read();
     }
@@ -64,6 +72,7 @@ void loop() {
     postToServer(host, port, sender, msgNum, result);
     stop3G();
   }
+  // ------- core part ------ //
 }
 
 void postToServer(String host, int port, byte id, byte count, String message) {

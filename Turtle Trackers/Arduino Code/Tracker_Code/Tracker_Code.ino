@@ -83,11 +83,20 @@ void sendMessage() {
   message += ",";
   message += String(longitude);
   
+  // ------- core part ------ //
+  // LoRa.beginPacket()
+  // Start the sequence of sending a packet.
   LoRa.beginPacket();
+  // LoRa.Writing()
+  // Write data to the packet. Each packet can contain up to 255 bytes.
   LoRa.write(localAddress);
   LoRa.write(msgCount);
   LoRa.write(message.length());
+  // Note: Other Arduino Print API's can also be used to write data into the packet
   LoRa.print(message);
+  // LoRa.endPacket()
+  // End the sequence of sending a packet.
   LoRa.endPacket();
+  // ------- core part ------ //
   msgCount++;
 }
