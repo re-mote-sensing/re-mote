@@ -1,131 +1,145 @@
+/*
+  Turtle Tracker Arduino code used in the re-mote setup found at 
+  https://gitlab.cas.mcmaster.ca/re-mote
+*/
+
 #include <SPI.h>
-#include <NMEAGPS.h>
 #include <LoRa.h>
+#include <NMEAGPS.h>
 #include <NeoSWSerial.h>
 #include "LowPower.h"
+
+/* ------------------------ Config ------------------------- */
 
 #define GPS_TX 3
 #define GPS_RX 4
 #define GPS_EN 6 // GPS Enable Pin
+#define LoRa_RESET 9 // LoRa reset Pin
 
-#define GPS_TIMEOUT 40000
+#define GPS_TIMEOUT 80000
+#define ACK_TIMEOUT 10000 // ack waiting time for sending sensor data
+#define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
 
-#define SLEEP_CYCLES 112 // Number of loops the tracker will sleep for 112 is ~15min
+#define REG_LEN 6 // registration message length (in bytes)
+#define SEN_LEN 14 // sensor data message length (in bytes)
 
+// below are main configurations needed to changed
+#define LORA_TX_POWER 23 // Output power of the RFM95 (23 is the max)
+#define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
 #define DEBUG true // Set to true for debug output, false for no output
-#define DEBUG_SERIAL if(DEBUG)Serial
+#define DEBUG_SERIAL if(DEBUG) Serial
+#define NODE_ID 0x06
+
+/* ------------------------ Constructors ------------------------- */
 
 NeoSWSerial gpsPort(GPS_TX, GPS_RX);
-
 NMEAGPS gps;
 gps_fix fix;
 
-byte msgCount = 0;        // Keeps track of how many messages were attempted to be sent
-byte localAddress = 2;    // Node ID
+/* ------------------------ Golbal Variables ------------------------- */
 
+boolean ackReceived = false; // flag used in automatically detecting ack
+long lastTime = 0; // Save the timestamp for the last GPS fix data
+uint8_t sleep_cycles = DEFAULT_SLEEP_CYCLES; // Dynamic Sleep Cycles
+long millis_count; // second counts for calculating the wait time
+
+/* ------------------------ Setup ------------------------- */
+
+// Main task: send registration
 void setup() {
-  pinMode(GPS_EN, OUTPUT);
-  
-  DEBUG_SERIAL.begin(115200);
-  
-  if (!LoRa.begin(915E6)) {
-    while (1);
+  initilaize();
+
+  millis_count = random(201); // generate a random number from 0 to 200 (E(X) = 100)
+  while (!ackReceived) {
+    sendRegistration();
+    // wait random time for solving collision among multiple trackers
+    DEBUG_SERIAL.print("Wait for (millis): ");
+    DEBUG_SERIAL.println(millis_count * 10);
+    delay(millis_count * 10);  // in average, wait for 1000 millis
+    millis_count *= 2; // then every time not received ack, wait current_interval * 2
   }
-  LoRa.enableCrc(); // Enables the LoRa module's built in error checking
+
+  // put LoRa to end mode before using it to save power
+  LoRa.end();
+//  DEBUG_SERIAL.println("MODE: END -- i.e. end");
   
-  gpsPort.begin(9600);
-  
-  DEBUG_SERIAL.println("started.");
+  DEBUG_SERIAL.println("Initialize Successfully!");
 }
 
+/* ------------------------ Loop ------------------------- */
+
+// Main task: send sensor data
 void loop() {
-  gpsPort.listen();
-  digitalWrite(GPS_EN, HIGH); // Enable GPS
+  // Initialize
+  ackReceived = false; // reset ackReceived to FALSE
 
-  // Run the GPS for some time to try and get a fix
-  long start = millis();
-  DEBUG_SERIAL.println("readGPS.");
-  while (millis() - start < GPS_TIMEOUT && (!fix.valid.location || !fix.valid.time)) {
-    readGPS();
-  }
-
+  // Read time & gps
+  enableGPS();
+  readGPSvaild();
+  disableGPS();
   #if DEBUG == true
-  DEBUG_SERIAL.println(millis() - start);
-  delay(100);
-  DEBUG_SERIAL.println(fix.valid.location);
-  delay(100);
-  DEBUG_SERIAL.println(fix.latitudeL());
-  delay(100);
-  DEBUG_SERIAL.println(fix.longitudeL());
+  printLocationData();
   #endif  //DEBUG == true
 
-  // If no satellites are found, skip the main routine and sleep the module
-  if (fix.satellites == 0)
-    goto lowPowerMode;
-
-  while (millis() - start < GPS_TIMEOUT && !fix.valid.location) {
-    readGPS();
-  }
-
-  digitalWrite(GPS_EN, LOW); // Power off GPS
-
-  sendMessage();
-
-lowPowerMode:
-  DEBUG_SERIAL.println("lowPowerMode Start.");
-  delay(100);
-  digitalWrite(GPS_EN, LOW); // Make sure GPS is off before sleep
-  LoRa.sleep();
-  for (int i = 0; i < SLEEP_CYCLES; i++) {
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~15 mins
-  }
-  DEBUG_SERIAL.println("lowPowerMode End.");
-}
-
-void readGPS() {
-  while (gps.available(gpsPort)) {
-    fix = gps.read();
-  }
-}
-
-void sendMessage() {
-  DEBUG_SERIAL.println("sendMessage.");
-  long latitude = fix.latitudeL();
-  long longitude = fix.longitudeL();
-  unsigned long currTime = (NeoGPS::clock_t) fix.dateTime + 946684800; //Get Unix Time (946684800 is because conversion gives Y2K epoch)
-
-  if(currTime <= 1000000000){ // The time is not fixed
-    DEBUG_SERIAL.println("timestamp Error.");
-    // TODO Error timestamp
-  }
-
-  if (latitude == 0 || longitude == 0){ // latitude / longitude get zero
-    DEBUG_SERIAL.println("latitude / longitude Error.");
+  // If No valid data, then skip sending data and sleep the module
+  if (!ifVaildFix()) {
+    
+    enterLowPowerMode();
     return;
   }
 
-  String message = "";
-  message += String(currTime);
-  message += ",";
-  message += String(latitude);
-  message += ",";
-  message += String(longitude);
+  // Now, fix should hold the time and location data
+  // Send time and gps data
+  millis_count = random(201); // generate a random number from 0 to 200 (E(X) = 100)
+  unsigned long ackStartTime = millis();
+  while (!ackReceived && millis() - ackStartTime < ACK_TIMEOUT) {
+    sendSensorData();
+    // wait random time for solving collision among multiple trackers
+    DEBUG_SERIAL.print("Wait for (millis): ");
+    DEBUG_SERIAL.println(millis_count * 10);
+    delay(millis_count * 10); // in average, wait for 1000 millis
+    millis_count *= 2; // then every time not received ack, wait current_interval * 2
+  }
   
-  // ------- core part ------ //
-  // LoRa.beginPacket()
-  // Start the sequence of sending a packet.
-  LoRa.beginPacket();
-  // LoRa.Writing()
-  // Write data to the packet. Each packet can contain up to 255 bytes.
-  LoRa.write(77); // Tell the gateway this is a turtle tracker
-  LoRa.write(localAddress);
-  LoRa.write(msgCount);
-  LoRa.write(message.length());
-  // Note: Other Arduino Print API's can also be used to write data into the packet
-  LoRa.print(message);
-  // LoRa.endPacket()
-  // End the sequence of sending a packet.
-  LoRa.endPacket();
-  // ------- core part ------ //
-  msgCount++;
+  // enter lowpower mode
+  enterLowPowerMode();
+}
+
+/* ------------------------ Callback Functions ------------------------- */
+
+// if LoRa received any message, it will interrupt any current execution line,
+// then begin call this onReceive function
+void onReceive(int packetSize) {  
+    if (packetSize == 2) {
+      // receive registration ack
+      uint8_t ack = (uint8_t) LoRa.read();
+      uint8_t nodeID = (uint8_t) LoRa.read();
+      if (ack == 0x00 && nodeID == NODE_ID) {
+        DEBUG_SERIAL.println("Received ACK:");
+        DEBUG_SERIAL.print("ACK type: ");
+        printByte(ack);
+        DEBUG_SERIAL.println();
+        DEBUG_SERIAL.print("Node ID: ");
+        printByte(nodeID);
+        DEBUG_SERIAL.println();
+        // success receive ack
+        ackReceived = true;
+      }
+    } else {
+      String temp = "";
+      while (LoRa.available()) {
+        temp += (char) LoRa.read();
+      }
+      #ifdef DEBUG
+      DEBUG_SERIAL.print("LoRa received: ");
+      DEBUG_SERIAL.println(temp);
+      #endif
+    }
+}
+
+// if LoRa finish transmitted message, it will interrupt any current execution line,
+// then begin call this onReceive function
+void onTxDone() {
+  DEBUG_SERIAL.println("Message Sent.");
+  LoRa_rxMode();
 }
