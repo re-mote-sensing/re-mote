@@ -1,182 +1,313 @@
+/*
+  Turtle Tracker Arduino code used in the re-mote setup found at 
+  https://gitlab.cas.mcmaster.ca/re-mote
+*/
+
 #include <SPI.h>
 #include <LoRa.h>
 #include <NeoSWSerial.h>
+#include "SdFat.h"
 
-#define SIM3G_EN A1
-#define SIM3G_TX 4
-#define SIM3G_RX 5
+/* ------------------------ Config ------------------------- */
+#define GATEWAY_ID 0x01 // Unique Gateway ID
 
-#define POWER_ON_TIME 180
-#define POWER_OFF_TIME 4000
+// Sever Info
+#define host "turtletracker.cas.mcmaster.ca" // Change this to the public IP address / domain of the pi server's network
+#define endpoint "/data"  // Server endpoint
+#define port 80 // Server port number
 
-#define SIM3G_TIMEOUT 4000
+// Length of variable in postToServerCSV()
+#define CHTTPSOPSE_LENGTH 53 // Command:22 + $Port:2 + $host:29
+#define msgBody_LENGTH 55 // Command:5 + $CsvLineLength:50
+#define POST_COMMAND_LENGTH 117 // Command:33 + $host:29 + $endpoint:5 + $msgBody_LENGTH:50
+
+// Length of each line in csv: 
+// NodeID,Count,TimeStamp,Lat,Lon
+// 6,0,1656458252,432585465,-799211845
+#define CSV_LINE_LENGTH 50
+
+#define POST_TIME 30000   // Time between each post
+
+// SD Card
+#define SD_CS_PIN A5      // SD Card CS Pin
+#define SD_SOFT_MISO_PIN A2  // SD Card MISO Pin
+#define SD_SOFT_MOSI_PIN A3  // SD Card MOSI Pin
+#define SD_SOFT_SCK_PIN A4   // SD Card SCK Pin
+// SdFat software SPI
+SoftSpiDriver<SD_SOFT_MISO_PIN, SD_SOFT_MOSI_PIN, SD_SOFT_SCK_PIN> softSpi;
+// Speed argument is ignored for software SPI.
+#define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(0), &softSpi)
+#if SPI_DRIVER_SELECT != 2  // Must be set in SdFat/SdFatConfig.h
+#error SPI_DRIVER_SELECT must be 2 in SdFat/SdFatConfig.h
+#endif  //SPI_DRIVER_SELECT
+
+// Tinysine 3G Shield
+#define SIM3G_EN A1                   // 3G Enable Pin
+#define SIM3G_TX 4                    // 3G TX Pin
+#define SIM3G_RX 5                    // 3G RX Pin
+#define SIM3G_POWER_ON_TIME 180       // 3G Power on time for enable pin
+#define SIM3G_POWER_OFF_TIME 4000     // 3G Power off time for enable pin
+#define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout
+#define SIM3G_POWER_ON_TIMEOUT 20000  // 3G power on timeout
+
+// LoRa
+//#define LORA_TX_POWER 23      // Output power of the RFM95 (23 is the max)
+#define INVERT_IQ_MODE false  // InvertIQ mode
+#define REG_LEN 6             // registration message length (in bytes)
+#define SEN_LEN 14            // sensor data message length (in bytes)
+
+// Serial
+#define PC_BAUDRATE 9600L     // Debug Serial Baudrate
 
 #define DEBUG true // Set to true for debug output, false for no output
-#define DEBUG_SERIAL if(DEBUG)Serial
 
+#if DEBUG == true
+#include <MemoryFree.h>
+#endif
+
+/* ------------------------ Constructors ------------------------- */
+#define DEBUG_SERIAL if(DEBUG)Serial
 NeoSWSerial ss(SIM3G_TX, SIM3G_RX);
 
-String host = "turtletracker.cas.mcmaster.ca"; // Change this to the public IP address/ domain of the pi server's network
-String endpoint = "/data";
-String altHost = ""; // Alternate server address, currently not working
-String altEndpoint = "";
+/* ------------------------ Golbal Variables ------------------------- */
+unsigned long lastPost = millis();
+bool readyToPost = true; // Ready to post to server
 
-int port = 80;
-
+/* ------------------------ Setup ------------------------- */
 void setup() {
+  DEBUG_SERIAL.begin(9600); // Start Debug Serial
+
+  // Power on 3G then turn it off
   pinMode(SIM3G_EN, OUTPUT);
-
-  digitalWrite(SIM3G_EN, HIGH);
-  delay(POWER_ON_TIME);
-  digitalWrite(SIM3G_EN, LOW);
-
+  powerOn3G();
   delay(1000);
-
-  digitalWrite(SIM3G_EN, HIGH);
-  delay(POWER_OFF_TIME);
-  digitalWrite(SIM3G_EN, LOW);
+  powerOff3G();
   
-  while (!Serial);
-
-  DEBUG_SERIAL.begin(115200);
-  DEBUG_SERIAL.println("Serial started.");
-
-  Serial.println("LoRa started.");
-  if (!LoRa.begin(915E6)) {
-    Serial.println("Starting LoRa failed!");
-    while (1);
-  }
-  LoRa.enableCrc(); // Enables the LoRa module's built in error checking
-  
+  // Start 3G Serial
   ss.begin(9600);
-  DEBUG_SERIAL.println("TinySine serial started.");
+  DEBUG_SERIAL.println(F("3G Ok"));
+
+  // Start SD and create ToSend.csv
+  createToSendFile(); 
+
+  // Start LoRa
+  if (!LoRa.begin(915E6)) {
+    DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
+    while (true);
+  }
+//  LoRa.setPins(10, 9, 3);
+  LoRa.enableCrc(); // Enables the LoRa module's built in error checking
+  DEBUG_SERIAL.println(F("LoRa init succeeded."));
+  //LoRa.onReceive(onReceive);
+  //LoRa.onTxDone(onTxDone);
+  //LoRa_rxMode();
+  
+  // Start 3G Shield HTTP Request
+  start3GHTTP();
+  
+  DEBUG_SERIAL.println(F("Gateway initialized successfully!"));
 }
 
+/* ------------------------ Loop ------------------------- */
 void loop() {
-  // ------- core part ------ //
-  // LoRa.parsePacket()
-  // Check if a packet has been received.
-  // Returns the packet size in bytes or 0 if no packet was received.
+  // Post to server every POST_TIME ms
+  if (readyToPost && (millis() - lastPost) > POST_TIME) {
+    if (postToServerCSV()){ // Post data under ToSend.csv
+      DEBUG_SERIAL.println(freeMemory());
+      resetToSend(); // Reset ToSend.csv
+      // createToSendFile(); // Create ToSend.csv
+    }else{
+      DEBUG_SERIAL.println(freeMemory());
+      DEBUG_SERIAL.println(F("No data to post"));
+    }
+    lastPost = millis();
+    readyToPost = false;
+  }
+
   int packetSize = LoRa.parsePacket();
   String result;
   if (packetSize) {
-    // LoRa.read()
-    // Read the next byte from the packet.
-    // 77 is the turtle tracker
-    // This number can temporary avoid sending invaild messages to server
-    if (!String(LoRa.read()).equals("77")) {
-      #if DEBUG == true
-      DEBUG_SERIAL.println("Received invaild LoRa Message");
-      while (LoRa.available()) {
-        result += (char)LoRa.read();
-      }
-      DEBUG_SERIAL.println(result);
-      #endif  //DEBUG == true
-      return;
-    }
-    byte sender = LoRa.read();
-    byte msgNum = LoRa.read();
-    byte msgLen = LoRa.read();
-    // LoRa.available()
-    // Returns number of bytes available for reading.
-    // read the message
-    while (LoRa.available()) {
-      result += (char)LoRa.read();
-    }
-
-    DEBUG_SERIAL.println("Received Turtle Tracker LoRa Message");
-    DEBUG_SERIAL.print("Node: ");
-    DEBUG_SERIAL.println(sender);
-    DEBUG_SERIAL.print("Count: ");
-    DEBUG_SERIAL.println(msgNum);
-    DEBUG_SERIAL.println(result);
-
-    start3G();
-    if (!postToServer(host, port, endpoint, sender, msgNum, result)){
-      // postToServer(altHost, port, altEndpoint, sender, msgNum, result);
-    }
-    DEBUG_SERIAL.println("Posted to Server");
-    stop3G();
+    onReceive(packetSize);
   }
-  // ------- core part ------ //
 }
 
-bool postToServer(String host, int port, String endpoint, byte id, byte count, String message) {
-  
-  char sessCommand[64];
-  sprintf(sessCommand, "AT+CHTTPSOPSE=\"%s\",%d,1", host.c_str(), port);
+/* ------------------------ below are LoRa helper functions ------------------------- */
 
-  long start = millis();
-  while (sendCommand(sessCommand, 10000).equals("ERROR")){
-    if (millis() - start < SIM3G_TIMEOUT){
-      return false;
-    }
-  }
-
-  char msgBody[64];
-  sprintf(msgBody, "id=%d&count=%d&msg=%s", id, count, message.c_str());
-  
-  char command[255];
-  sprintf(command, "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: %d\r\n\r\n%s", endpoint.c_str(), host.c_str(), strlen(msgBody), msgBody);
-
-  char preCommand[64];
-  sprintf(preCommand, "AT+CHTTPSSEND=%d", strlen(command));
-  sendCommand(preCommand, 250);
-  
-  sendCommand(command, 8000);
-  sendCommand("AT+CHTTPSRECV?", 8000);
-  sendCommand("AT+CHTTPSRECV=1000", 8000);
-  sendCommand("AT+CHTTPSCLSE", 8000);
-  return true;
+void LoRa_rxMode(){
+  #if INVERT_IQ_MODE
+  LoRa.disableInvertIQ();               // normal mode
+  #endif
+  LoRa.receive();                       // set receive mode
 }
 
-void start3G() {
-  digitalWrite(SIM3G_EN, HIGH);
-  delay(POWER_ON_TIME);
-  digitalWrite(SIM3G_EN, LOW);
-  
-  delay(15000);
-
-  sendCommand("AT", 250);
-  sendCommand("ATE0", 250);
-  sendCommand("AT+CMEE=2", 250);
-  sendCommand("AT+CGDCONT=1,\"IP\",\"pda.bell.ca\"", 250);
-  sendCommand("AT+CGSOCKCONT=1,\"IP\",\"pda.bell.ca\"", 250);
-  sendCommand("AT+CSOCKSETPN=1", 250);
-  
-  while (sendCommand("AT+CHTTPSSTART", 10000).equals("ERROR")) {
-    sendCommand("AT+CHTTPSCLSE", 10000);
-    sendCommand("AT+CHTTPSSTOP", 10000);
-  }
-
-  delay(500);
+void LoRa_txMode(){
+  LoRa.idle();                          // set standby mode
+  #if INVERT_IQ_MODE
+  LoRa.enableInvertIQ();                // active invert I and Q signals
+  #endif
 }
 
-void stop3G() {
-  sendCommand("AT+CHTTPSSTOP", 2000);
-  
-  digitalWrite(SIM3G_EN, HIGH);
-  delay(4000);
-  digitalWrite(SIM3G_EN, LOW);
+void LoRa_sendMessage(String message) {
+  LoRa_txMode();                        // set tx mode
+  LoRa.beginPacket();                   // start packet
+  LoRa.print(message);                  // add payload
+  LoRa.endPacket(true);                 // finish packet and send it
 }
 
-String sendCommand(const char *command, unsigned long timeout) {
-  String result;
-  DEBUG_SERIAL.print(">> ");
-  DEBUG_SERIAL.println(command);
-  ss.println(command);
-  unsigned long start =  millis();
-  DEBUG_SERIAL.print("<< ");
-  while(millis() - start < timeout) {
-    if (ss.available()) {
-      char c = ss.read();
-      if (c == 0x0A || c == 0x0D);
-      else {
-        DEBUG_SERIAL.write(c);
-        result += c;
-      }
-    }
+void LoRa_sendMessage(const uint8_t* message, size_t messageLen) {
+  LoRa_txMode();                        // set tx mode
+  LoRa.beginPacket();                   // start packet
+  LoRa.write(message, messageLen);      // add payload
+  LoRa.endPacket(true);                 // finish packet and send it
+}
+
+void onReceive(int packetSize) {
+  // filter by size
+  if (packetSize != SEN_LEN && packetSize != REG_LEN) {
+    return;
   }
+  
+  DEBUG_SERIAL.print(F("Size: "));
+  DEBUG_SERIAL.println(packetSize);
+  
+  // read type and sensor#
+  uint8_t typeAndSensor = (uint8_t) LoRa.read();
+  uint8_t type = typeAndSensor >> 4;
+  
+  DEBUG_SERIAL.print("Type: ");
+  printByte(type);
   DEBUG_SERIAL.println();
-  return result;
+  
+  // do action according to message type
+  switch (type) {
+    // <--- CASE: Registration ---> //
+    case 0x0c: {
+      // read nodeID
+      uint8_t nodeID = (uint8_t) LoRa.read();
+      // read unixTime
+      uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+      // !!! reverse order <= little edian
+      unixTime[0] = (uint8_t) LoRa.read();
+      unixTime[1] = (uint8_t) LoRa.read();
+      unixTime[2] = (uint8_t) LoRa.read();
+      unixTime[3] = (uint8_t) LoRa.read();
+      // READ DATA TEST
+      #ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print(F("nodeID: "));
+      printByte(nodeID);
+      DEBUG_SERIAL.println();
+      DEBUG_SERIAL.print(F("unixTime: "));
+      printByte(unixTime[0]);
+      printByte(unixTime[1]);
+      printByte(unixTime[2]);
+      printByte(unixTime[3]);
+      DEBUG_SERIAL.println();
+      #endif
+      // covert data to string
+      DEBUG_SERIAL.print(F("nodeID: "));
+      DEBUG_SERIAL.println(String(nodeID));
+      DEBUG_SERIAL.print(F("unixTime: "));
+      DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
+      // clear
+      free(unixTime); 
+      // register
+      registerTracker((char) nodeID);
+      // send ACK
+      sendAck(nodeID);     
+      break;
+    }
+      
+    // <--- CASE: Sensor Data ---> //
+    case 0x0d: {
+      // read nodeID
+      uint8_t nodeID = (uint8_t) LoRa.read();
+      // read unixTime
+      uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+      unixTime[0] = (uint8_t) LoRa.read();
+      unixTime[1] = (uint8_t) LoRa.read();
+      unixTime[2] = (uint8_t) LoRa.read();
+      unixTime[3] = (uint8_t) LoRa.read();
+      // read latitude
+      uint8_t* latitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+      latitude[0] = (uint8_t) LoRa.read();
+      latitude[1] = (uint8_t) LoRa.read();
+      latitude[2] = (uint8_t) LoRa.read();
+      latitude[3] = (uint8_t) LoRa.read();
+      // read longitude
+      uint8_t* longitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+      longitude[0] = (uint8_t) LoRa.read();
+      longitude[1] = (uint8_t) LoRa.read();
+      longitude[2] = (uint8_t) LoRa.read();
+      longitude[3] = (uint8_t) LoRa.read();
+      // READ DATA TEST
+      #ifdef DEBUG_SERIAL
+      DEBUG_SERIAL.print(F("nodeID: "));
+      printByte(nodeID);
+      DEBUG_SERIAL.println();
+      DEBUG_SERIAL.print(F("unixTime: "));
+      printByte(unixTime[0]);
+      printByte(unixTime[1]);
+      printByte(unixTime[2]);
+      printByte(unixTime[3]);
+      DEBUG_SERIAL.println();
+      DEBUG_SERIAL.print(F("latitude: "));
+      printByte(latitude[0]);
+      printByte(latitude[1]);
+      printByte(latitude[2]);
+      printByte(latitude[3]);
+      DEBUG_SERIAL.println();
+      DEBUG_SERIAL.print(F("longitude: "));
+      printByte(longitude[0]);
+      printByte(longitude[1]);
+      printByte(longitude[2]);
+      printByte(longitude[3]);
+      DEBUG_SERIAL.println();
+      #endif    
+      // covert data to string
+      DEBUG_SERIAL.print(F("nodeID: "));
+      DEBUG_SERIAL.println(String(nodeID));
+      DEBUG_SERIAL.print(F("unixTime: "));
+      DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
+      DEBUG_SERIAL.print(F("latitude: "));
+      DEBUG_SERIAL.println(String(* (long*) latitude));
+      DEBUG_SERIAL.print(F("longitude: "));
+      DEBUG_SERIAL.println(String(* (long*) longitude));
+      // store data into csv
+      addData((char) nodeID, 
+              "0", 
+              String(* (unsigned long*) unixTime),
+              String(* (long*) latitude),
+              String(* (long*) longitude));
+      // send ACK
+      sendAck(nodeID);
+      // clear
+      free(unixTime);
+      free(latitude);
+      free(longitude);
+      readyToPost = true;
+      break;
+    }
+      
+    // <--- CASE: Sensor Data ---> //      
+  }
+}
+
+// send ack to targe node
+void sendAck(uint8_t nodeID) {
+  uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * 2);
+  message[0] = (uint8_t) 0x00;
+  message[1] = (uint8_t) nodeID;
+  
+  DEBUG_SERIAL.print(F("ACK TARGET NodeID: "));
+  printByte(nodeID);
+  DEBUG_SERIAL.println();
+  
+  LoRa_sendMessage(message, sizeof(uint8_t) * 2);
+  DEBUG_SERIAL.println(F("ACK Sent."));
+  free(message);
+}
+
+void onTxDone() {
+  DEBUG_SERIAL.println(F("TxDone"));
+  LoRa_rxMode();
 }
