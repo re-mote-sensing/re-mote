@@ -117,10 +117,14 @@ void onReceive(int packetSize) {
       if (ack == 0x00 && nodeID == NODE_ID) {
         DEBUG_SERIAL.println("Received ACK:");
         DEBUG_SERIAL.print("ACK type: ");
+        #ifdef DEBUG
         printByte(ack);
+        #endif
         DEBUG_SERIAL.println();
         DEBUG_SERIAL.print("Node ID: ");
+        #ifdef DEBUG
         printByte(nodeID);
+        #endif
         DEBUG_SERIAL.println();
         // success receive ack
         ackReceived = true;
@@ -130,10 +134,8 @@ void onReceive(int packetSize) {
       while (LoRa.available()) {
         temp += (char) LoRa.read();
       }
-      #ifdef DEBUG
       DEBUG_SERIAL.print("LoRa received: ");
       DEBUG_SERIAL.println(temp);
-      #endif
     }
 }
 
