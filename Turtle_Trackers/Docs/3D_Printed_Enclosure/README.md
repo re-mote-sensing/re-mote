@@ -76,7 +76,7 @@ Copy the file into a MicroSD card
 
 ## 6. Start printing
 
-[Kobra Manual](./Kobra_Manual/Files_English_Anycubic%20Kobra/User%20Manual/Anycubic%20Kobra_User%20Manual_20211227_V0.0.1.pdf)
+[Kobra Manual](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/3D_Printed_Enclosure/Kobra_Manual/User%20Manual/Anycubic%20Kobra_User%20Manual_20211227_V0.0.1.pdf)
 
 - Leveling: page 25 - 27
 - Loading Filament: page 28 - 31
