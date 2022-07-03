@@ -8,7 +8,7 @@
 // Initialize Serial, GPS, and LoRa.
 void initilaize() {
   Serial.println("Initializing...");
-  
+
   pinMode(GPS_EN, OUTPUT);
 
   LoRa.setTxPower(LORA_TX_POWER);
@@ -55,12 +55,12 @@ void sendRegistration() {
 // Send sensor data message
 void sendSensorData() {
   // read data
-  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-//  unsigned long unixTime = 3392475485; // 32 bits i.e 4 bytes
-//  long latitude = 123456789; // 32 bits i.e 4 bytes
-//  long longitude = 987654321; // 32 bits i.e 4 bytes
+//  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+//  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+//  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+  long latitude = 432582727; // 32 bits i.e 4 bytes
+  long longitude = -799207620; // 32 bits i.e 4 bytes
 
   // send data
   Serial.println("Trying to send sensor data...");
@@ -162,17 +162,96 @@ void LoRa_sendMessage(uint8_t* message, uint8_t messageLength) {
 /* ------------------------ Low Power ------------------------- */
 
 // Turn off GPS, LoRa and sleep the arduino
-void enterLowPowerMode(){
-  DEBUG_SERIAL.println("lowPowerMode Start.");
+void enterLowPowerMode(uint8_t sleep_cycles){
+  DEBUG_SERIAL.print("lowPowerMode Start. with sleep cyles = ");
+  DEBUG_SERIAL.println(sleep_cycles);
   disableGPS(); // Make sure GPS is off before sleep
-  LoRa.end(); // Ture off LoRa SPI before sleep
+//  LoRa.end(); // Ture off LoRa SPI before sleep
+  LoRa.end(); // test
   resetLoRa(); // Ture off LoRa hardware before sleep
   delay(100);
-//  for (int i = 0; i < sleep_cycles; i++) {
-  for (int i = 0; i < 3; i++) {
+  for (uint8_t i = 0; i < sleep_cycles; i++) {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*8 mins
   }
   DEBUG_SERIAL.println("lowPowerMode End.");
+}
+
+/* ------------------------ LoRa Buff ------------------------- */
+
+void writeBuf(uint8_t* buf, int* writeIndex, int* bufLen, uint8_t value) {
+  // write i.e. mem[] = value
+  if (*bufLen == BUF_SIZE) {
+    Serial.println("Buff is full!");
+    return;
+  }
+
+  // WRITE
+  buf[*writeIndex] = value;
+  Serial.print("Write into buffer: " );
+  printByte(value);
+  Serial.println();
+  
+  (*bufLen)++;
+  (*writeIndex)++;
+  if (*writeIndex == BUF_SIZE) {
+    *writeIndex = 0;
+  }
+}
+
+void readBuf(uint8_t* buf, int* readIndex, int* bufLen) {
+  // read i.e lora.wirte()
+  if (*bufLen == 0) {
+    Serial.println("Buffer is empty!");
+    return;
+  }
+
+  // READ
+  Serial.print("Read from buffer: " );
+  printByte(buf[*readIndex]);
+  Serial.println();
+  
+  (*bufLen)--;
+  (*readIndex)++;
+  if (*readIndex == BUF_SIZE) {
+    *readIndex = 0;
+  }
+}
+
+boolean isFullBuf(int bufLen, int maxBufLen) {
+  if (bufLen == maxBufLen) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+// "fake" reading n elements (i.e. lazy deleting n elements from the buff)
+void lazyDeleteNFromBuf(uint8_t* buf, int* readIndex, int* bufLen, int n) {
+  if ((*bufLen) - n < 0) {
+    Serial.println("ERROR: Not enough remaining elements to be removed.");
+    return;
+  }
+
+  // otherwise, update bufLen and readIndex correspondingly (lazy delection).
+  (*bufLen) = (*bufLen) - n;
+  (*readIndex) = ((*readIndex) + n) % BUF_SIZE;
+}
+
+// Read buff into lora message 
+// Usage:
+//  LoRa_txMode();
+//  LoRa.beginPacket();
+//  LoRa_writeFromBuff(&buf[0], &readIndex, &bufLen)
+//  LoRa.endPacket(true);    
+void LoRa_writeFromBuff(uint8_t* buf, int* readIndex, int* bufLen) {
+  Serial.println("-------- Buff sent:  ----------");
+  for (uint8_t i = 0; i < *bufLen; i++) {
+    int addr = ((*readIndex) + i) % (*bufLen); // calculate the address in physical memory
+    LoRa.write((uint8_t) buf[addr]);
+    printByte((uint8_t) buf[addr]);
+  }    
+  Serial.println();
+  Serial.println("-------------------------------");             
 }
 
 /* ------------------------ Helper for Debug ------------------------- */
@@ -212,4 +291,21 @@ void printLocationData(){
   DEBUG_SERIAL.print("dateTime: ");
   DEBUG_SERIAL.println(fix.dateTime);
   delay(100);
+}
+
+// show the physical memory content representing the LoRa buff for debug
+void showBuf(uint8_t* buf, int* writeIndex, int* readIndex, int* bufLen) {
+  Serial.println("------------------");
+  Serial.print("writeIndex :");
+  Serial.println(*writeIndex);
+  Serial.print("readIndex :");
+  Serial.println(*readIndex);
+  Serial.print("bufLen :");
+  Serial.println(*bufLen);
+  Serial.println("Content: ");
+  for (int i = 0; i < BUF_SIZE; i++) {
+    printByte(buf[i]);
+  }
+  Serial.println();
+  Serial.println("------------------");
 }

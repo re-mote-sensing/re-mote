@@ -99,6 +99,7 @@ SoftSpiDriver<SD_SOFT_MISO_PIN, SD_SOFT_MOSI_PIN, SD_SOFT_SCK_PIN> softSpi;
 
 unsigned long lastPost = millis();  // Track what is the last posted time
 bool readyToPost = true;            // Ready to post to server
+uint8_t trackerSleepCycles = 112; // Tracker remotge control
 
 /* ------------------------ Setup ------------------------- */
 
@@ -191,7 +192,7 @@ void LoRa_sendMessage(const uint8_t* message, size_t messageLen) {
 
 void onReceive(int packetSize) {
   // filter by size
-  if (packetSize != SEN_LEN && packetSize != REG_LEN) {
+  if ((packetSize - 2) % 12 != 0 && packetSize != REG_LEN) {
     return;
   }
   
@@ -251,91 +252,96 @@ void onReceive(int packetSize) {
     case 0x0d: {
       // read nodeID
       uint8_t nodeID = (uint8_t) LoRa.read();
-      // read unixTime
-      uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
-      unixTime[0] = (uint8_t) LoRa.read();
-      unixTime[1] = (uint8_t) LoRa.read();
-      unixTime[2] = (uint8_t) LoRa.read();
-      unixTime[3] = (uint8_t) LoRa.read();
-      // read latitude
-      uint8_t* latitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
-      latitude[0] = (uint8_t) LoRa.read();
-      latitude[1] = (uint8_t) LoRa.read();
-      latitude[2] = (uint8_t) LoRa.read();
-      latitude[3] = (uint8_t) LoRa.read();
-      // read longitude
-      uint8_t* longitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
-      longitude[0] = (uint8_t) LoRa.read();
-      longitude[1] = (uint8_t) LoRa.read();
-      longitude[2] = (uint8_t) LoRa.read();
-      longitude[3] = (uint8_t) LoRa.read();
 
-      // Add data into buffer
-      addDataByte("0",
-              type,
-              nodeID, 
-              unixTime,
-              latitude,
-              longitude);
-              
-      // READ DATA TEST
-      #ifdef DEBUG
-      DEBUG_SERIAL.print(F("nodeID: "));
-      printByte(nodeID);
-      DEBUG_SERIAL.println();
-      DEBUG_SERIAL.print(F("unixTime: "));
-      printByte(unixTime[0]);
-      printByte(unixTime[1]);
-      printByte(unixTime[2]);
-      printByte(unixTime[3]);
-      DEBUG_SERIAL.println();
-      DEBUG_SERIAL.print(F("latitude: "));
-      printByte(latitude[0]);
-      printByte(latitude[1]);
-      printByte(latitude[2]);
-      printByte(latitude[3]);
-      DEBUG_SERIAL.println();
-      DEBUG_SERIAL.print(F("longitude: "));
-      printByte(longitude[0]);
-      printByte(longitude[1]);
-      printByte(longitude[2]);
-      printByte(longitude[3]);
-      DEBUG_SERIAL.println();
-      // covert data to string
-      DEBUG_SERIAL.print(F("nodeID: "));
-      DEBUG_SERIAL.println(String(nodeID));
-      DEBUG_SERIAL.print(F("unixTime: "));
-      DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
-      DEBUG_SERIAL.print(F("latitude: "));
-      DEBUG_SERIAL.println(String(* (long*) latitude));
-      DEBUG_SERIAL.print(F("longitude: "));
-      DEBUG_SERIAL.println(String(* (long*) longitude));
-      #endif
+      // calculate num of datapoints
+      // num of datapoints = (messageLen - header lenfth) / (size of ONE data point (4 bytes) i.e. (unixTime, latitude, longtitude))
+      int num_data = (packetSize - 2) / 12;
+      for (int i = 0; i < num_data; i++) {
+        // read unixTime
+        uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        unixTime[0] = (uint8_t) LoRa.read();
+        unixTime[1] = (uint8_t) LoRa.read();
+        unixTime[2] = (uint8_t) LoRa.read();
+        unixTime[3] = (uint8_t) LoRa.read();
+        // read latitude
+        uint8_t* latitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        latitude[0] = (uint8_t) LoRa.read();
+        latitude[1] = (uint8_t) LoRa.read();
+        latitude[2] = (uint8_t) LoRa.read();
+        latitude[3] = (uint8_t) LoRa.read();
+        // read longitude
+        uint8_t* longitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        longitude[0] = (uint8_t) LoRa.read();
+        longitude[1] = (uint8_t) LoRa.read();
+        longitude[2] = (uint8_t) LoRa.read();
+        longitude[3] = (uint8_t) LoRa.read();
+  
+        // Add data into buffer
+        addDataByte("0",
+                type,
+                nodeID, 
+                unixTime,
+                latitude,
+                longitude);
+
+        // READ DATA TEST
+        #ifdef DEBUG
+        DEBUG_SERIAL.print(F("nodeID: "));
+        printByte(nodeID);
+        DEBUG_SERIAL.println();
+        DEBUG_SERIAL.print(F("unixTime: "));
+        printByte(unixTime[0]);
+        printByte(unixTime[1]);
+        printByte(unixTime[2]);
+        printByte(unixTime[3]);
+        DEBUG_SERIAL.println();
+        DEBUG_SERIAL.print(F("latitude: "));
+        printByte(latitude[0]);
+        printByte(latitude[1]);
+        printByte(latitude[2]);
+        printByte(latitude[3]);
+        DEBUG_SERIAL.println();
+        DEBUG_SERIAL.print(F("longitude: "));
+        printByte(longitude[0]);
+        printByte(longitude[1]);
+        printByte(longitude[2]);
+        printByte(longitude[3]);
+        DEBUG_SERIAL.println();
+        // covert data to string
+        DEBUG_SERIAL.print(F("nodeID: "));
+        DEBUG_SERIAL.println(String(nodeID));
+        DEBUG_SERIAL.print(F("unixTime: "));
+        DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
+        DEBUG_SERIAL.print(F("latitude: "));
+        DEBUG_SERIAL.println(String(* (long*) latitude));
+        DEBUG_SERIAL.print(F("longitude: "));
+        DEBUG_SERIAL.println(String(* (long*) longitude));
+        #endif
+        // clear
+        free(unixTime);
+        free(latitude);
+        free(longitude);
+      }       
       // send ACK
       sendAck(nodeID);
-      // clear
-      free(unixTime);
-      free(latitude);
-      free(longitude);
       readyToPost = true; // Ready to post to server
       break;
-    }
-      
-    // <--- CASE: Sensor Data ---> //      
+    }    
   }
 }
 
 // send ack to targe node
 void sendAck(uint8_t nodeID) {
-  uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * 2);
+  uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * 3);
   message[0] = (uint8_t) 0x00;
   message[1] = (uint8_t) nodeID;
+  message[2] = (uint8_t) trackerSleepCycles; 
   
   DEBUG_SERIAL.print(F("ACK TARGET NodeID: "));
   printByte(nodeID);
   DEBUG_SERIAL.println();
   
-  LoRa_sendMessage(message, sizeof(uint8_t) * 2);
+  LoRa_sendMessage(message, sizeof(uint8_t) * 3);
   DEBUG_SERIAL.println(F("ACK Sent."));
   free(message);
 }
