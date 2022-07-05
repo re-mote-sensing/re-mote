@@ -7,31 +7,30 @@
 
 // Initialize Serial, GPS, and LoRa.
 void initilaize() {
-  Serial.println("Initializing...");
+  DEBUG_SERIAL.begin(PC_BAUDRATE); // Start Debug Serial
+  DEBUG_SERIAL.println(F("Initializing..."));
 
-  pinMode(GPS_EN, OUTPUT);
-  
-  Serial.begin(9600);
-  while (!Serial);
+  configGPS();
 
   if (!LoRa.begin(915E6)) {
-    Serial.println("LoRa init failed. Check your connections.");
+    DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
-//  LoRa.setSignalBandwidth(7.8E3); // test
-  LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+  // LoRa.setSignalBandwidth(7.8E3); // test
+  // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
+  // LoRa.enableCrc(); // Enables the LoRa module's built in error checking
 
-  gpsPort.begin(9600);
+  pinMode(LoRa_RESET, OUTPUT);
 
-  Serial.println("Initialize Successfully.");
+  DEBUG_SERIAL.println(F("Initialize Successfully."));
 }
 
 // Send registration message
 void sendRegistration() {
-  Serial.println("Trying to send registration...");
+  DEBUG_SERIAL.println(F("Trying to send registration..."));
   // allocate space for message
   uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * REG_LEN);
   // write message type and sensor#
@@ -57,15 +56,15 @@ void sendRegistration() {
 // Send sensor data message
 void sendSensorData() {
   // read data
-//  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-//  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-//  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-  long latitude = 432582727; // 32 bits i.e 4 bytes
-  long longitude = -799207620; // 32 bits i.e 4 bytes
+  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+//  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+//  long latitude = 432582727; // 32 bits i.e 4 bytes
+//  long longitude = -799207620; // 32 bits i.e 4 bytes
 
   // send data
-  Serial.println("Trying to send sensor data...");
+  DEBUG_SERIAL.println(F("Trying to send sensor data..."));
   uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * SEN_LEN);
   // write message type and sensor#
   message[0] = (uint8_t) 0xd0;
@@ -87,6 +86,16 @@ void sendSensorData() {
 }
 
 /* ------------------------ GPS ------------------------- */
+
+// Config GPS Module
+void configGPS(){
+  pinMode(GPS_EN, OUTPUT);
+  gpsPort.begin(GPS_BAUDRATE);
+  enableGPS();
+  delay(1000);
+  TurtleTracker_UBX_2022 turtleTracker_UBX(Serial,gpsPort);
+  turtleTracker_UBX.configGPS();
+}
 
 // Enable GPS Module
 void enableGPS(){
@@ -110,7 +119,7 @@ void readGPS() {
 void readGPSvaild(){
   // Run the GPS for some time to try and get a fix
   long start = millis();
-  DEBUG_SERIAL.println("Reading GPS...");
+  DEBUG_SERIAL.println(F("Reading GPS..."));
   while (millis() - start < GPS_TIMEOUT && (!fix.valid.location || !fix.valid.time || fix.dateTime == lastTime)) {
     readGPS();
   }
@@ -175,7 +184,7 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   for (uint8_t i = 0; i < sleep_cycles; i++) {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*8 mins
   }
-  DEBUG_SERIAL.println("lowPowerMode End.");
+  DEBUG_SERIAL.println(F("lowPowerMode End."));
 }
 
 /* ------------------------ LoRa Buff ------------------------- */
@@ -183,15 +192,17 @@ void enterLowPowerMode(uint8_t sleep_cycles){
 void writeBuf(uint8_t* buf, int* writeIndex, int* bufLen, uint8_t value) {
   // write i.e. mem[] = value
   if (*bufLen == BUF_SIZE) {
-    Serial.println("Buff is full!");
+    DEBUG_SERIAL.println(F("Buff is full!"));
     return;
   }
 
   // WRITE
   buf[*writeIndex] = value;
-  Serial.print("Write into buffer: " );
+  #if DEBUG == true
+  DEBUG_SERIAL.print(F("Write into buffer: "));
   printByte(value);
-  Serial.println();
+  DEBUG_SERIAL.println();
+  #endif  //DEBUG == true
   
   (*bufLen)++;
   (*writeIndex)++;
@@ -203,14 +214,16 @@ void writeBuf(uint8_t* buf, int* writeIndex, int* bufLen, uint8_t value) {
 void readBuf(uint8_t* buf, int* readIndex, int* bufLen) {
   // read i.e lora.wirte()
   if (*bufLen == 0) {
-    Serial.println("Buffer is empty!");
+    DEBUG_SERIAL.println(F("Buffer is empty!"));
     return;
   }
 
   // READ
-  Serial.print("Read from buffer: " );
+  DEBUG_SERIAL.print(F("Read from buffer: "));
+  #if DEBUG == true
   printByte(buf[*readIndex]);
-  Serial.println();
+  #endif  //DEBUG == true
+  DEBUG_SERIAL.println();
   
   (*bufLen)--;
   (*readIndex)++;
@@ -230,7 +243,7 @@ boolean isFullBuf(int bufLen, int maxBufLen) {
 // "fake" reading n elements (i.e. lazy deleting n elements from the buff)
 void lazyDeleteNFromBuf(uint8_t* buf, int* readIndex, int* bufLen, int n) {
   if ((*bufLen) - n < 0) {
-    Serial.println("ERROR: Not enough remaining elements to be removed.");
+    DEBUG_SERIAL.println(F("ERROR: Not enough remaining elements to be removed."));
     return;
   }
 
@@ -246,29 +259,32 @@ void lazyDeleteNFromBuf(uint8_t* buf, int* readIndex, int* bufLen, int n) {
 //  LoRa_writeFromBuff(&buf[0], &readIndex, &bufLen)
 //  LoRa.endPacket(true);    
 void LoRa_writeFromBuff(uint8_t* buf, int* readIndex, int* bufLen) {
-  Serial.println("-------- Buff sent:  ----------");
+  DEBUG_SERIAL.println(F("-------- Buff sent:  ----------"));
   for (uint8_t i = 0; i < *bufLen; i++) {
     int addr = ((*readIndex) + i) % (*bufLen); // calculate the address in physical memory
     LoRa.write((uint8_t) buf[addr]);
+    #if DEBUG == true
     printByte((uint8_t) buf[addr]);
+    #endif  //DEBUG == true
   }    
-  Serial.println();
-  Serial.println("-------------------------------");             
+  DEBUG_SERIAL.println();
+  DEBUG_SERIAL.println(F("-------------------------------"));             
 }
 
 /* ------------------------ Helper for Debug ------------------------- */
 
+#if DEBUG == true
 // Prints a byte as hex to the Serial port
 void printByte(uint8_t b) {
-  Serial.print(F(" 0x"));
+  DEBUG_SERIAL.print(F(" 0x"));
   if (b <= 0xF)
-    Serial.print(F("0"));
-  Serial.print(b, HEX);
+    DEBUG_SERIAL.print(F("0"));
+  DEBUG_SERIAL.print(b, HEX);
 }
 
 // Pause the program for debuging
 void pause(){
-  DEBUG_SERIAL.println("Wait input (G): ");
+  Serial.println(F("Wait input (G): "));
   while(true){
     if(Serial.available() > 0)
       if(Serial.read() == 'G')
@@ -278,36 +294,37 @@ void pause(){
 
 // Prints various GPS data
 void printLocationData(){
-  DEBUG_SERIAL.print("Status: ");
+  DEBUG_SERIAL.print(F("Status: "));
   DEBUG_SERIAL.println(fix.status);
   delay(100);
-  DEBUG_SERIAL.print("valid.location: ");
+  DEBUG_SERIAL.print(F("valid.location: "));
   DEBUG_SERIAL.println(fix.valid.location);
   delay(100);
-  DEBUG_SERIAL.print("latitudeL: ");
+  DEBUG_SERIAL.print(F("latitudeL: "));
   DEBUG_SERIAL.println(fix.latitudeL());
   delay(100);
-  DEBUG_SERIAL.print("longitudeL: ");
+  DEBUG_SERIAL.print(F("longitudeL: "));
   DEBUG_SERIAL.println(fix.longitudeL());
   delay(100);
-  DEBUG_SERIAL.print("dateTime: ");
+  DEBUG_SERIAL.print(F("dateTime: "));
   DEBUG_SERIAL.println(fix.dateTime);
   delay(100);
 }
 
 // show the physical memory content representing the LoRa buff for debug
 void showBuf(uint8_t* buf, int* writeIndex, int* readIndex, int* bufLen) {
-  Serial.println("------------------");
-  Serial.print("writeIndex :");
-  Serial.println(*writeIndex);
-  Serial.print("readIndex :");
-  Serial.println(*readIndex);
-  Serial.print("bufLen :");
-  Serial.println(*bufLen);
-  Serial.println("Content: ");
+  DEBUG_SERIAL.println(F("------------------"));
+  DEBUG_SERIAL.print(F("writeIndex :"));
+  DEBUG_SERIAL.println(*writeIndex);
+  DEBUG_SERIAL.print(F("readIndex :"));
+  DEBUG_SERIAL.println(*readIndex);
+  DEBUG_SERIAL.print(F("bufLen :"));
+  DEBUG_SERIAL.println(*bufLen);
+  DEBUG_SERIAL.println(F("Content: "));
   for (int i = 0; i < BUF_SIZE; i++) {
     printByte(buf[i]);
   }
-  Serial.println();
-  Serial.println("------------------");
+  DEBUG_SERIAL.println();
+  DEBUG_SERIAL.println(F("------------------"));
 }
+#endif  //DEBUG == true

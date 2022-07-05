@@ -3,20 +3,22 @@
   https://gitlab.cas.mcmaster.ca/re-mote
 */
 
-#include <SPI.h>
 #include <LoRa.h>
 #include <NMEAGPS.h>
 #include <NeoSWSerial.h>
+#include <TurtleTracker_UBX_2022.h>
 #include "LowPower.h"
 
 /* ------------------------ Config ------------------------- */
 
-#define GPS_TX 3
-#define GPS_RX 4
+#define NODE_ID 0x01 // Unique Node ID
+
+#define GPS_TX 3 // GPS TX Pin
+#define GPS_RX 4 // GPS RX Pin
 #define GPS_EN 6 // GPS Enable Pin
 #define LoRa_RESET 9 // LoRa reset Pin
 
-#define GPS_TIMEOUT 360000
+#define GPS_TIMEOUT 360000 // GPS read timeout (Average read time 31sec on GP735T)
 #define ACK_TIMEOUT 10000 // ack waiting time for sending sensor data
 #define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
 
@@ -24,12 +26,15 @@
 #define SEN_LEN 14 // sensor data message length (in bytes)
 
 // below are main configurations needed to changed
-#define LORA_TX_POWER 23 // Output power of the RFM95 (23 is the max)
+#define LORA_TX_POWER 20 // Output power of the RFM95 (23 is the max)
 #define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
 #define BUF_SIZE 240 // set LoRa buff size to a mutipler of 12 (bytes of one data point) but no more than 256 (maximum len of a lora message)
+
+#define PC_BAUDRATE 9600L
+#define GPS_BAUDRATE 9600L
+
 #define DEBUG true // Set to true for debug output, false for no output
 #define DEBUG_SERIAL if(DEBUG) Serial
-#define NODE_ID 0x02
 
 /* ------------------------ Constructors ------------------------- */
 
@@ -67,11 +72,11 @@ void setup() {
   millis_count = 0;
   while (!ackReceived) {
     if ((millis() - lastSent) > sent_time){
-      DEBUG_SERIAL.print("Wait for (millis): ");
+      DEBUG_SERIAL.print(F("Wait for (millis): "));
       DEBUG_SERIAL.println(sent_time);
       
        /*---------- send registration -----------*/
-      Serial.println("Trying to send registration...");
+      DEBUG_SERIAL.println(F("Trying to send registration..."));
       // allocate space for message
       uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * REG_LEN);
       // write message type and sensor#
@@ -106,7 +111,7 @@ void setup() {
   LoRa.sleep();
 //  DEBUG_SERIAL.println("MODE: END -- i.e. end");
   
-  DEBUG_SERIAL.println("Initialize Successfully!");
+  DEBUG_SERIAL.println(F("Initialize Successfully!"));
 }
 
 /* ------------------------ Loop ------------------------- */
@@ -120,13 +125,13 @@ void loop() {
   enableGPS();
   readGPSvaild();
   disableGPS();
+  
   #if DEBUG == true
   printLocationData();
   #endif  //DEBUG == true
 
   // If No valid data, then skip sending data and sleep the module
   if (!ifVaildFix()) {
-    
     enterLowPowerMode(trackerSleepCycles);
     return;
   }
@@ -136,7 +141,7 @@ void loop() {
   // Store the time and location data into buff
   if (isFullBuf(bufLen, BUF_SIZE)) {
     // if buff is full, throw that message then skip this data points 
-    Serial.println("BUFF IS FULL. will skip collecting datapoints and try sending the buff FIRST.");
+    DEBUG_SERIAL.println(F("BUFF IS FULL. will skip collecting datapoints and try sending the buff FIRST."));
   } else {
     // only collect data if the buff is not full
   // Read data from fix
@@ -176,17 +181,17 @@ void loop() {
   sent_time = 0; // reset sent_time to 0
   while (!ackReceived && millis() - ackStartTime < ACK_TIMEOUT) {    
     if ((millis() - lastSent) > sent_time){
-      DEBUG_SERIAL.print("Wait for (millis): ");
+      DEBUG_SERIAL.print(F("Wait for (millis): "));
       DEBUG_SERIAL.println(sent_time);
       
-      Serial.println("Trying to send the WHOLE buff...");
+      DEBUG_SERIAL.println(F("Trying to send the WHOLE buff..."));
       LoRa_txMode();
       LoRa.beginPacket();
       // write header into lora message
       LoRa.write((uint8_t) 0xd0);
       LoRa.write((uint8_t) NODE_ID);
       // debug buffer size
-      DEBUG_SERIAL.print("Buffer Size: ");
+      DEBUG_SERIAL.print(F("Buffer Size: "));
       DEBUG_SERIAL.println(bufLen);
       // write buff into lora message
       LoRa_writeFromBuff(&buf[0], &readIndex, &bufLen);
@@ -217,13 +222,15 @@ void onReceive(int packetSize) {
       uint8_t ack = (uint8_t) LoRa.read();
       uint8_t nodeID = (uint8_t) LoRa.read();
       if (ack == 0x00 && nodeID == NODE_ID) {
-        DEBUG_SERIAL.println("Received ACK:");
-        DEBUG_SERIAL.print("ACK type: ");
+        #if DEBUG == true
+        DEBUG_SERIAL.println(F("Received ACK:"));
+        DEBUG_SERIAL.print(F("ACK type: "));
         printByte(ack);
         DEBUG_SERIAL.println();
-        DEBUG_SERIAL.print("Node ID: ");
+        DEBUG_SERIAL.print(F("Node ID: "));
         printByte(nodeID);
         DEBUG_SERIAL.println();
+        #endif  //DEBUG == true
 
         // accept remote control from gateway
         trackerSleepCycles = (uint8_t) LoRa.read();
@@ -236,7 +243,7 @@ void onReceive(int packetSize) {
         temp += (char) LoRa.read();
       }
       #ifdef DEBUG
-      DEBUG_SERIAL.print("LoRa received: ");
+      DEBUG_SERIAL.print(F("LoRa received: "));
       DEBUG_SERIAL.println(temp);
       #endif
     }
@@ -245,6 +252,6 @@ void onReceive(int packetSize) {
 // if LoRa finish transmitted message, it will interrupt any current execution line,
 // then begin call this onReceive function
 void onTxDone() {
-  DEBUG_SERIAL.println("Message Sent.");
+  DEBUG_SERIAL.println(F("Message Sent."));
   LoRa_rxMode();
 }

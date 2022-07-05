@@ -100,7 +100,7 @@ SoftSpiDriver<SD_SOFT_MISO_PIN, SD_SOFT_MOSI_PIN, SD_SOFT_SCK_PIN> softSpi;
 
 unsigned long lastPost = millis();  // Track what is the last posted time
 bool readyToPost = true;            // Ready to post to server
-uint8_t trackerSleepCycles = 8; // Tracker remotge control
+uint8_t trackerSleepCycles = 8;     // Tracker remotge control
 
 /* ------------------------ Setup ------------------------- */
 
@@ -126,7 +126,7 @@ void setup() {
     while (true);
   }
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
-  LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+  // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.enableCrc(); // Enables the LoRa module's built in error checking
   DEBUG_SERIAL.println(F("LoRa init succeeded."));
   // Uncomment the following three line to enable onReceive with interupt pins DIO0(D2)

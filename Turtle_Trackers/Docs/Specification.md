@@ -14,10 +14,10 @@
 
 #### Enclosure
 
-| Part          | Link                                                                                                                       |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| PETG Filament | https://www.amazon.ca/gp/product/B07PGYHYV8/                                                                               |
-| Screws        | https://www.homedepot.ca/product/paulin--5-x-5-8-in-flat-head-square-drive-steel-wood-screws-zinc-plated-100pcs/1000141168 |
+| Part          | Link                                         |
+| ------------- | -------------------------------------------- |
+| PETG Filament | https://www.amazon.ca/gp/product/B07PGYHYV8/ |
+| Screws        | https://www.homedepot.ca/product/1000141168  |
 
 ## Turtle Tracker Gateway Node
 
@@ -32,7 +32,7 @@
 | GPIO Cable              | https://www.amazon.ca/gp/product/B01EV70C78/                       |
 | Battery                 |                                                                    |
 | Solor Panel             |                                                                    |
-| SIM card with data plan |                                                                    |
+| SIM Card with Data Plan |                                                                    |
 
 #### Enclosure
 
