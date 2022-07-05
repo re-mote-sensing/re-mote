@@ -10,8 +10,7 @@ void initilaize() {
   Serial.println("Initializing...");
 
   pinMode(GPS_EN, OUTPUT);
-
-  LoRa.setTxPower(LORA_TX_POWER);
+  
   Serial.begin(9600);
   while (!Serial);
 
@@ -19,6 +18,9 @@ void initilaize() {
     Serial.println("LoRa init failed. Check your connections.");
     while (true);
   }
+//  LoRa.setSignalBandwidth(7.8E3); // test
+  LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+  LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
 
@@ -118,7 +120,7 @@ void readGPSvaild(){
 
 // Check if the fix variable is vaild
 bool ifVaildFix(){
-  return (fix.valid.location || fix.valid.time);
+  return (fix.valid.location && fix.valid.time);
 }
 
 /* ------------------------ LoRa ------------------------- */
@@ -167,7 +169,7 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   DEBUG_SERIAL.println(sleep_cycles);
   disableGPS(); // Make sure GPS is off before sleep
 //  LoRa.end(); // Ture off LoRa SPI before sleep
-  LoRa.end(); // test
+  LoRa.sleep(); // test
   resetLoRa(); // Ture off LoRa hardware before sleep
   delay(100);
   for (uint8_t i = 0; i < sleep_cycles; i++) {

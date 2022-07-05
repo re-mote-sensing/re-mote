@@ -16,7 +16,7 @@
 #define GPS_EN 6 // GPS Enable Pin
 #define LoRa_RESET 9 // LoRa reset Pin
 
-#define GPS_TIMEOUT 80000
+#define GPS_TIMEOUT 360000
 #define ACK_TIMEOUT 10000 // ack waiting time for sending sensor data
 #define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
 
@@ -26,10 +26,10 @@
 // below are main configurations needed to changed
 #define LORA_TX_POWER 23 // Output power of the RFM95 (23 is the max)
 #define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
-#define BUF_SIZE 120 // set LoRa buff size to a mutipler of 12 (bytes of one data point) but no more than 256 (maximum len of a lora message)
+#define BUF_SIZE 240 // set LoRa buff size to a mutipler of 12 (bytes of one data point) but no more than 256 (maximum len of a lora message)
 #define DEBUG true // Set to true for debug output, false for no output
 #define DEBUG_SERIAL if(DEBUG) Serial
-#define NODE_ID 0x11
+#define NODE_ID 0x02
 
 /* ------------------------ Constructors ------------------------- */
 
@@ -93,7 +93,8 @@ void setup() {
       free(message);
       /*-----------------------------------------*/
       
-      sent_time = (2 << millis_count) * 1000 + random(1000); // based on experiments, the minimum progation time is 1s
+//      sent_time = (2 << millis_count) * 1000 + random(1000); // based on experiments, the minimum progation time is 1s
+      sent_time = 1000 + random(1000); // based on experiments, the minimum progation time is 1s
       lastSent = millis();
       millis_count++;
     }
@@ -102,7 +103,7 @@ void setup() {
   }
 
   // put LoRa to end mode before using it to save power
-  LoRa.end();
+  LoRa.sleep();
 //  DEBUG_SERIAL.println("MODE: END -- i.e. end");
   
   DEBUG_SERIAL.println("Initialize Successfully!");
@@ -115,20 +116,20 @@ void loop() {
   // Initialize
   ackReceived = false; // reset ackReceived to FALSE
 
-//  // Read time & gps
-//  enableGPS();
-//  readGPSvaild();
-//  disableGPS();
-//  #if DEBUG == true
-//  printLocationData();
-//  #endif  //DEBUG == true
-//
-//  // If No valid data, then skip sending data and sleep the module
-//  if (!ifVaildFix()) {
-//    
-//    enterLowPowerMode(trackerSleepCycles);
-//    return;
-//  }
+  // Read time & gps
+  enableGPS();
+  readGPSvaild();
+  disableGPS();
+  #if DEBUG == true
+  printLocationData();
+  #endif  //DEBUG == true
+
+  // If No valid data, then skip sending data and sleep the module
+  if (!ifVaildFix()) {
+    
+    enterLowPowerMode(trackerSleepCycles);
+    return;
+  }
 
   // Now, fix should hold the time and location data
 
@@ -139,12 +140,12 @@ void loop() {
   } else {
     // only collect data if the buff is not full
   // Read data from fix
-  //  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-  //  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-  //  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-    long latitude = 432582727; // 32 bits i.e 4 bytes
-    long longitude = -799207620; // 32 bits i.e 4 bytes
+    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+//    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+//    long latitude = 432582727; // 32 bits i.e 4 bytes
+//    long longitude = -799207620; // 32 bits i.e 4 bytes
     
     uint8_t* temp; // a helper pointer
     // write unixTime
@@ -184,6 +185,9 @@ void loop() {
       // write header into lora message
       LoRa.write((uint8_t) 0xd0);
       LoRa.write((uint8_t) NODE_ID);
+      // debug buffer size
+      DEBUG_SERIAL.print("Buffer Size: ");
+      DEBUG_SERIAL.println(bufLen);
       // write buff into lora message
       LoRa_writeFromBuff(&buf[0], &readIndex, &bufLen);
       LoRa.endPacket(true); 

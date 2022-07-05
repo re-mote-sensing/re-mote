@@ -138,14 +138,8 @@ void powerOff3G(){
 // Start 3G Shield HTTP Request
 void start3GHTTP() {
   powerOn3G();
-  delay(4500);
-  long start = millis();
-  String result;
-  while (!result.equals(F("ATOK"))&&!result.equals(F("OK"))){
-    if (millis() - start > SIM3G_POWER_ON_TIMEOUT)
-      break;
-    result = sendCommand("AT", 250, true);
-  }
+  delay(7000);
+  sendCommand("AT", 250, true);
   sendCommand("ATE0", 250, true);
   delay(1000);
   sendCommand("AT+CMEE=2", 250, true);
@@ -156,6 +150,13 @@ void start3GHTTP() {
   while (sendCommand("AT+CHTTPSSTART", 10000, true).equals(F("ERROR"))) {
     sendCommand("AT+CHTTPSCLSE", 10000, false);
     sendCommand("AT+CHTTPSSTOP", 10000, false);
+    sendCommand("AT", 250, true);
+    sendCommand("ATE0", 250, true);
+    delay(1000);
+    sendCommand("AT+CMEE=2", 250, true);
+    sendCommand("AT+CGDCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
+    sendCommand("AT+CGSOCKCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
+    sendCommand("AT+CSOCKSETPN=1", 250, true);
   }
   delay(500);
 }
