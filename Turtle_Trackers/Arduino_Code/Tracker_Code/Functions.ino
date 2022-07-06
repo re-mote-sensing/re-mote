@@ -10,14 +10,14 @@ void initilaize() {
   DEBUG_SERIAL.begin(PC_BAUDRATE); // Start Debug Serial
   DEBUG_SERIAL.println(F("Initializing..."));
 
-  configGPS();
+//  configGPS();
 
   if (!LoRa.begin(915E6)) {
     DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
   // LoRa.setSignalBandwidth(7.8E3); // test
-  // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+//  LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
@@ -56,12 +56,12 @@ void sendRegistration() {
 // Send sensor data message
 void sendSensorData() {
   // read data
-  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-//  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-//  long latitude = 432582727; // 32 bits i.e 4 bytes
-//  long longitude = -799207620; // 32 bits i.e 4 bytes
+//  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+//  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+//  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+  long latitude = 432582727; // 32 bits i.e 4 bytes
+  long longitude = -799207620; // 32 bits i.e 4 bytes
 
   // send data
   DEBUG_SERIAL.println(F("Trying to send sensor data..."));
@@ -188,7 +188,9 @@ void enterLowPowerMode(uint8_t sleep_cycles){
 }
 
 /* ------------------------ LoRa Buff ------------------------- */
+// A simple cycle buff implementation acting as datpoint buff.
 
+// Write a uint8_t value into the buff. If the buff is full, do nothing.
 void writeBuf(uint8_t* buf, int* writeIndex, int* bufLen, uint8_t value) {
   // write i.e. mem[] = value
   if (*bufLen == BUF_SIZE) {
@@ -211,6 +213,7 @@ void writeBuf(uint8_t* buf, int* writeIndex, int* bufLen, uint8_t value) {
   }
 }
 
+// Read the value at readIndex of the buff.
 void readBuf(uint8_t* buf, int* readIndex, int* bufLen) {
   // read i.e lora.wirte()
   if (*bufLen == 0) {
@@ -232,6 +235,7 @@ void readBuf(uint8_t* buf, int* readIndex, int* bufLen) {
   }
 }
 
+// Test if the buf is full.
 boolean isFullBuf(int bufLen, int maxBufLen) {
   if (bufLen == maxBufLen) {
     return true;
@@ -311,7 +315,7 @@ void printLocationData(){
   delay(100);
 }
 
-// show the physical memory content representing the LoRa buff for debug
+// Show the physical memory content representing the LoRa buff for debug
 void showBuf(uint8_t* buf, int* writeIndex, int* readIndex, int* bufLen) {
   DEBUG_SERIAL.println(F("------------------"));
   DEBUG_SERIAL.print(F("writeIndex :"));

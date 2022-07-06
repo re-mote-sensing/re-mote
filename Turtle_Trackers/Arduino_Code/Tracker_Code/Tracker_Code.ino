@@ -3,27 +3,43 @@
   https://gitlab.cas.mcmaster.ca/re-mote
 */
 
+// LoRa Library
+// An Arduino library for sending and receiving data using LoRa radios.
+// https://www.arduino.cc/reference/en/libraries/lora/
 #include <LoRa.h>
+
+// NMEA and ublox GPS parser for Arduino, configurable to use as few as 10 bytes of RAM
+// https://github.com/SlashDevin/NeoGPS/blob/master/src/NMEAGPS.h
 #include <NMEAGPS.h>
-#include <NeoSWSerial.h>
+
+// Overwrite the GPS hardware's configuration
 #include <TurtleTracker_UBX_2022.h>
+
+// NeoSWSerial Library
+// An efficient replacement for SoftwareSerial, Simultaneous RX & TX
+// https://www.arduino.cc/reference/en/libraries/neoswserial/
+#include <NeoSWSerial.h>
+
+// Lightweight low power library for Arduino.
+// https://github.com/rocketscream/Low-Power
 #include "LowPower.h"
 
 /* ------------------------ Config ------------------------- */
 
-#define NODE_ID 0x01 // Unique Node ID
+#define NODE_ID 0x98 // Unique Node ID
 
 #define GPS_TX 3 // GPS TX Pin
 #define GPS_RX 4 // GPS RX Pin
 #define GPS_EN 6 // GPS Enable Pin
 #define LoRa_RESET 9 // LoRa reset Pin
 
-#define GPS_TIMEOUT 360000 // GPS read timeout (Average read time 31sec on GP735T)
+#define GPS_TIMEOUT 36000 // GPS read timeout (Average read time 31sec on GP735T)
 #define ACK_TIMEOUT 10000 // ack waiting time for sending sensor data
 #define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
 
 #define REG_LEN 6 // registration message length (in bytes)
 #define SEN_LEN 14 // sensor data message length (in bytes)
+#define ACK_LEN 3 // ack messgae length (in bytes)
 
 // below are main configurations needed to changed
 #define LORA_TX_POWER 20 // Output power of the RFM95 (23 is the max)
@@ -122,19 +138,19 @@ void loop() {
   ackReceived = false; // reset ackReceived to FALSE
 
   // Read time & gps
-  enableGPS();
-  readGPSvaild();
-  disableGPS();
-  
-  #if DEBUG == true
-  printLocationData();
-  #endif  //DEBUG == true
-
-  // If No valid data, then skip sending data and sleep the module
-  if (!ifVaildFix()) {
-    enterLowPowerMode(trackerSleepCycles);
-    return;
-  }
+//  enableGPS();
+//  readGPSvaild();
+//  disableGPS();
+//  
+//  #if DEBUG == true
+//  printLocationData();
+//  #endif  //DEBUG == true
+//
+//  // If No valid data, then skip sending data and sleep the module
+//  if (!ifVaildFix()) {
+//    enterLowPowerMode(trackerSleepCycles);
+//    return;
+//  }
 
   // Now, fix should hold the time and location data
 
@@ -145,12 +161,12 @@ void loop() {
   } else {
     // only collect data if the buff is not full
   // Read data from fix
-    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-//    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-//    long latitude = 432582727; // 32 bits i.e 4 bytes
-//    long longitude = -799207620; // 32 bits i.e 4 bytes
+//    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+//    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+//    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+    long latitude = 432582727; // 32 bits i.e 4 bytes
+    long longitude = -799207620; // 32 bits i.e 4 bytes
     
     uint8_t* temp; // a helper pointer
     // write unixTime
@@ -217,8 +233,8 @@ void loop() {
 // if LoRa received any message, it will interrupt any current execution line,
 // then begin call this onReceive function
 void onReceive(int packetSize) {  
-    if (packetSize == 3) {
-      // receive registration ack
+    if (packetSize == ACK_LEN) {
+      // CASE: received registration ack
       uint8_t ack = (uint8_t) LoRa.read();
       uint8_t nodeID = (uint8_t) LoRa.read();
       if (ack == 0x00 && nodeID == NODE_ID) {
@@ -234,10 +250,12 @@ void onReceive(int packetSize) {
 
         // accept remote control from gateway
         trackerSleepCycles = (uint8_t) LoRa.read();
-        // success receive ack
+        
+        // set the ack flag to true to break to read loop.
         ackReceived = true;
       }
     } else {
+      // CASE: received noisy information
       String temp = "";
       while (LoRa.available()) {
         temp += (char) LoRa.read();

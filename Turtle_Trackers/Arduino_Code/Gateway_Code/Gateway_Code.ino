@@ -126,7 +126,7 @@ void setup() {
     while (true);
   }
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
-  // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+   LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.enableCrc(); // Enables the LoRa module's built in error checking
   DEBUG_SERIAL.println(F("LoRa init succeeded."));
   // Uncomment the following three line to enable onReceive with interupt pins DIO0(D2)
