@@ -10,14 +10,14 @@ void initilaize() {
   DEBUG_SERIAL.begin(PC_BAUDRATE); // Start Debug Serial
   DEBUG_SERIAL.println(F("Initializing..."));
 
-//  configGPS();
+  configGPS();
 
   if (!LoRa.begin(915E6)) {
     DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
   // LoRa.setSignalBandwidth(7.8E3); // test
-//  LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+  // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
@@ -56,12 +56,12 @@ void sendRegistration() {
 // Send sensor data message
 void sendSensorData() {
   // read data
-//  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-//  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-//  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-  long latitude = 432582727; // 32 bits i.e 4 bytes
-  long longitude = -799207620; // 32 bits i.e 4 bytes
+  unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+  long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+  long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+//  unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+//  long latitude = 432582727; // 32 bits i.e 4 bytes
+//  long longitude = -799207620; // 32 bits i.e 4 bytes
 
   // send data
   DEBUG_SERIAL.println(F("Trying to send sensor data..."));

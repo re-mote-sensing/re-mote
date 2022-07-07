@@ -26,7 +26,7 @@
 
 /* ------------------------ Config ------------------------- */
 
-#define NODE_ID 0x98 // Unique Node ID
+#define NODE_ID 0x01 // Unique Node ID
 
 #define GPS_TX 3 // GPS TX Pin
 #define GPS_RX 4 // GPS RX Pin
@@ -138,19 +138,19 @@ void loop() {
   ackReceived = false; // reset ackReceived to FALSE
 
   // Read time & gps
-//  enableGPS();
-//  readGPSvaild();
-//  disableGPS();
-//  
-//  #if DEBUG == true
-//  printLocationData();
-//  #endif  //DEBUG == true
-//
-//  // If No valid data, then skip sending data and sleep the module
-//  if (!ifVaildFix()) {
-//    enterLowPowerMode(trackerSleepCycles);
-//    return;
-//  }
+  enableGPS();
+  readGPSvaild();
+  disableGPS();
+  
+  #if DEBUG == true
+  printLocationData();
+  #endif  //DEBUG == true
+
+  // If No valid data, then skip sending data and sleep the module
+  if (!ifVaildFix()) {
+    enterLowPowerMode(trackerSleepCycles);
+    return;
+  }
 
   // Now, fix should hold the time and location data
 

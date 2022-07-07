@@ -71,7 +71,7 @@ bool postToServerWithBuffer(){
   return true;
 }
 
-// Get lines from ToSend.bin
+// Get $postAmount lines from ToSend.bin begin with line $lineCount
 // return END : End of file
 // return SKIP : Blank line
 // return ETY : Empty File
@@ -87,7 +87,7 @@ String getPostBufferFromSdBin(int lineCount, int postAmount){
       DEBUG_SERIAL.println(F("Open BIN Failed"));
       return "END";
     }
-    char line[CSV_LINE_LENGTH]; // Store a line of bin here
+    char line[BIN_LINE_LENGTH]; // Store a line of bin here
     for (int i = 0; i < lineCount; i++) 
       if (file.available())
         file.fgets(line, sizeof(line)); // Skip lines that already read / ignore
@@ -101,7 +101,7 @@ String getPostBufferFromSdBin(int lineCount, int postAmount){
         return "SKIP";
       }
       readCounter++; // Add counter
-      dataString += line; // Conbine line with previous read
+      dataString += line; // Combine line with previous read
       dataString.trim();
       if (readCounter>=postAmount) // If reach defined amount, return dataString
         break;
@@ -192,8 +192,6 @@ String sendCommand(const char *command, unsigned long timeout, bool multiLine) {
         result += c;
         count++;
       }
-    }else{
-      
     }
   }
   DEBUG_SERIAL.println();
@@ -227,10 +225,9 @@ void createToSendFile(){
 // Get a HEX string from uint8_t
 String getByte(uint8_t b) {
   String s = "";
-    if (b <= 0xF)
-        s=s+"0";
-    s=s+String(b,HEX);
-    return s;
+  if (b <= 0xF)
+    s+="0";
+  return s+=String(b,HEX);
 }
 
 // Add Tracker data into SD card
@@ -244,7 +241,7 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
   }
   
   // Get file name for tracker csv log
-  char* fileName = getFileName((char)nodeID);
+  char* fileName = getFileName(nodeID);
   if (fileName == NULL)
     return false;
 
@@ -252,18 +249,27 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
   if (sd.exists(fileName)) {
     // Create csv file
     File file;
-    free(fileName);
-    char* fileName = getFileName((char)nodeID); // Get name again
-    if (fileName == NULL)
-      return false;
+//    free(fileName);
+//    char* fileName = getFileName((char)nodeID); // Get name again
+//    if (fileName == NULL)
+//      return false;
     if (!file.open(fileName, FILE_WRITE)) { // Open Tracker data CSV
       DEBUG_SERIAL.print(F("Open CSV Failed: "));
       DEBUG_SERIAL.println(fileName);
       free(fileName);
       return false;
     }
+
+    // Data added to CSV
+    file.print("\r\n");
+    file.print(count);
+    file.print(",");
+    file.print(String(* (unsigned long*) unixTime));
+    file.print(",");
+    file.print(String(* (long*) latitude));
+    file.print(",");
+    file.print(String(* (long*) longitude));
     
-    file.print("\r\n"+count+","+String(* (unsigned long*) unixTime)+","+String(* (long*) latitude)+","+String(* (long*) longitude)); // Data added to CSV
     file.close();
     
     DEBUG_SERIAL.print(F("Data Added: "));
@@ -279,7 +285,7 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
   if (sd.exists("ToSend.bin")) {
     // Create csv file
     File file;
-    if (!file.open("ToSend.bin", FILE_WRITE)) {  // Create ToSend.csv
+    if (!file.open("ToSend.bin", FILE_WRITE)) {  // Open ToSend.bin
       DEBUG_SERIAL.print(F("Open CSV Failed: "));
       DEBUG_SERIAL.println("ToSend.bin");
       return false;
@@ -294,14 +300,22 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
     // longitude:  0xB1 0x68 0xDE 0x3A
     // -->
     // 0d065d1135ca15cd5b07b168de3a
-    String dataString = "\r\n"+getByte(type)+getByte(nodeID)+
-            getByte(unixTime[3])+getByte(unixTime[2])+getByte(unixTime[1])+getByte(unixTime[0])+
-            getByte(latitude[3])+getByte(latitude[2])+getByte(latitude[1])+getByte(latitude[0])+
-            getByte(longitude[3])+getByte(longitude[2])+getByte(longitude[1])+getByte(longitude[0]);
-    
-    DEBUG_SERIAL.println(dataString);
-    
-    file.print(dataString);
+    file.print("\r\n");
+    file.print(getByte(type));
+    file.print(getByte(nodeID));
+    file.print(getByte(unixTime[3]));
+    file.print(getByte(unixTime[2]));
+    file.print(getByte(unixTime[1]));
+    file.print(getByte(unixTime[0]));
+    file.print(getByte(latitude[3]));
+    file.print(getByte(latitude[2]));
+    file.print(getByte(latitude[1]));
+    file.print(getByte(latitude[0]));
+    file.print(getByte(longitude[3]));
+    file.print(getByte(longitude[2]));
+    file.print(getByte(longitude[1]));
+    file.print(getByte(longitude[0]));
+
     file.close();
     DEBUG_SERIAL.println(F("Buffer Added"));
   }else{
@@ -312,7 +326,7 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
 
 // Get file name for tracker csv log
 // remember to free(fileName) after called
-char* getFileName(char id){
+char* getFileName(uint8_t id){
   // Set file name
   char* fileName = (char*) malloc(sizeof(char) * 7);
   if (fileName == NULL) {
@@ -320,14 +334,14 @@ char* getFileName(char id){
     free(fileName);
     return NULL;
   }
-  sprintf(fileName, "t%u.csv", id);
+  sprintf(fileName, "t%u.csv", (char*) id);
   return fileName;
 }
 
 // Register Tracker into SD card
 // return true : success reg
 // return false : failed reg
-bool registerTracker(char id){
+bool registerTracker(uint8_t id){
   SdFat sd;
   if (!sd.begin(SD_CONFIG)) {
     DEBUG_SERIAL.println(F("SD Error"));
@@ -341,7 +355,7 @@ bool registerTracker(char id){
     return false;
   DEBUG_SERIAL.println(fileName);
 
-  // If csv not existed, create with name "tracker<id>.csv"
+  // If csv not existed, create with name "t<id>.csv"
   if (!sd.exists(fileName)) {
     // Create csv file
     File file;

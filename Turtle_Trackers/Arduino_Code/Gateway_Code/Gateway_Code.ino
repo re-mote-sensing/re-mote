@@ -8,24 +8,18 @@
 #define GATEWAY_ID 0x01 // Unique Gateway ID
 
 // Sever Info
-#define HOST "turtletracker.cas.mcmaster.ca"  // Change this to the public IP address / domain of the pi server's network
-#define ENDPOINT "/data"                      // Server endpoint
+#define HOST "turtletracker.cas.mcmaster.ca"  // Change this to the public IP address / domain of the server's network
+#define ENDPOINT "/data"                      // Server HTTP POST endpoint
 #define SERVER_PORT 80                        // Server port number
-
-// Length of variable in postToServerWithBuffer()
-// Must change after changing "host" "endpoint" or "port"
-#define CHTTPSOPSE_LENGTH 53    // Command:22 + $Port:2 + $host:29
-#define msgBody_LENGTH 170      // Command:2 + ($CsvLineLength:32-4)*$POST_AMOUNT:6
-#define POST_COMMAND_LENGTH 237 // Command:33 + $host:29 + $endpoint:5 + $msgBody_LENGTH:2 + ($CsvLineLength:32-4)*$POST_AMOUNT:6
 
 // Length of each line in ToSend.bin: 
 // Type,NodeID,TimeStamp,Lat,Lon
 // \r\n0d065d1135ca15cd5b07b168de3a
-#define CSV_LINE_LENGTH 32
+#define BIN_LINE_LENGTH 30
 
 // HTTP Post
-#define POST_AMOUNT 6       // Define how many tracker data to read for a single post
-#define POST_TIME 30000     // Time between each post
+#define POST_AMOUNT 6       // Define how many tracker data to read for a single post (Based on testing, 6 is a stable amount for Uno)
+#define POST_TIME 30000     // Time between each post (ms)
 
 // SD Card
 // Hardware SPI is used by LoRa, so software SPI with different pins is required
@@ -38,16 +32,20 @@
 // Two pins conflict with LoRa Shield
 // Connect 8 => A1
 //         9 => A0
+// Config Bandrate under "STEP2: 3G Baud Adjustment"
+// https://www.tinyosshop.com/index.php?route=information/news&news_id=51
 #define SIM3G_EN A1                   // 3G Enable Pin
 #define SIM3G_TX 4                    // 3G TX Pin
 #define SIM3G_RX 5                    // 3G RX Pin
-#define SIM3G_POWER_ON_TIME 180       // 3G Power on time for enable pin
-#define SIM3G_POWER_OFF_TIME 4000     // 3G Power off time for enable pin
-#define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout
-#define SIM3G_POWER_ON_TIMEOUT 20000  // 3G power on timeout
+// 3G Enable Pin Time
+// https://www.tinyosshop.com/datasheet/3G%20Shield%20Datasheet.pdf
+#define SIM3G_POWER_ON_TIME 180       // 3G Power on time for enable pin (ms)
+#define SIM3G_POWER_OFF_TIME 4000     // 3G Power off time for enable pin (ms)
+// 3G Timeout
+#define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout (ms)
 
 // LoRa
-#define LORA_TX_POWER 23 // Output power of the RFM95 (23 is the max)
+#define LORA_TX_POWER 20      // Output power of the RFM95 (23 is the max)
 #define INVERT_IQ_MODE false  // InvertIQ mode
 #define REG_LEN 6             // registration message length (in bytes)
 #define SEN_LEN 14            // sensor data message length (in bytes)
@@ -57,7 +55,7 @@
 #define PC_BAUDRATE 9600L     // Debug Serial Baudrate
 #define SIM3G_BAUDRATE 9600L  // 3G Shield Serial Baudrate
 
-#define DEBUG true  // Set to true for debug output, false for no output
+#define DEBUG true  // Set to true for debug Serial output, false for no output
 
 /* ------------------------ Librarys ------------------------- */
 
@@ -92,25 +90,31 @@
 #define DEBUG_SERIAL if(DEBUG)Serial  // Serial for debuging
 NeoSWSerial ss(SIM3G_TX, SIM3G_RX);   // Serial for 3G Shield
 // SdFat software SPI
+// https://github.com/greiman/SdFat/blob/master/examples/SoftwareSpi/SoftwareSpi.ino
 SoftSpiDriver<SD_SOFT_MISO_PIN, SD_SOFT_MOSI_PIN, SD_SOFT_SCK_PIN> softSpi;
 // Speed argument is ignored for software SPI.
 #define SD_CONFIG SdSpiConfig(SD_CS_PIN, DEDICATED_SPI, SD_SCK_MHZ(0), &softSpi)
+
+// Length of variable in postToServerWithBuffer()
+const unsigned int CHTTPSOPSE_LENGTH = 22 + sizeof(SERVER_PORT) + sizeof(HOST); // Command:22 + $SERVER_PORT:3 + $HOST:29
+const unsigned int msgBody_LENGTH = 2 + (BIN_LINE_LENGTH-2)*POST_AMOUNT; // Command:2 + ($BIN_LINE_LENGTH-2)*$POST_AMOUNT:6
+const unsigned int POST_COMMAND_LENGTH = 33 + sizeof(HOST) + sizeof(ENDPOINT) + msgBody_LENGTH; // Command:33 + $HOST:29 + $ENDPOINT:5 + $msgBody_LENGTH
 
 /* ------------------------ Golbal Variables ------------------------- */
 
 unsigned long lastPost = millis();  // Track what is the last posted time
 bool readyToPost = true;            // Ready to post to server
-uint8_t trackerSleepCycles = 8;     // Tracker remotge control
+uint8_t trackerSleepCycles = 8;     // Tracker remote control
 
 /* ------------------------ Setup ------------------------- */
 
 void setup() {
   DEBUG_SERIAL.begin(PC_BAUDRATE); // Start Debug Serial
 
-  // Power on 3G then turn it off
+  // Reset the 3G shield then turn it off
   pinMode(SIM3G_EN, OUTPUT);
   powerOn3G();
-  delay(1000);
+  delay(8000);  // Delay will ensure the 3G is fully turned on
   powerOff3G();
   
   // Start 3G Serial
@@ -126,11 +130,12 @@ void setup() {
     while (true);
   }
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
-   LoRa.setSpreadingFactor(12); // maximum SF to get longest range
+  //LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.enableCrc(); // Enables the LoRa module's built in error checking
   DEBUG_SERIAL.println(F("LoRa init succeeded."));
-  // Uncomment the following three line to enable onReceive with interupt pins DIO0(D2)
+  
   #if INTERUPT_MODE == true
+  // Enable the following three line to enable onReceive with interupt pins DIO0(D2)
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
   LoRa_rxMode();
@@ -149,7 +154,7 @@ void loop() {
     }else{
       DEBUG_SERIAL.println(F("No data to post"));
     }
-    lastPost = millis();
+    lastPost = millis(); // Reset lastPost to current time
     readyToPost = false;
   }
 
@@ -244,7 +249,7 @@ void onReceive(int packetSize) {
       // clear
       free(unixTime); 
       // register
-      registerTracker((char) nodeID);
+      registerTracker(nodeID);
       // send ACK
       sendAck(nodeID);     
       break;
