@@ -12,17 +12,17 @@ void initilaize() {
 
   configGPS();
 
+  // lora frequency = 915e6， （legal frequency in Canada）
   if (!LoRa.begin(915E6)) {
     DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
-  // LoRa.setSignalBandwidth(7.8E3); // test
+  // LoRa.setSignalBandwidth(7.8E3); // 
   // LoRa.setSpreadingFactor(12); // maximum SF to get longest range
   LoRa.setTxPower(LORA_TX_POWER); // maximum tx power to get longest range
   LoRa.onReceive(onReceive);
   LoRa.onTxDone(onTxDone);
-  // LoRa.enableCrc(); // Enables the LoRa module's built in error checking
-
+  LoRa.enableCrc(); // Enables the LoRa module's built in error checking
   pinMode(LoRa_RESET, OUTPUT);
 
   DEBUG_SERIAL.println(F("Initialize Successfully."));
@@ -92,7 +92,7 @@ void configGPS(){
   pinMode(GPS_EN, OUTPUT);
   gpsPort.begin(GPS_BAUDRATE);
   enableGPS();
-  delay(1000);
+  delay(1000); // Make sure the GPS is fully turned on (ms)
   TurtleTracker_UBX_2022 turtleTracker_UBX(Serial,gpsPort);
   turtleTracker_UBX.configGPS();
 }
@@ -177,9 +177,9 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   DEBUG_SERIAL.print("lowPowerMode Start. with sleep cyles = ");
   DEBUG_SERIAL.println(sleep_cycles);
   disableGPS(); // Make sure GPS is off before sleep
-//  LoRa.end(); // Ture off LoRa SPI before sleep
+//  LoRa.end(); // Turn off LoRa SPI before sleep
   LoRa.sleep(); // test
-  resetLoRa(); // Ture off LoRa hardware before sleep
+  resetLoRa(); // Turn off LoRa hardware before sleep
   delay(100);
   for (uint8_t i = 0; i < sleep_cycles; i++) {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*8 mins
@@ -237,11 +237,7 @@ void readBuf(uint8_t* buf, int* readIndex, int* bufLen) {
 
 // Test if the buf is full.
 boolean isFullBuf(int bufLen, int maxBufLen) {
-  if (bufLen == maxBufLen) {
-    return true;
-  } else {
-    return false;
-  }
+  return bufLen == maxBufLen;
 }
 
 // "fake" reading n elements (i.e. lazy deleting n elements from the buff)

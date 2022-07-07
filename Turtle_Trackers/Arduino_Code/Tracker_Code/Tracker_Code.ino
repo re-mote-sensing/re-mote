@@ -31,12 +31,15 @@
 #define GPS_TX 3 // GPS TX Pin
 #define GPS_RX 4 // GPS RX Pin
 #define GPS_EN 6 // GPS Enable Pin
+
 #define LoRa_RESET 9 // LoRa reset Pin
 
-#define GPS_TIMEOUT 36000 // GPS read timeout (Average read time 31sec on GP735T)
-#define ACK_TIMEOUT 10000 // ack waiting time for sending sensor data
+#define GPS_TIMEOUT 80000 // GPS read timeout (ms) (Average read time 31sec on GP735T)
+#define ACK_TIMEOUT 10000 // ack waiting time (ms) for sending sensor data
 #define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
 
+// refer to message encoding in this file:
+// https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx
 #define REG_LEN 6 // registration message length (in bytes)
 #define SEN_LEN 14 // sensor data message length (in bytes)
 #define ACK_LEN 3 // ack messgae length (in bytes)
@@ -46,8 +49,8 @@
 #define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
 #define BUF_SIZE 240 // set LoRa buff size to a mutipler of 12 (bytes of one data point) but no more than 256 (maximum len of a lora message)
 
-#define PC_BAUDRATE 9600L
-#define GPS_BAUDRATE 9600L
+#define PC_BAUDRATE 9600L   // Debug Serial Baudrate
+#define GPS_BAUDRATE 9600L  // Debug GPS Baudrate
 
 #define DEBUG true // Set to true for debug output, false for no output
 #define DEBUG_SERIAL if(DEBUG) Serial
@@ -62,7 +65,7 @@ gps_fix fix;
 
 boolean ackReceived = false; // flag used in automatically detecting ack
 long lastTime = 0; // Save the timestamp for the last GPS fix data
-uint8_t sleep_cycles = DEFAULT_SLEEP_CYCLES; // Dynamic Sleep Cycles
+//uint8_t sleep_cycles = DEFAULT_SLEEP_CYCLES; // Dynamic Sleep Cycles
 
 uint8_t millis_count = 0; // second counts for calculating the wait time
 unsigned long lastSent = millis();  // Track what is the last sent time
@@ -85,7 +88,7 @@ int bufLen = 0;
 void setup() {
   initilaize();
 
-  millis_count = 0;
+//  millis_count = 0;
   while (!ackReceived) {
     if ((millis() - lastSent) > sent_time){
       DEBUG_SERIAL.print(F("Wait for (millis): "));
@@ -115,9 +118,9 @@ void setup() {
       /*-----------------------------------------*/
       
 //      sent_time = (2 << millis_count) * 1000 + random(1000); // based on experiments, the minimum progation time is 1s
-      sent_time = 1000 + random(1000); // based on experiments, the minimum progation time is 1s
+      sent_time = 1000 + random(1000); // (ms) based on experiments, the minimum progation time is 1s
       lastSent = millis();
-      millis_count++;
+//      millis_count++;
     }
     
     
@@ -125,6 +128,7 @@ void setup() {
 
   // put LoRa to end mode before using it to save power
   LoRa.sleep();
+  resetLoRa();
 //  DEBUG_SERIAL.println("MODE: END -- i.e. end");
   
   DEBUG_SERIAL.println(F("Initialize Successfully!"));
@@ -142,7 +146,7 @@ void loop() {
   readGPSvaild();
   disableGPS();
   
-  #if DEBUG == true
+  #if DEBUG
   printLocationData();
   #endif  //DEBUG == true
 
@@ -161,12 +165,12 @@ void loop() {
   } else {
     // only collect data if the buff is not full
   // Read data from fix
-//    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-//    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-//    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-    long latitude = 432582727; // 32 bits i.e 4 bytes
-    long longitude = -799207620; // 32 bits i.e 4 bytes
+    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+//    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
+//    long latitude = 432582727; // 32 bits i.e 4 bytes
+//    long longitude = -799207620; // 32 bits i.e 4 bytes
     
     uint8_t* temp; // a helper pointer
     // write unixTime
@@ -192,7 +196,7 @@ void loop() {
   // Always try sending the WHOLE buff using LoRa
   unsigned long ackStartTime = millis();
   
-  millis_count = 0; // reset millis count to 0
+  millis_count = 0; // count of iteration
   lastSent = millis();  // reset lastSent to current time
   sent_time = 0; // reset sent_time to 0
   while (!ackReceived && millis() - ackStartTime < ACK_TIMEOUT) {    
@@ -213,7 +217,7 @@ void loop() {
       LoRa_writeFromBuff(&buf[0], &readIndex, &bufLen);
       LoRa.endPacket(true); 
   
-      sent_time = (2 << millis_count) * 1000 + random(1000); // based on experiments, the minimum progation time is 1s
+      sent_time = (2 << millis_count) * 1000 + random(1000); // (ms) based on experiments, the minimum progation time is 1s
       lastSent = millis();
       millis_count++;
     }
@@ -238,7 +242,7 @@ void onReceive(int packetSize) {
       uint8_t ack = (uint8_t) LoRa.read();
       uint8_t nodeID = (uint8_t) LoRa.read();
       if (ack == 0x00 && nodeID == NODE_ID) {
-        #if DEBUG == true
+        #if DEBUG
         DEBUG_SERIAL.println(F("Received ACK:"));
         DEBUG_SERIAL.print(F("ACK type: "));
         printByte(ack);
@@ -246,7 +250,7 @@ void onReceive(int packetSize) {
         DEBUG_SERIAL.print(F("Node ID: "));
         printByte(nodeID);
         DEBUG_SERIAL.println();
-        #endif  //DEBUG == true
+        #endif
 
         // accept remote control from gateway
         trackerSleepCycles = (uint8_t) LoRa.read();
