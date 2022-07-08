@@ -44,11 +44,20 @@
 // 3G Timeout
 #define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout (ms)
 
+// Message encoding
+#define REG_LEN 4 // registration message length (in bytes)
+#define SEN_LEN 14 // sensor data message length (in bytes)
+#define SEN_HEADER_LEN 6 // SEN_BODY_LEN = SEN_LEN - SEN_HEADER_LEN (in bytes)
+#define ACK_LEN 3 // ack messgae length (in bytes)
+#define DATA_POINT_NUM 19 // the maximum num of data points that can be stored in lora buff
+#define DATA_POINT_SIZE 13 // size of one data points (in bytes)
+#define REG_TYPE 0x0c
+#define SEN_TYPE 0x0d
+#define ACK_SUCCESS 0x00
+
 // LoRa
 #define LORA_TX_POWER 20      // Output power of the RFM95 (23 is the max)
 #define INVERT_IQ_MODE false  // InvertIQ mode
-#define REG_LEN 6             // registration message length (in bytes)
-#define SEN_LEN 14            // sensor data message length (in bytes)
 #define INTERUPT_MODE false   // Use interupt pin when receive a LoRa Message (Arduino Uno does not have enough SRAM)
 
 // Serial
@@ -199,7 +208,7 @@ void LoRa_sendMessage(const uint8_t* message, size_t messageLen) {
 
 void onReceive(int packetSize) {
   // filter by size
-  if ((packetSize - 2) % 12 != 0 && packetSize != REG_LEN) {
+  if (packetSize != REG_LEN && (packetSize - SEN_HEADER_LEN) % DATA_POINT_SIZE != 0) {
     return;
   }
   
@@ -219,35 +228,28 @@ void onReceive(int packetSize) {
   // do action according to message type
   switch (type) {
     // <--- CASE: Registration ---> //
-    case 0x0c: {
+    case REG_TYPE: {
       // read nodeID
       uint8_t nodeID = (uint8_t) LoRa.read();
-      // read unixTime
-      uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
-      // !!! reverse order <= little edian
-      unixTime[0] = (uint8_t) LoRa.read();
-      unixTime[1] = (uint8_t) LoRa.read();
-      unixTime[2] = (uint8_t) LoRa.read();
-      unixTime[3] = (uint8_t) LoRa.read();
-      // READ DATA TEST
+      // read serial number (16 bits = 2 bytes)
+      uint8_t serialNum[2];
+      serialNum[0] = (uint8_t) LoRa.read();
+      serialNum[1] = (uint8_t) LoRa.read();
+      // read data debug
       #ifdef DEBUG
       DEBUG_SERIAL.print(F("nodeID: "));
       printByte(nodeID);
       DEBUG_SERIAL.println();
-      DEBUG_SERIAL.print(F("unixTime: "));
-      printByte(unixTime[0]);
-      printByte(unixTime[1]);
-      printByte(unixTime[2]);
-      printByte(unixTime[3]);
+      DEBUG_SERIAL.print(F("serialNum: "));
+      printByte(serialNum[0]);
+      printByte(serialNum[1]);
       DEBUG_SERIAL.println();
       #endif
       // covert data to string
       DEBUG_SERIAL.print(F("nodeID: "));
       DEBUG_SERIAL.println(String(nodeID));
-      DEBUG_SERIAL.print(F("unixTime: "));
-      DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
-      // clear
-      free(unixTime); 
+      DEBUG_SERIAL.print(F("serialNum: "));
+      DEBUG_SERIAL.println(String(* (uint16_t*) serialNum)); 
       // register
       registerTracker(nodeID);
       // send ACK
@@ -256,34 +258,41 @@ void onReceive(int packetSize) {
     }
       
     // <--- CASE: Sensor Data ---> //
-    case 0x0d: {
+    case SEN_TYPE: {
       // read nodeID
       uint8_t nodeID = (uint8_t) LoRa.read();
-
-      // calculate num of datapoints
-      // num of datapoints = (messageLen - header lenfth) / (size of ONE data point (4 bytes) i.e. (unixTime, latitude, longtitude))
-      int num_data = (packetSize - 2) / 12;
-      for (int i = 0; i < num_data; i++) {
+      // read serial number (16 bits = 2 bytes)
+      uint8_t serialNum[2];
+      serialNum[0] = (uint8_t) LoRa.read();
+      serialNum[1] = (uint8_t) LoRa.read();
+      // read battery percentage
+      uint8_t batteryPercentage = (uint8_t) LoRa.read();
+      // read datapoint count
+      uint8_t datapointCount = (uint8_t) LoRa.read();
+      
+      for (uint8_t i = 0; i < datapointCount; i++) {
         // read unixTime
-        uint8_t* unixTime = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        uint8_t unixTime[4];
         unixTime[0] = (uint8_t) LoRa.read();
         unixTime[1] = (uint8_t) LoRa.read();
         unixTime[2] = (uint8_t) LoRa.read();
         unixTime[3] = (uint8_t) LoRa.read();
         // read latitude
-        uint8_t* latitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        uint8_t latitude[4];
         latitude[0] = (uint8_t) LoRa.read();
         latitude[1] = (uint8_t) LoRa.read();
         latitude[2] = (uint8_t) LoRa.read();
         latitude[3] = (uint8_t) LoRa.read();
         // read longitude
-        uint8_t* longitude = (uint8_t*) malloc(sizeof(uint8_t) * 4);
+        uint8_t longitude[4];
         longitude[0] = (uint8_t) LoRa.read();
         longitude[1] = (uint8_t) LoRa.read();
         longitude[2] = (uint8_t) LoRa.read();
         longitude[3] = (uint8_t) LoRa.read();
-  
-        // Add data into buffer
+        // read tempurature
+        uint8_t tempurature = (uint8_t) LoRa.read();
+
+        // add data into buffer
         addDataByte("0",
                 type,
                 nodeID, 
@@ -291,7 +300,7 @@ void onReceive(int packetSize) {
                 latitude,
                 longitude);
 
-        // READ DATA TEST
+        // read data debug
         #ifdef DEBUG
         DEBUG_SERIAL.print(F("nodeID: "));
         printByte(nodeID);
@@ -314,6 +323,9 @@ void onReceive(int packetSize) {
         printByte(longitude[2]);
         printByte(longitude[3]);
         DEBUG_SERIAL.println();
+        DEBUG_SERIAL.print(F("tempurature: "));
+        printByte(tempurature);
+        DEBUG_SERIAL.println();
         // covert data to string
         DEBUG_SERIAL.print(F("nodeID: "));
         DEBUG_SERIAL.println(String(nodeID));
@@ -323,11 +335,9 @@ void onReceive(int packetSize) {
         DEBUG_SERIAL.println(String(* (long*) latitude));
         DEBUG_SERIAL.print(F("longitude: "));
         DEBUG_SERIAL.println(String(* (long*) longitude));
+        DEBUG_SERIAL.print(F("tempurature: "));
+        DEBUG_SERIAL.println(String(tempurature));
         #endif
-        // clear
-        free(unixTime);
-        free(latitude);
-        free(longitude);
       }       
       // send ACK
       sendAck(nodeID);
@@ -339,8 +349,8 @@ void onReceive(int packetSize) {
 
 // send ack to targe node
 void sendAck(uint8_t nodeID) {
-  uint8_t* message = (uint8_t*) malloc(sizeof(uint8_t) * 3);
-  message[0] = (uint8_t) 0x00;
+  uint8_t message[3];
+  message[0] = (uint8_t) ACK_SUCCESS;
   message[1] = (uint8_t) nodeID;
   message[2] = (uint8_t) trackerSleepCycles; 
   
@@ -350,7 +360,6 @@ void sendAck(uint8_t nodeID) {
   
   LoRa_sendMessage(message, sizeof(uint8_t) * 3);
   DEBUG_SERIAL.println(F("ACK Sent."));
-  free(message);
 }
 
 void onTxDone() {
