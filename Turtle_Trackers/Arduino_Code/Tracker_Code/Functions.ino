@@ -12,8 +12,7 @@ void initilaize() {
 
   configGPS();
 
-  // lora frequency = 915e6， （legal frequency in Canada）
-  if (!LoRa.begin(915E6)) {
+  if (!LoRa.begin(LORA_FREQ)) {
     DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
@@ -118,7 +117,6 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   DEBUG_SERIAL.print("lowPowerMode Start. with sleep cyles = ");
   DEBUG_SERIAL.println(sleep_cycles);
   disableGPS(); // Make sure GPS is off before sleep
-//  LoRa.end(); // Turn off LoRa SPI before sleep
   LoRa.sleep(); // test
   resetLoRa(); // Turn off LoRa hardware before sleep
   delay(100);

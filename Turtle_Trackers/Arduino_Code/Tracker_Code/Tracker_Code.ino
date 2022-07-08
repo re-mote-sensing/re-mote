@@ -3,6 +3,50 @@
   https://gitlab.cas.mcmaster.ca/re-mote
 */
 
+/* ------------------------ Config ------------------------- */
+
+#define NODE_ID 0x01 // Unique Node ID
+
+// Pinout
+#define GPS_TX 3 // GPS TX Pin
+#define GPS_RX 4 // GPS RX Pin
+#define GPS_EN 6 // GPS Enable Pin
+#define LoRa_RESET 9 // LoRa reset Pin
+
+// Timeout
+#define GPS_TIMEOUT 80000 // GPS read timeout (ms) (Average read time 31sec on GP735T)
+#define ACK_TIMEOUT 10000 // ack waiting time (ms) for sending sensor data
+#define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
+
+// Message encoding
+// refer to message encoding in this file:
+// https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx
+#define REG_LEN 4 // registration message length (in bytes)
+#define SEN_LEN 14 // sensor data message length (in bytes)
+#define ACK_LEN 3 // ack messgae length (in bytes)
+#define DATA_POINT_NUM 19 // the maximum num of data points that can be stored in lora buff
+#define DATA_POINT_SIZE 13 // size of one data points (in bytes)
+#define BUF_SIZE DATA_POINT_NUM*DATA_POINT_SIZE // no more than 256 bytes (maximum len of a lora message)
+#define REG_AND_NUM 0xc0 // registration message type and sensor number 0
+#define SEN_AND_NUM 0xd0 // sensor data message type and sensor number 0
+
+// LoRa
+#define LORA_TX_POWER 20 // Output power of the RFM95 (23 is the max)
+#define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
+#define LORA_RegTemp 0x3c
+#define LORA_RegIrqFlag2 0x3f
+#define LORA_FREQ 915E6// legal frequency in Canada
+
+// Serial
+#define PC_BAUDRATE 9600L   // Debug Serial Baudrate
+#define GPS_BAUDRATE 9600L  // Debug GPS Baudrate
+
+// Debug
+#define DEBUG true // Set to true for debug output, false for no output
+#define DEBUG_SERIAL if(DEBUG) Serial // Serial for debuging
+
+/* ------------------------ Librarys ------------------------- */
+
 // LoRa Library
 // An Arduino library for sending and receiving data using LoRa radios.
 // https://www.arduino.cc/reference/en/libraries/lora/
@@ -24,43 +68,9 @@
 // https://github.com/rocketscream/Low-Power
 #include "LowPower.h"
 
-/* ------------------------ Config ------------------------- */
-
-#define NODE_ID 0x01 // Unique Node ID
-
-#define GPS_TX 3 // GPS TX Pin
-#define GPS_RX 4 // GPS RX Pin
-#define GPS_EN 6 // GPS Enable Pin
-
-#define LoRa_RESET 9 // LoRa reset Pin
-
-#define GPS_TIMEOUT 80000 // GPS read timeout (ms) (Average read time 31sec on GP735T)
-#define ACK_TIMEOUT 10000 // ack waiting time (ms) for sending sensor data
-#define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
-
-// refer to message encoding in this file:
-// https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx
-#define REG_LEN 4 // registration message length (in bytes)
-#define SEN_LEN 14 // sensor data message length (in bytes)
-#define ACK_LEN 3 // ack messgae length (in bytes)
-#define DATA_POINT_NUM 19 // the maximum num of data points that can be stored in lora buff
-#define DATA_POINT_SIZE 13 // size of one data points (in bytes)
-#define BUF_SIZE DATA_POINT_NUM*DATA_POINT_SIZE // no more than 256 bytes (maximum len of a lora message)
-#define REG_AND_NUM 0xc0 // registration message type and sensor number 0
-#define SEN_AND_NUM 0xd0 // sensor data message type and sensor number 0
-
-#define LORA_TX_POWER 20 // Output power of the RFM95 (23 is the max)
-#define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
-
-#define PC_BAUDRATE 9600L   // Debug Serial Baudrate
-#define GPS_BAUDRATE 9600L  // Debug GPS Baudrate
-
-#define DEBUG true // Set to true for debug output, false for no output
-#define DEBUG_SERIAL if(DEBUG) Serial
-
 /* ------------------------ Constructors ------------------------- */
-
-NeoSWSerial gpsPort(GPS_TX, GPS_RX);
+// Official usage provided by <NMEAGPS.h>
+NeoSWSerial gpsPort(GPS_TX, GPS_RX); 
 NMEAGPS gps;
 gps_fix fix;
 
@@ -121,7 +131,7 @@ void setup() {
   LoRa.sleep();
   resetLoRa();
   
-  DEBUG_SERIAL.println(F("Initialize Successfully!"));
+  DEBUG_SERIAL.println(F("Registration Complete!"));
 }
 
 /* ------------------------ Loop ------------------------- */
@@ -131,20 +141,20 @@ void loop() {
   // Initialize
   ackReceived = false; // reset ackReceived to FALSE
 
-//  // Read time & gps
-//  enableGPS();
-//  readGPSValid();
-//  disableGPS();
-//  
-//  #if DEBUG
-//  printLocationData();
-//  #endif  //DEBUG == true
-//
-//  // If No valid data, then skip sending data and sleep the module
-//  if (!ifVaildFix()) {
-//    enterLowPowerMode(trackerSleepCycles);
-//    return;
-//  }
+  // Read time & gps
+  enableGPS();
+  readGPSValid();
+  disableGPS();
+  
+  #if DEBUG
+  printLocationData();
+  #endif  //DEBUG == true
+
+  // If No valid data, then skip sending data and sleep the module
+  if (!ifVaildFix()) {
+    enterLowPowerMode(trackerSleepCycles);
+    return;
+  }
 
   // Now, fix should hold the time and location data
 
@@ -154,16 +164,13 @@ void loop() {
     DEBUG_SERIAL.println(F("BUFF IS FULL. will skip collecting datapoints and try sending the buff FIRST."));
   } else {
     // only collect data if the buff is not full
-  // Read data from fix
-//    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
-//    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
-//    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
-    unsigned long unixTime = 1656555632; // 32 bits i.e 4 bytes
-    long latitude = 432582727; // 32 bits i.e 4 bytes
-    long longitude = -799207620; // 32 bits i.e 4 bytes
-    uint8_t temperature = 0x02; // 8 bits i.e. 1 byte (HARDCODED)
-    
-    uint8_t* temp; // a helper pointer
+    // Read data from fix
+    unsigned long unixTime = (NeoGPS::clock_t) fix.dateTime + 946684800; // 32 bits i.e 4 bytes
+    long latitude = fix.latitudeL(); // 32 bits i.e 4 bytes
+    long longitude = fix.longitudeL(); // 32 bits i.e 4 bytes
+    uint8_t temperature = LoRa.readRegister(LORA_RegTemp); // 8 bits i.e. 1 byte
+    // create a helper pointer for memcpy
+    uint8_t* temp; 
     // write unixTime (32 bits = 4 bytes)
     temp = (uint8_t*) &unixTime;
     for (uint8_t i = 0; i < 4; i++) {
@@ -184,7 +191,6 @@ void loop() {
   }
 
   // Always try sending the WHOLE buff using LoRa
-  
   unsigned long ackStartTime = millis(); // track the ack start waiting time
   uint8_t millis_count = 0; // count of iteration
   unsigned long lastSent = millis();  // track what is the last sent time
@@ -207,8 +213,8 @@ void loop() {
       temp = (uint8_t*) &serialNum;
       LoRa.write((uint8_t) *(temp));
       LoRa.write((uint8_t) *(temp + 1));
-      // write battery percentage (HARDCODED)
-      LoRa.write((uint8_t) 0x40);
+      // write battery percentage
+      LoRa.write((uint8_t) LoRa.readRegister(LORA_RegIrqFlag2));
       // write datapoint count
       LoRa.write((uint8_t) (loraBuf.bufLen / DATA_POINT_SIZE));
       // debug buffer size
@@ -236,7 +242,7 @@ void loop() {
 
 /* ------------------------ Callback Functions ------------------------- */
 
-// if LoRa received any message, it will interrupt any current execution line,
+// If LoRa received any message, it will interrupt any current execution line,
 // then begin call this onReceive function
 void onReceive(int packetSize) {  
     if (packetSize == ACK_LEN) {
@@ -273,7 +279,7 @@ void onReceive(int packetSize) {
     }
 }
 
-// if LoRa finish transmitted message, it will interrupt any current execution line,
+// If LoRa finish transmitted message, it will interrupt any current execution line,
 // then begin call this onReceive function
 void onTxDone() {
   DEBUG_SERIAL.println(F("Message Sent."));

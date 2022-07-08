@@ -233,7 +233,7 @@ String getByte(uint8_t b) {
 // Add Tracker data into SD card
 // return true : success
 // return false : failed
-bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, uint8_t* latitude, uint8_t* longitude) {
+bool addDataByte(uint8_t type, uint8_t nodeID, uint8_t* serialNum, uint8_t batteryPercentage, uint8_t datapointCount, uint8_t* unixTime, uint8_t* latitude, uint8_t* longitude, uint8_t tempurature) {
   SdFat sd;
   if (!sd.begin(SD_CONFIG)) {
     DEBUG_SERIAL.println(F("SD Error"));
@@ -249,10 +249,6 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
   if (sd.exists(fileName)) {
     // Create csv file
     File file;
-//    free(fileName);
-//    char* fileName = getFileName((char)nodeID); // Get name again
-//    if (fileName == NULL)
-//      return false;
     if (!file.open(fileName, FILE_WRITE)) { // Open Tracker data CSV
       DEBUG_SERIAL.print(F("Open CSV Failed: "));
       DEBUG_SERIAL.println(fileName);
@@ -262,13 +258,19 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
 
     // Data added to CSV
     file.print("\r\n");
-    file.print(count);
+    file.print(String(datapointCount));
     file.print(",");
     file.print(String(* (unsigned long*) unixTime));
     file.print(",");
     file.print(String(* (long*) latitude));
     file.print(",");
     file.print(String(* (long*) longitude));
+    file.print(",");
+    file.print(String(batteryPercentage));
+    file.print(",");
+    file.print(String(* (uint16_t*) serialNum));
+    file.print(",");
+    file.print(String(tempurature));
     
     file.close();
     
@@ -277,6 +279,7 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
     
     free(fileName);
   }else{
+    free(fileName);
     DEBUG_SERIAL.println(F("Node not registered"));
     return false;
   }
@@ -293,16 +296,23 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
 
     // Convert data to byte string
     // Example:
-    // Type:  0x0D
+    // type:  0x0D
     // nodeID:  0x06
     // unixTime:  0x5D 0x11 0x35 0xCA
     // latitude:  0x15 0xCD 0x5B 0x07
     // longitude:  0xB1 0x68 0xDE 0x3A
     // -->
     // 0d065d1135ca15cd5b07b168de3a
+    // ty ni sn   bp dp ut       lat      long     tp
+    // 01 23 4567
+    // 0d 01 0006 00 01 386d4380 00000000 00000000 00
     file.print("\r\n");
     file.print(getByte(type));
     file.print(getByte(nodeID));
+    file.print(getByte(serialNum[1]));
+    file.print(getByte(serialNum[0]));
+    file.print(getByte(batteryPercentage));
+    file.print(getByte(datapointCount));
     file.print(getByte(unixTime[3]));
     file.print(getByte(unixTime[2]));
     file.print(getByte(unixTime[1]));
@@ -315,11 +325,13 @@ bool addDataByte(String count, uint8_t type, uint8_t nodeID, uint8_t* unixTime, 
     file.print(getByte(longitude[2]));
     file.print(getByte(longitude[1]));
     file.print(getByte(longitude[0]));
+    file.print(getByte(tempurature));
 
     file.close();
     DEBUG_SERIAL.println(F("Buffer Added"));
   }else{
     DEBUG_SERIAL.println(F("ToSend.bin not existed"));
+    free(fileName);
     return false;
   }
 }
@@ -366,7 +378,7 @@ bool registerTracker(uint8_t id){
       return false;
     }
     file.print(fileName); // Write ID in first line
-    file.print(F("\nCount,Time,Lat,Lon")); // Write table header
+    file.print(F("\nCount,Time,Lat,Lon,BAT,Serial,Temp")); // Write table header
     file.close();
   }else{
     DEBUG_SERIAL.println(F("CSV File Existed"));
@@ -399,6 +411,46 @@ void resetToSend(){
     DEBUG_SERIAL.println(F("ToSend.bin Still Exist"));
   }
   DEBUG_SERIAL.println(F("ToSend.bin Reseted"));
+}
+
+/* ------------------------ LoRa ------------------------- */
+// Turn LoRa into receive mode
+void LoRa_rxMode(){
+  #if INVERT_IQ_MODE
+  LoRa.disableInvertIQ();               // normal mode
+  #endif
+  LoRa.receive();                       // set receive mode
+}
+
+// Turn LoRa into transmit mode
+void LoRa_txMode(){
+  LoRa.idle();                          // set standby mode
+  #if INVERT_IQ_MODE
+  LoRa.enableInvertIQ();                // active invert I and Q signals
+  #endif
+}
+
+// Use LoRA send a memory block pointed by message with length messageLength
+void LoRa_sendMessage(const uint8_t* message, size_t messageLen) {
+  LoRa_txMode();                        // set tx mode
+  LoRa.beginPacket();                   // start packet
+  LoRa.write(message, messageLen);      // add payload
+  LoRa.endPacket(true);                 // finish packet and send it
+}
+
+// Send ack to targe node
+void sendAck(uint8_t nodeID) {
+  uint8_t message[3];
+  message[0] = (uint8_t) ACK_SUCCESS;
+  message[1] = (uint8_t) nodeID;
+  message[2] = (uint8_t) trackerSleepCycles; 
+  
+  DEBUG_SERIAL.print(F("ACK TARGET NodeID: "));
+  printByte(nodeID);
+  DEBUG_SERIAL.println();
+  
+  LoRa_sendMessage(message, sizeof(uint8_t) * 3);
+  DEBUG_SERIAL.println(F("ACK Sent."));
 }
 
 /* ------------------------ Helper for Debug ------------------------- */

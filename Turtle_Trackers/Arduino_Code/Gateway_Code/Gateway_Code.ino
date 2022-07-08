@@ -15,10 +15,10 @@
 // Length of each line in ToSend.bin: 
 // Type,NodeID,TimeStamp,Lat,Lon
 // \r\n0d065d1135ca15cd5b07b168de3a
-#define BIN_LINE_LENGTH 30
+#define BIN_LINE_LENGTH 40
 
 // HTTP Post
-#define POST_AMOUNT 6       // Define how many tracker data to read for a single post (Based on testing, 6 is a stable amount for Uno)
+#define POST_AMOUNT 4       // Define how many tracker data to read for a single post (Based on testing, 6 is a stable amount for Uno)
 #define POST_TIME 30000     // Time between each post (ms)
 
 // SD Card
@@ -37,34 +37,41 @@
 #define SIM3G_EN A1                   // 3G Enable Pin
 #define SIM3G_TX 4                    // 3G TX Pin
 #define SIM3G_RX 5                    // 3G RX Pin
+
 // 3G Enable Pin Time
 // https://www.tinyosshop.com/datasheet/3G%20Shield%20Datasheet.pdf
 #define SIM3G_POWER_ON_TIME 180       // 3G Power on time for enable pin (ms)
 #define SIM3G_POWER_OFF_TIME 4000     // 3G Power off time for enable pin (ms)
+
 // 3G Timeout
 #define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout (ms)
 
 // Message encoding
+// refer to message encoding in this file:
+// https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx
 #define REG_LEN 4 // registration message length (in bytes)
 #define SEN_LEN 14 // sensor data message length (in bytes)
 #define SEN_HEADER_LEN 6 // SEN_BODY_LEN = SEN_LEN - SEN_HEADER_LEN (in bytes)
 #define ACK_LEN 3 // ack messgae length (in bytes)
 #define DATA_POINT_NUM 19 // the maximum num of data points that can be stored in lora buff
 #define DATA_POINT_SIZE 13 // size of one data points (in bytes)
-#define REG_TYPE 0x0c
-#define SEN_TYPE 0x0d
-#define ACK_SUCCESS 0x00
+#define REG_TYPE 0x0c // registration type in hex
+#define SEN_TYPE 0x0d // sensor data type in hex
+#define ACK_SUCCESS 0x00 // first byte in successful ack message
 
 // LoRa
 #define LORA_TX_POWER 20      // Output power of the RFM95 (23 is the max)
 #define INVERT_IQ_MODE false  // InvertIQ mode
 #define INTERUPT_MODE false   // Use interupt pin when receive a LoRa Message (Arduino Uno does not have enough SRAM)
+#define LORA_FREQ 915E6// legal frequency in Canada
 
 // Serial
 #define PC_BAUDRATE 9600L     // Debug Serial Baudrate
 #define SIM3G_BAUDRATE 9600L  // 3G Shield Serial Baudrate
 
+// Debug
 #define DEBUG true  // Set to true for debug Serial output, false for no output
+#define DEBUG_SERIAL if(DEBUG) Serial // Serial for debuging
 
 /* ------------------------ Librarys ------------------------- */
 
@@ -96,7 +103,6 @@
 
 /* ------------------------ Constructors ------------------------- */
 
-#define DEBUG_SERIAL if(DEBUG)Serial  // Serial for debuging
 NeoSWSerial ss(SIM3G_TX, SIM3G_RX);   // Serial for 3G Shield
 // SdFat software SPI
 // https://github.com/greiman/SdFat/blob/master/examples/SoftwareSpi/SoftwareSpi.ino
@@ -113,7 +119,7 @@ const unsigned int POST_COMMAND_LENGTH = 33 + sizeof(HOST) + sizeof(ENDPOINT) + 
 
 unsigned long lastPost = millis();  // Track what is the last posted time
 bool readyToPost = true;            // Ready to post to server
-uint8_t trackerSleepCycles = 8;     // Tracker remote control
+uint8_t trackerSleepCycles = 112;     // Tracker remote control
 
 /* ------------------------ Setup ------------------------- */
 
@@ -134,7 +140,7 @@ void setup() {
   createToSendFile(); 
 
   // Start LoRa
-  if (!LoRa.begin(915E6)) {
+  if (!LoRa.begin(LORA_FREQ)) {
     DEBUG_SERIAL.println(F("LoRa init failed. Check your connections."));
     while (true);
   }
@@ -176,36 +182,10 @@ void loop() {
   #endif
 }
 
-/* ------------------------ LoRa helper functions ------------------------- */
+/* ------------------------ Callback Functions ------------------------- */
 
-void LoRa_rxMode(){
-  #if INVERT_IQ_MODE
-  LoRa.disableInvertIQ();               // normal mode
-  #endif
-  LoRa.receive();                       // set receive mode
-}
-
-void LoRa_txMode(){
-  LoRa.idle();                          // set standby mode
-  #if INVERT_IQ_MODE
-  LoRa.enableInvertIQ();                // active invert I and Q signals
-  #endif
-}
-
-void LoRa_sendMessage(String message) {
-  LoRa_txMode();                        // set tx mode
-  LoRa.beginPacket();                   // start packet
-  LoRa.print(message);                  // add payload
-  LoRa.endPacket(true);                 // finish packet and send it
-}
-
-void LoRa_sendMessage(const uint8_t* message, size_t messageLen) {
-  LoRa_txMode();                        // set tx mode
-  LoRa.beginPacket();                   // start packet
-  LoRa.write(message, messageLen);      // add payload
-  LoRa.endPacket(true);                 // finish packet and send it
-}
-
+// If LoRa received any message, it will interrupt any current execution line,
+// then begin call this onReceive function
 void onReceive(int packetSize) {
   // filter by size
   if (packetSize != REG_LEN && (packetSize - SEN_HEADER_LEN) % DATA_POINT_SIZE != 0) {
@@ -293,12 +273,17 @@ void onReceive(int packetSize) {
         uint8_t tempurature = (uint8_t) LoRa.read();
 
         // add data into buffer
-        addDataByte("0",
+        addDataByte(
                 type,
                 nodeID, 
+                serialNum,
+                batteryPercentage,
+                datapointCount,
                 unixTime,
                 latitude,
-                longitude);
+                longitude,
+                tempurature
+                );
 
         // read data debug
         #ifdef DEBUG
@@ -330,6 +315,12 @@ void onReceive(int packetSize) {
         DEBUG_SERIAL.print(F("nodeID: "));
         DEBUG_SERIAL.println(String(nodeID));
         DEBUG_SERIAL.print(F("unixTime: "));
+        DEBUG_SERIAL.print(F("serialNum: "));
+        DEBUG_SERIAL.println(String(* (uint16_t*) serialNum));
+        DEBUG_SERIAL.print(F("batteryPercentage: "));
+        DEBUG_SERIAL.println(String(batteryPercentage));
+        DEBUG_SERIAL.print(F("datapointCount: "));
+        DEBUG_SERIAL.println(String(datapointCount));
         DEBUG_SERIAL.println(String(* (unsigned long*) unixTime));
         DEBUG_SERIAL.print(F("latitude: "));
         DEBUG_SERIAL.println(String(* (long*) latitude));
@@ -347,21 +338,8 @@ void onReceive(int packetSize) {
   }
 }
 
-// send ack to targe node
-void sendAck(uint8_t nodeID) {
-  uint8_t message[3];
-  message[0] = (uint8_t) ACK_SUCCESS;
-  message[1] = (uint8_t) nodeID;
-  message[2] = (uint8_t) trackerSleepCycles; 
-  
-  DEBUG_SERIAL.print(F("ACK TARGET NodeID: "));
-  printByte(nodeID);
-  DEBUG_SERIAL.println();
-  
-  LoRa_sendMessage(message, sizeof(uint8_t) * 3);
-  DEBUG_SERIAL.println(F("ACK Sent."));
-}
-
+// If LoRa finish transmitted message, it will interrupt any current execution line,
+// then begin call this onReceive function
 void onTxDone() {
   DEBUG_SERIAL.println(F("TxDone"));
   LoRa_rxMode();
