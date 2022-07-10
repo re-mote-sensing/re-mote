@@ -5,7 +5,7 @@
 
 /* ------------------------ Config ------------------------- */
 
-#define GATEWAY_ID 0x01 // Unique Gateway ID
+#define GATEWAY_ID 0x64 // Unique Gateway ID
 
 // Sever Info
 #define HOST "turtletracker.cas.mcmaster.ca"  // Change this to the public IP address / domain of the server's network
@@ -18,8 +18,9 @@
 #define BIN_LINE_LENGTH 40
 
 // HTTP Post
-#define POST_AMOUNT 4       // Define how many tracker data to read for a single post (Based on testing, 6 is a stable amount for Uno)
-#define POST_TIME 30000     // Time between each post (ms)
+#define POST_AMOUNT 4       // Define how many tracker data to read for a single post (Based on testing, 4 is a stable amount for Uno)
+#define POST_TIME 1800000     // Time between each post (ms), 1800000ms ~half hour
+#define GATEWAY_REPORT_TIME 3600000 // Time between each gateway report, 3600000 ~a hour
 
 // SD Card
 // Hardware SPI is used by LoRa, so software SPI with different pins is required
@@ -32,7 +33,7 @@
 // Two pins conflict with LoRa Shield
 // Connect 8 => A1
 //         9 => A0
-// Config Bandrate under "STEP2: 3G Baud Adjustment"
+// Config Bandrate to 9600 under "STEP2: 3G Baud Adjustment"
 // https://www.tinyosshop.com/index.php?route=information/news&news_id=51
 #define SIM3G_EN A1                   // 3G Enable Pin
 #define SIM3G_TX 4                    // 3G TX Pin
@@ -60,10 +61,10 @@
 #define ACK_SUCCESS 0x00 // first byte in successful ack message
 
 // LoRa
-#define LORA_TX_POWER 20      // Output power of the RFM95 (23 is the max)
+#define LORA_TX_POWER 20      // Output power of the RFM95
 #define INVERT_IQ_MODE false  // InvertIQ mode
 #define INTERUPT_MODE false   // Use interupt pin when receive a LoRa Message (Arduino Uno does not have enough SRAM)
-#define LORA_FREQ 915E6// legal frequency in Canada
+#define LORA_FREQ 915E6       // Legal frequency in Canada
 
 // Serial
 #define PC_BAUDRATE 9600L     // Debug Serial Baudrate
@@ -97,7 +98,7 @@
 // MemoryFree Library
 // Report memory usage for SRAM debuging
 // https://github.com/maniacbug/MemoryFree
-#if DEBUG == true
+#if DEBUG
 #include <MemoryFree.h>
 #endif
 
@@ -115,11 +116,13 @@ const unsigned int CHTTPSOPSE_LENGTH = 22 + sizeof(SERVER_PORT) + sizeof(HOST); 
 const unsigned int msgBody_LENGTH = 2 + (BIN_LINE_LENGTH-2)*POST_AMOUNT; // Command:2 + ($BIN_LINE_LENGTH-2)*$POST_AMOUNT:6
 const unsigned int POST_COMMAND_LENGTH = 33 + sizeof(HOST) + sizeof(ENDPOINT) + msgBody_LENGTH; // Command:33 + $HOST:29 + $ENDPOINT:5 + $msgBody_LENGTH
 
-/* ------------------------ Golbal Variables ------------------------- */
+/* ------------------------ Global Variables ------------------------- */
 
 unsigned long lastPost = millis();  // Track what is the last posted time
+unsigned long lastReport = millis();  // Track what is the last gateway report time
 bool readyToPost = true;            // Ready to post to server
-uint8_t trackerSleepCycles = 112;     // Tracker remote control
+uint8_t trackerSleepCycles = 224;   // Tracker sleep cycle remote control
+uint16_t serialNum = 0; // count how many messages has been sent.
 
 /* ------------------------ Setup ------------------------- */
 
@@ -138,6 +141,9 @@ void setup() {
 
   // Start SD and create ToSend.bin
   createToSendFile(); 
+
+  // Register gateway itself
+  registerTracker((uint8_t)GATEWAY_ID);
 
   // Start LoRa
   if (!LoRa.begin(LORA_FREQ)) {
@@ -173,6 +179,14 @@ void loop() {
     readyToPost = false;
   }
 
+  // Report gateway itself with serial number to check if gateway is working
+  // (GPS time and coords has not been impenment yet)
+  if ((millis() - lastReport) > GATEWAY_REPORT_TIME){
+    reportGateway();
+    lastReport = millis(); // Reset lastReport to current time
+    readyToPost = true;
+  }
+
   #if INTERUPT_MODE == false
   int packetSize = LoRa.parsePacket();
   String result;
@@ -199,7 +213,7 @@ void onReceive(int packetSize) {
   uint8_t typeAndSensor = (uint8_t) LoRa.read();
   uint8_t type = typeAndSensor >> 4;
 
-  #ifdef DEBUG
+  #if DEBUG
   DEBUG_SERIAL.print("Type: ");
   printByte(type);
   DEBUG_SERIAL.println();
@@ -216,7 +230,7 @@ void onReceive(int packetSize) {
       serialNum[0] = (uint8_t) LoRa.read();
       serialNum[1] = (uint8_t) LoRa.read();
       // read data debug
-      #ifdef DEBUG
+      #if DEBUG
       DEBUG_SERIAL.print(F("nodeID: "));
       printByte(nodeID);
       DEBUG_SERIAL.println();
@@ -286,7 +300,7 @@ void onReceive(int packetSize) {
                 );
 
         // read data debug
-        #ifdef DEBUG
+        #if DEBUG
         DEBUG_SERIAL.print(F("nodeID: "));
         printByte(nodeID);
         DEBUG_SERIAL.println();

@@ -126,6 +126,15 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   DEBUG_SERIAL.println(F("lowPowerMode End."));
 }
 
+// Double the sleep cycle x2
+void doubleSleepCycle(){
+  if (trackerSleepCycles == MAX_SLEEP_CYCLES) // If already the maximum sleep cycle, nothing changed
+    return;
+  trackerSleepCycles *= 2; // Double sleep cycle
+  if (trackerSleepCycles > MAX_SLEEP_CYCLES) // If sleep cycle is larger than maximum, change it to max time
+    trackerSleepCycles = MAX_SLEEP_CYCLES;
+}
+
 /* ------------------------ LoRa Buff ------------------------- */
 // A simple cycle buff implementation acting as datpoint buff.
 // Write the vlaue into the buffer
@@ -139,9 +148,11 @@ boolean writeBuf(circularBuffer* buf, uint8_t value) {
 
   // WRITE
   buf->bufArray[buf->writeIndex] = value;
+  #if DEBUG
   DEBUG_SERIAL.print("Write into buffer: " );
   printByte(value);
   DEBUG_SERIAL.println();
+  #endif
   
   (buf->bufLen)++;
   (buf->writeIndex)++;
@@ -161,9 +172,11 @@ boolean readOneFromBuf(circularBuffer* buf) {
   }
 
   // READ
+  #if DEBUG
   DEBUG_SERIAL.print("Read from buffer: " );
   printByte(buf->bufArray[buf->readIndex]);
   DEBUG_SERIAL.println();
+  #endif
   
   (buf->bufLen)--;
   (buf->readIndex)++;
@@ -201,7 +214,9 @@ void LoRa_writeFromBuff(circularBuffer* buf) {
   for (uint8_t i = 0; i < buf->bufLen; i++) {
     uint8_t addr = ((buf->readIndex) + i) % (buf->bufLen); // calculate the address in physical memory
     LoRa.write((uint8_t) (buf->bufArray)[addr]);
+    #if DEBUG
     printByte((uint8_t) (buf->bufArray)[addr]);
+    #endif
   }    
   DEBUG_SERIAL.println();
   DEBUG_SERIAL.println("-------------------------------");             
@@ -210,7 +225,7 @@ void LoRa_writeFromBuff(circularBuffer* buf) {
 
 /* ------------------------ Helper for Debug ------------------------- */
 
-#ifdef DEBUG
+#if DEBUG
 // Prints a byte as hex to the Serial port
 void printByte(uint8_t b) {
   DEBUG_SERIAL.print(F(" 0x"));

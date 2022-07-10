@@ -17,6 +17,7 @@
 #define GPS_TIMEOUT 80000 // GPS read timeout (ms) (Average read time 31sec on GP735T)
 #define ACK_TIMEOUT 10000 // ack waiting time (ms) for sending sensor data
 #define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
+#define MAX_SLEEP_CYCLES 1350 // Maximum sleep time, ~3 hours
 
 // Message encoding
 // refer to message encoding in this file:
@@ -31,7 +32,7 @@
 #define SEN_AND_NUM 0xd0 // sensor data message type and sensor number 0
 
 // LoRa
-#define LORA_TX_POWER 20 // Output power of the RFM95 (23 is the max)
+#define LORA_TX_POWER 20 // Output power of the RFM95
 #define INVERT_IQ_MODE false // currently use InvertIQ mode, set it to false to stop INVERTIQ
 #define LORA_RegTemp 0x3c
 #define LORA_RegIrqFlag2 0x3f
@@ -74,7 +75,7 @@ NeoSWSerial gpsPort(GPS_TX, GPS_RX);
 NMEAGPS gps;
 gps_fix fix;
 
-/* ------------------------ Golbal Variables ------------------------- */
+/* ------------------------ Global Variables ------------------------- */
 
 boolean ackReceived = false; // flag used in automatically detecting ack
 long lastTime = 0; // Save the timestamp for the last GPS fix data
@@ -148,15 +149,16 @@ void loop() {
   
   #if DEBUG
   printLocationData();
-  #endif  //DEBUG == true
+  #endif  //DEBUG
 
   // If No valid data, then skip sending data and sleep the module
   if (!ifVaildFix()) {
+    doubleSleepCycle(); // Sleep cycle x2
     enterLowPowerMode(trackerSleepCycles);
     return;
   }
 
-  // Now, fix should hold the time and location data
+  // Now, the fix should hold the time and location data
 
   // Store the time and location data into buff
   if (isFullBuf(&loraBuf)) {
@@ -234,6 +236,8 @@ void loop() {
   // if received ACK, then we need to "fake" read the buff (i.e. update buffLen and readIndex)
   if (ackReceived) {
     readNFromBuf(&loraBuf, loraBuf.bufLen);
+  }else{
+    doubleSleepCycle(); // Sleep cycle x2
   }
 
   // enter lowpower mode

@@ -201,6 +201,44 @@ String sendCommand(const char *command, unsigned long timeout, bool multiLine) {
 
 /* ------------------------ SD Card ------------------------- */
 
+// Report gateway itself with serial number (GPS time and coords has not been impenment yet)
+void reportGateway(){
+  uint8_t* temp; 
+  temp = (uint8_t*) &serialNum;
+  uint8_t serialNum1[2];
+  serialNum1[0] = (uint8_t) *(temp);
+  serialNum1[1] = (uint8_t) *(temp + 1);
+  uint8_t unixTime[4];
+  unixTime[0] = (uint8_t) 0x00;
+  unixTime[1] = (uint8_t) 0x00;
+  unixTime[2] = (uint8_t) 0x00;
+  unixTime[3] = (uint8_t) 0x00;
+  // latitude
+  uint8_t latitude[4];
+  latitude[0] = (uint8_t) 0x00;
+  latitude[1] = (uint8_t) 0x00;
+  latitude[2] = (uint8_t) 0x00;
+  latitude[3] = (uint8_t) 0x00;
+  // longitude
+  uint8_t longitude[4];
+  longitude[0] = (uint8_t) 0x00;
+  longitude[1] = (uint8_t) 0x00;
+  longitude[2] = (uint8_t) 0x00;
+  longitude[3] = (uint8_t) 0x00;
+  addDataByte(
+      (uint8_t) 0x0D,
+      GATEWAY_ID, 
+      serialNum1,
+      (uint8_t) 0x00,
+      (uint8_t) 0x04,
+      unixTime,
+      latitude,
+      longitude,
+      (uint8_t) 0x00
+  );
+  serialNum++;
+}
+
 // Create a ToSend.bin file in SD Card
 void createToSendFile(){
   SdFat sd;
@@ -378,7 +416,7 @@ bool registerTracker(uint8_t id){
       return false;
     }
     file.print(fileName); // Write ID in first line
-    file.print(F("\nCount,Time,Lat,Lon,BAT,Serial,Temp")); // Write table header
+    file.print(F("\nDataPoint,Time,Lat,Lon,BAT,Serial,Temp")); // Write table header
     file.close();
   }else{
     DEBUG_SERIAL.println(F("CSV File Existed"));
@@ -444,10 +482,12 @@ void sendAck(uint8_t nodeID) {
   message[0] = (uint8_t) ACK_SUCCESS;
   message[1] = (uint8_t) nodeID;
   message[2] = (uint8_t) trackerSleepCycles; 
-  
+
+  #if DEBUG
   DEBUG_SERIAL.print(F("ACK TARGET NodeID: "));
   printByte(nodeID);
   DEBUG_SERIAL.println();
+  #endif
   
   LoRa_sendMessage(message, sizeof(uint8_t) * 3);
   DEBUG_SERIAL.println(F("ACK Sent."));
@@ -455,7 +495,7 @@ void sendAck(uint8_t nodeID) {
 
 /* ------------------------ Helper for Debug ------------------------- */
 
-#ifdef DEBUG
+#if DEBUG
 void printByte(uint8_t b) {
     DEBUG_SERIAL.print(F(" 0x"));
     if (b <= 0xF)
