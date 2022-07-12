@@ -66,12 +66,12 @@ void readGPSValid(){
     readGPS();
   }
   if (fix.valid.time)
-    lastTime = fix.dateTime; // Save the timestanp for the last GPS fix data
+    lastTime = fix.dateTime; // Save the timestamp for the last GPS fix data
 }
 
 // Check if the fix variable is vaild
 bool ifVaildFix(){
-  return (fix.valid.location && fix.valid.time);
+  return (fix.valid.location && fix.valid.time && fix.dateTime != lastTime);
 }
 
 /* ------------------------ LoRa ------------------------- */
@@ -120,8 +120,8 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   LoRa.sleep(); // test
   resetLoRa(); // Turn off LoRa hardware before sleep
   delay(100);
-  for (uint8_t i = 0; i < sleep_cycles; i++) {
-    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*8 mins
+  for (uint8_t i = 0; i < sleep_cycles * SLEEP_CYCLES_MUTIPLIER; i++) {
+    LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*SLEEP_CYCLES_MUTIPLIER*8 secs
   }
   DEBUG_SERIAL.println(F("lowPowerMode End."));
 }

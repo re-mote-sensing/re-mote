@@ -16,8 +16,9 @@
 // Timeout
 #define GPS_TIMEOUT 80000 // GPS read timeout (ms) (Average read time 31sec on GP735T)
 #define ACK_TIMEOUT 10000 // ack waiting time (ms) for sending sensor data
-#define DEFAULT_SLEEP_CYCLES 112 // Number of loops the tracker will sleep 8s, for 112 is ~15min
-#define MAX_SLEEP_CYCLES 1350 // Maximum sleep time, ~3 hours
+#define DEFAULT_SLEEP_CYCLES 14 // Number of loops the tracker will sleep 8*SLEEP_CYCLES_MUTIPLIERs, for 112 is ~15min
+#define MAX_SLEEP_CYCLES 168 // Maximum sleep time, ~3 hours
+#define SLEEP_CYCLES_MUTIPLIER 8 // SLEEP_CYCLES in lowpower mode will always mutiply this number
 
 // Message encoding
 // refer to message encoding in this file:

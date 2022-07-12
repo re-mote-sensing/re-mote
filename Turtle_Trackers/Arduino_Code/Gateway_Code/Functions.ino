@@ -378,7 +378,7 @@ bool addDataByte(uint8_t type, uint8_t nodeID, uint8_t* serialNum, uint8_t batte
 // remember to free(fileName) after called
 char* getFileName(uint8_t id){
   // Set file name
-  char* fileName = (char*) malloc(sizeof(char) * 7);
+  char* fileName = (char*) malloc(sizeof(char) * 8);
   if (fileName == NULL) {
     DEBUG_SERIAL.println(F("Ran out of memory making file name"));
     free(fileName);

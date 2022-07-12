@@ -5,7 +5,7 @@
 
 /* ------------------------ Config ------------------------- */
 
-#define GATEWAY_ID 0x64 // Unique Gateway ID
+#define GATEWAY_ID 0x64 // Unique Gateway ID, 100(0x64) <= GATEWAY_ID <= 200(0xc8)
 
 // Sever Info
 #define HOST "turtletracker.cas.mcmaster.ca"  // Change this to the public IP address / domain of the server's network
@@ -121,7 +121,7 @@ const unsigned int POST_COMMAND_LENGTH = 33 + sizeof(HOST) + sizeof(ENDPOINT) + 
 unsigned long lastPost = millis();  // Track what is the last posted time
 unsigned long lastReport = millis();  // Track what is the last gateway report time
 bool readyToPost = true;            // Ready to post to server
-uint8_t trackerSleepCycles = 224;   // Tracker sleep cycle remote control
+uint8_t trackerSleepCycles = 28;   // Tracker sleep cycle remote control, 28 for ~30min
 uint16_t serialNum = 0; // count how many messages has been sent.
 
 /* ------------------------ Setup ------------------------- */
@@ -181,7 +181,7 @@ void loop() {
 
   // Report gateway itself with serial number to check if gateway is working
   // (GPS time and coords has not been impenment yet)
-  if ((millis() - lastReport) > GATEWAY_REPORT_TIME){
+  if ((millis() - lastReport) > GATEWAY_REPORT_TIME){ // Every GATEWAY_REPORT_TIME ms
     reportGateway();
     lastReport = millis(); // Reset lastReport to current time
     readyToPost = true;
