@@ -48,6 +48,7 @@ void enableGPS(){
 // Disable GPS Module
 void disableGPS(){
   digitalWrite(GPS_EN, LOW);
+  gpsPort.end();
 }
 
 // Try to get GPS fix data and stored into fix variable
@@ -71,7 +72,7 @@ void readGPSValid(){
 
 // Check if the fix variable is vaild
 bool ifVaildFix(){
-  return (fix.valid.location && fix.valid.time && fix.dateTime != lastTime);
+  return (fix.valid.location && fix.valid.time);
 }
 
 /* ------------------------ LoRa ------------------------- */
@@ -120,7 +121,7 @@ void enterLowPowerMode(uint8_t sleep_cycles){
   LoRa.sleep(); // test
   resetLoRa(); // Turn off LoRa hardware before sleep
   delay(100);
-  for (uint8_t i = 0; i < sleep_cycles * SLEEP_CYCLES_MUTIPLIER; i++) {
+  for (int i = 0; i < sleep_cycles * SLEEP_CYCLES_MUTIPLIER; i++) {
     LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF); // Sleeps the tracker for ~SLEEP_CYCLES*SLEEP_CYCLES_MUTIPLIER*8 secs
   }
   DEBUG_SERIAL.println(F("lowPowerMode End."));
