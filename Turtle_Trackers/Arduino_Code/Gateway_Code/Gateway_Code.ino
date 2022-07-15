@@ -19,7 +19,7 @@
 
 // HTTP Post
 #define POST_AMOUNT 4       // Define how many tracker data to read for a single post (Based on testing, 4 is a stable amount for Uno)
-#define POST_TIME 1800000     // Time between each post (ms), 1800000ms ~half hour
+#define POST_TIME 2700000     // Time between each post (ms), 2700000ms ~45min
 #define GATEWAY_REPORT_TIME 3600000 // Time between each gateway report, 3600000 ~a hour
 
 // SD Card
@@ -45,7 +45,7 @@
 #define SIM3G_POWER_OFF_TIME 4000     // 3G Power off time for enable pin (ms)
 
 // 3G Timeout
-#define SIM3G_HTTP_TIMEOUT 4000       // 3G http timeout (ms)
+#define SIM3G_HTTP_TIMEOUT 60000       // 3G http timeout (ms)
 
 // Message encoding
 // refer to message encoding in this file:
@@ -71,7 +71,7 @@
 #define SIM3G_BAUDRATE 9600L  // 3G Shield Serial Baudrate
 
 // Debug
-#define DEBUG true  // Set to true for debug Serial output, false for no output
+#define DEBUG false  // Set to true for debug Serial output, false for no output
 #define DEBUG_SERIAL if(DEBUG) Serial // Serial for debuging
 
 /* ------------------------ Librarys ------------------------- */

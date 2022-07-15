@@ -44,7 +44,7 @@
 #define GPS_BAUDRATE 9600L  // Debug GPS Baudrate
 
 // Debug
-#define DEBUG true // Set to true for debug output, false for no output
+#define DEBUG false // Set to true for debug output, false for no output
 #define DEBUG_SERIAL if(DEBUG) Serial // Serial for debuging
 
 /* ------------------------ Librarys ------------------------- */

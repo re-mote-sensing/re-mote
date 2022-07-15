@@ -35,7 +35,7 @@ bool postToServerWithBuffer(){
     sprintf(sessCommand, "AT+CHTTPSOPSE=\"%s\",%d,1", HOST, SERVER_PORT);
     long start = millis();
     while (sendCommand(sessCommand, 5000, true).equals("ERROR"))
-      if (millis() - start < SIM3G_HTTP_TIMEOUT){
+      if ((millis() - start) > SIM3G_HTTP_TIMEOUT){
         stop3GHTTP();
         return false;
       }
