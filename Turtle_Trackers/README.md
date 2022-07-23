@@ -19,3 +19,5 @@ Assembly of Gateway: [Assembly of Gateway](./Docs/Assembly_of_Gateway.md)
 Assembly of Trackers: [Assembly of Trackers](./Docs/Assembly_of_Trackers.md) | [Enclosure](./Docs/3D_Printed_Enclosure/README.md)
 
 Pi Server Setup: [Server Source Code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver) | [How to Setup Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md)
+
+Message Format: [Message Format](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
