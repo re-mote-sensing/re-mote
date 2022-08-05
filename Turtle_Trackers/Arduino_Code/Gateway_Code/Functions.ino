@@ -143,8 +143,15 @@ void start3GHTTP() {
   sendCommand("ATE0", 250, true);
   delay(1000);
   sendCommand("AT+CMEE=2", 250, true);
-  sendCommand("AT+CGDCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
-  sendCommand("AT+CGSOCKCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
+
+  // Rogers Network
+  sendCommand("AT+CGDCONT=1,\"IP\",\"rogers-core-appl1.apn\"", 250, true);
+  sendCommand("AT+CGSOCKCONT=1,\"IP\",\"rogers-core-appl1.apn\"", 250, true);
+  
+  // Bell Network
+  // sendCommand("AT+CGDCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
+  // sendCommand("AT+CGSOCKCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
+
   sendCommand("AT+CSOCKSETPN=1", 250, true);
   
   while (sendCommand("AT+CHTTPSSTART", 10000, true).equals(F("ERROR"))) {
