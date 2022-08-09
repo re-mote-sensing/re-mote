@@ -1,6 +1,7 @@
 /*
 Main Arduino code used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina and Ryan Tyrrell, last updated August 22, 2019
+Author: Victor Vezina, Ryan Tyrrell and Tianyu Zhou
+Last updated: August 7, 2022
 Released into the public domain
 */
 
@@ -23,8 +24,6 @@ Things to do:
 
 
 /*---------------------------INCLUDES---------------------------*/
-
-#define DEBUG
 
 #include <remoteLoRa.h>
 #include <remote3G.h>
@@ -57,28 +56,28 @@ void setup() {
     #endif
     
     #ifdef DEBUG
-    Serial.println(F("Initialising Sensors"));
+    Serial.println(F("Init Sensors"));
     #endif
     Sensors.initialise();
     
     #ifdef DEBUG
-    Serial.println(F("Initialising LoRa"));
+    Serial.println(F("Init LoRa"));
     #endif
     while (!LoRa.writeConfig(NETWORK_ID, GATEWAY_ID)) {
         delay(2500);
     }
     
     #ifdef DEBUG
-    Serial.println(F("Initialising 3G"));
+    Serial.println(F("Init 3G"));
     #endif
     while (!cell3G.initialise()) {
         delay(2500);
     }
     
     #ifdef DEBUG
-    Serial.println(F("Waiting for input..."));
-    Serial.println(freeMemory());
-    while (!Serial.available()) ; //Useful for testing
+//    Serial.println(F("Waiting for input..."));
+//    Serial.println(freeMemory());
+//    while (!Serial.available()) ; //Useful for testing
     #endif
     
     #ifdef DEBUG
@@ -87,12 +86,12 @@ void setup() {
     #endif
     
     #ifdef DEBUG
-    Serial.println(F("Initialising Data"));
+    Serial.println(F("Init Data"));
     #endif
     Data.initialise();
     
     #ifdef DEBUG
-    Serial.println(F("Registering this node"));
+    Serial.println(F("Gateway Register"));
     #endif
     registerThisNode();
 }
@@ -102,11 +101,14 @@ void setup() {
 
 void loop() {
     unsigned long lastPost = millis(); //Get post time before we start to read sensors and post
+    
+    cell3G.power(true);
     readSensors();
     postData(); //Post the saved data
+    cell3G.power(false);
     
     #ifdef DEBUG
-    Serial.println(F("Waiting for LoRa messages"));
+    Serial.println(F("Wait LoRa"));
     Serial.println(freeMemory());
     #endif
 
@@ -118,7 +120,7 @@ void loop() {
             
             #ifdef DEBUG
             //Print the data to the Serial interface
-            Serial.println(F("Received LoRa message"));
+            Serial.println(F("Received LoRa"));
             printByte(loraData[0]);
             printByte(loraData[1]);
             printByte(loraData[2]);
@@ -142,7 +144,7 @@ void loop() {
 
                 default: //Unknown message
                     #ifdef DEBUG
-                    Serial.println(F("Unknown Message Type Received"));
+                    Serial.println(F("Unknown Message"));
                     #endif
                     sendAck(0xFE, loraData);
             }
@@ -208,7 +210,13 @@ void readSensors() {
     float lon;// = -79;
     
     //Get GPS data from the 3G chip
+    #ifdef DEBUG_NO_GPS
+    time = 1563816782 + millis()/1000;
+    lat = 43;
+    lon = -79;
+    #else
     cell3G.getGPSData(&time, &lat, &lon, GPS_Time);
+    #endif
     
     uint8_t* data; //Array of data
     uint8_t timeIndex = 5; //Where in the array time should be inserted
@@ -410,7 +418,7 @@ void toggle() {
 void printByte(uint8_t b) {
   Serial.print(F(" 0x"));
   if (b <= 0xF)
-	Serial.print(F("0"));
+	  Serial.print(F("0"));
   Serial.print(b, HEX);
 }
 #endif
@@ -533,46 +541,43 @@ float longitude = 0;
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
-    #ifdef DEBUG
     Serial.begin(9600); //Begin usb serial for debug print statements
-    #endif
+    Serial.println();
+    Serial.println(F("Hello")); //If web serial is connected, tell it ready
     
-    #ifdef DEBUG
     Serial.println(F("Initialising GPS"));
-    #endif
     GPS.initialise(); //Initialise the connected GPS
     
-    #ifdef DEBUG
     Serial.println(F("Initialising sensors"));
-    #endif
     Sensors.initialise(); //Initialise the connected sensors
+    if (Serial.available())
+      Sensors.configMode(); // Enter Config Mode when serial is available
     
-    #ifdef DEBUG
     Serial.println(F("Initialising data storage"));
-    #endif
     Data.initialise(); //Initialise the connected data storage
     
-    #ifdef DEBUG
     Serial.println(F("Initialising LoRa"));
-    #endif
     //Write the config parameters to the LoRa module
     while (!LoRa.writeConfig(NETWORK_ID, NODE_ID)) {
         delay(2500); //If it fails wait 2.5 seconds then try again
     }
     
     #ifdef DEBUG
-    Serial.println(F("Waiting for input..."));
-    while (!Serial.available()) ; //Useful for testing
+    // Serial.println(F("Waiting for input..."));
+    // while (!Serial.available()) ; //Useful for testing
     #endif
     
-    #ifdef DEBUG
     Serial.println(F("Registering node"));
-    #endif
     registerNode(); //Register this node with the gateway
     
     #ifdef DEBUG
-    //Resets saved data, used in testing
-    //Data.reset(false);
+    // Resets saved data, used in testing
+    // Data.reset(false);
+    #endif
+
+    Serial.println(F("Done Setup"));
+    #ifndef DEBUG
+    Serial.end();
     #endif
 }
 
@@ -710,9 +715,15 @@ uint8_t* readGPSSensors() {
     
     unsigned long before = millis();
     #endif
-    
+
+    #ifdef DEBUG_NO_GPS
+    time = 1563816782 + millis()/1000;
+    lat = 42;
+    lon = -80;
+    #else
     //Try to update gps data for GPS_Time time
     GPS.getData(&time, &lat, &lon, GPS_Time);
+    #endif
     
     #ifdef DEBUG
     Serial.println(F("GPS data:"));

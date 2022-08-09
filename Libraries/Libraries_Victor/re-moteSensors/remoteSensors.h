@@ -1,6 +1,7 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 9, 2019
+Author: Victor Vezina and Tianyu Zhou
+Last updated: July 28, 2022
 Released into the public domain
 */
 
@@ -15,6 +16,7 @@ class remoteSensors {
         remoteSensors();
         void initialise();
         void read(uint8_t* dataArr);
+        void configMode();
     private:
         #ifdef Temperature_Comp
         float lastTemp = 20;

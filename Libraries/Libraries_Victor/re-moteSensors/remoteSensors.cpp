@@ -1,6 +1,7 @@
 /*
 Library for reading from various sensors, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 13, 2019
+Author: Victor Vezina and Tianyu Zhou
+Last updated: July 28, 2022
 Released into the public domain
 */
 
@@ -19,36 +20,42 @@ void remoteSensors::initialise() {
     for (uint8_t i = 0; i < NUMBER_SENSOR_TYPES; i++) {
         #ifdef AS_DO_Sensor
         if (strcmp(sensorTypes[i], "AS_DO") == 0) {
+            Serial.println(F("Init AS_DO_Sensor"));
             initialiseASDO(i);
         }
         #endif
         
         #ifdef AS_EC_Sensor
         if (strcmp(sensorTypes[i], "AS_EC") == 0) {
+            Serial.println(F("Init AS_EC_Sensor"));
             initialiseASEC(i);
         }
         #endif
         
         #ifdef AS_pH_Sensor
         if (strcmp(sensorTypes[i], "AS_pH") == 0) {
+            Serial.println(F("Init AS_pH_Sensor"));
             initialiseASpH(i);
         }
         #endif
         
         #ifdef DF_TB_Sensor
         if (strcmp(sensorTypes[i], "DF_TB") == 0) {
+            Serial.println(F("Init DF_TB_Sensor"));
             initialiseDFTB(i);
         }
         #endif
         
         #ifdef DF_Temp_Sensor
         if (strcmp(sensorTypes[i], "DF_Temp") == 0) {
+            Serial.println(F("Init DF_Temp_Sensor"));
             initialiseDFTemp(i);
         }
         #endif
         
         #ifdef DHT22_Sensor
         if (strcmp(sensorTypes[i], "DHT22") == 0) {
+            Serial.println(F("Init DHT22_Sensor"));
             initialiseDHT22(i);
         }
         #endif
@@ -58,6 +65,12 @@ void remoteSensors::initialise() {
 #ifdef AS_DO_Sensor
 //Initialise an Atlas Scientific Dissolved Oxygen sensor at index index
 void remoteSensors::initialiseASDO(uint8_t index) {
+    #if AS_DO_Sensor == true
+    //Turn on the sensor
+    pinMode(sensorPorts[index][2], OUTPUT);
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+
     //Initialise the software serial for this sensor
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
@@ -78,6 +91,11 @@ void remoteSensors::initialiseASDO(uint8_t index) {
 
 
     sensor.print(F("Sleep\r")); //Put sensor to sleep
+
+    //If it can be turned off, turn it off
+    #if AS_DO_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
 
     sensor.end();
 }
@@ -288,6 +306,11 @@ void remoteSensors::read(uint8_t* dataArr) {
 #ifdef AS_DO_Sensor
 //Read data from an Atlas Scientific Dissolved Oxygen sensor at index i
 uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
+    #if AS_DO_Sensor == true
+    //Turn on the sensor
+    digitalWrite(sensorPorts[index][2], HIGH);
+    #endif
+
     //Initialise the sensor's software serial
     NeoSWSerial sensor (sensorPorts[index][0], sensorPorts[index][1]);
     sensor.begin(9600);
@@ -316,6 +339,11 @@ uint8_t remoteSensors::readASDO(uint8_t index, uint8_t* data) {
     
     //Put sensor to sleep
     sensor.print(F("Sleep\r"));
+
+    //If it can be turned off, turn it off
+    #if AS_DO_Sensor == true
+    digitalWrite(sensorPorts[index][2], LOW);
+    #endif
     
     sensor.end();
     
@@ -497,12 +525,12 @@ uint8_t remoteSensors::readDFTemp(uint8_t index, uint8_t* data) {
     } while (!(addr[0] == 16 || addr[0] == 40));
     
     //Make sure the CRC is valid
-    if (OneWire::crc8(addr, 7) != addr[7]) {
-        #ifdef DEBUG
-        Serial.println(F("CRC not valid"));
-        #endif
-        return -1;
-    }
+    // if (OneWire::crc8(addr, 7) != addr[7]) {
+    //     #ifdef DEBUG
+    //     Serial.println(F("CRC not valid"));
+    //     #endif
+    //     return -1;
+    // }
     
     //Read temperature command
     tempSensor.reset();
@@ -581,3 +609,66 @@ uint8_t remoteSensors::readDHT22(uint8_t index, uint8_t* data) {
     return 8;
 }
 #endif
+
+// Config Mode Bridge, allow config atlas sensor through serial
+void remoteSensors::configMode() {
+  // Keep LED on to show the node stop at config mode
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
+  Serial.println(F("ConfigMode"));
+  while (Serial.available()) Serial.read(); // Dump all serial msg
+  bool configMode = true;
+  while (configMode) {
+    if (Serial.available()) {
+      char charBuf[15];
+      Serial.readString().toCharArray(charBuf, 15);
+      switch (tolower(charBuf[0])) {
+      case 'e': // Exit Config Mode
+        configMode = false;
+        break;
+      case 'c': // Config sensors by UART bridge (c,tx,rx,en)
+        strtok(charBuf, ",");
+        int txPin = atoi(strtok(NULL, ","));
+        int rxPin = atoi(strtok(NULL, ","));
+        int enPin = atoi(strtok(NULL, ","));
+
+        Serial.print(F("Sensor: "));
+        Serial.print(enPin);
+        Serial.print(F(" "));
+        Serial.print(txPin);
+        Serial.print(F(" "));
+        Serial.println(rxPin);
+
+        // Enable Sensor by enable pin
+        pinMode(enPin, OUTPUT);
+        digitalWrite(enPin, HIGH);
+
+        // Start Serial of Sensor
+        NeoSWSerial sensorSerial(txPin, rxPin);
+        sensorSerial.begin(9600);
+        sensorSerial.print(F("Find\r")); // Flash the LED
+
+        while (true) {
+          if (Serial.available()) {
+            String cmd = Serial.readString();
+            if (cmd == "exit") break; // Exit sensor serial
+            sensorSerial.print(cmd + "\r");
+            delay(500);
+          }
+          if (sensorSerial.available()) {
+            while (sensorSerial.available()) {
+              Serial.print((char) sensorSerial.read());
+              delay(5);
+            }
+            Serial.println();
+          }
+        }
+        sensorSerial.end();
+        break;
+      }
+    }
+  }
+  Serial.println(F("ConfigModeExit"));
+  digitalWrite(LED_BUILTIN, LOW);
+
+}

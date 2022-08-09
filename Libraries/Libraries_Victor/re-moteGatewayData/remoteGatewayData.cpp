@@ -1,6 +1,7 @@
 /*
 Library for saving the data of a gateway, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last updated August 13, 2019
+Author: Victor Vezina and Tianyu Zhou
+Last updated: July 28, 2022
 Released into the public domain
 */
 
@@ -11,7 +12,7 @@ Released into the public domain
 #include <SdFat.h>
 #endif
 
-#ifdef DEBUG
+#ifdef DEBUG_GetewayData
 #include <MemoryFree.h>
 #endif
 
@@ -82,7 +83,7 @@ void remoteGatewayData::initialiseSD() {
     //Initialise the SD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return;
@@ -90,13 +91,13 @@ void remoteGatewayData::initialiseSD() {
     
     //If ToSend.csv doesn't already exist, create it with the appropriate starting line
     if (!sd.exists("ToSend.csv")) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Creating ToSend.csv"));
         #endif
         
         SdFile file;
         if (!file.open("ToSend.csv", FILE_WRITE)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening ToSend.csv"));
             #endif
             return;
@@ -110,7 +111,7 @@ void remoteGatewayData::initialiseSD() {
 
 //Reset the SD card
 void remoteGatewayData::resetSD(bool hard) {
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     if (hard) Serial.println(F("Hard resetting SD card"));
     else Serial.println(F("Soft resetting SD card"));
     #endif
@@ -118,7 +119,7 @@ void remoteGatewayData::resetSD(bool hard) {
     //Initialise the SD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return;
@@ -132,7 +133,7 @@ void remoteGatewayData::resetSD(bool hard) {
         if (sd.exists("ToSend.csv")) {
             SdFile file;
             if (!file.open("ToSend.csv", FILE_WRITE)) {
-                #ifdef DEBUG
+                #ifdef DEBUG_GetewayData
                 Serial.println(F("Error opening ToSend.csv"));
                 #endif
                 return;
@@ -153,7 +154,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return ans;
@@ -166,7 +167,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     uint8_t nameLen = data[curr++];
     char* name = (char*) malloc(sizeof(char) * (nameLen + 1));
     if (name == NULL) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Ran out of memory making node name"));
         #endif
         return ans;
@@ -182,7 +183,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
         uint8_t len = data[curr++]; //Get length of type
         types[i] = (char*) malloc(sizeof(char) * (len + 1)); //Allocate current char array
         if (types[i] == NULL) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Ran out of memory making type name"));
             #endif
             for (uint8_t i = 0; i < numSensors; i++) {
@@ -205,7 +206,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     //Get the file name for that node
     char* fileName = (char*) malloc(sizeof(char) * 13);
     if (fileName == NULL) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Ran out of memory making file name"));
         #endif
         for (uint8_t i = 0; i < numSensors; i++) {
@@ -217,7 +218,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
     
     //Print the file name to a string
     if (sprintf(fileName, "node%u.csv", add) < 0) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error printing to node file name"));
         #endif
         free(fileName);
@@ -230,7 +231,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
 
     if (sd.exists(fileName)) { //Receiving registration from already registered node, check to see if good or not
         if (!file.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening node file"));
             #endif
             free(fileName);
@@ -269,7 +270,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
         err = err || currTypeNum != numSensors;
         
         if (err) { //If the registration is bad
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.print(F("Received bad registration data from node "));
             Serial.println(add);
             #endif
@@ -279,7 +280,7 @@ uint8_t remoteGatewayData::saveRegSD(uint8_t* data) {
         }
     } else { //Registering new node
         if (!file.open(fileName, FILE_WRITE)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening node file"));
             #endif
             free(fileName);
@@ -322,7 +323,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return ans;
@@ -335,7 +336,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     //Get the file name for that node
     char* fileName = (char*) malloc(sizeof(char) * 13);
     if (fileName == NULL) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Ran out of memory making node name"));
         #endif
         return ans;
@@ -343,7 +344,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     
     //Print the file name to a string
     if (sprintf(fileName, "node%u.csv", add) < 0) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error printing to node file name"));
         #endif
         free(fileName);
@@ -356,7 +357,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
     
     if (!sd.exists(fileName)) { //If the node hasn't yet registered with this gateway
         //Should send error acknowledgement
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.print(F("Received sensor data before registration from node "));
         Serial.println(add);
         #endif
@@ -365,7 +366,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
         //Open the node file
         SdFile file;
         if (!file.open(fileName, FILE_WRITE)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening node file"));
             #endif
             free(fileName);
@@ -391,7 +392,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
         
         if (sum - 3 != numSensors) { //If it doesn't match
             //Should send error acknowledgement
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.print(F("Received bad sensor data from node "));
             Serial.println(add);
             #endif
@@ -418,7 +419,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
                 file.print(time);
                 file.print(F(","));
                 
-                #ifdef DEBUG
+                #ifdef DEBUG_GetewayData
                 Serial.print(F("Time: "));
                 Serial.println(time);
                 #endif
@@ -442,7 +443,7 @@ uint8_t remoteGatewayData::saveDataSD(uint8_t* data) {
             
             //See if the node already has data to be sent in ToSend.csv
             if (!file.open("ToSend.csv", FILE_WRITE)) {
-                #ifdef DEBUG
+                #ifdef DEBUG_GetewayData
                 Serial.println(F("Error opening ToSend.csv"));
                 #endif
                 free(fileName);
@@ -502,7 +503,7 @@ uint8_t remoteGatewayData::filePrintFloat(SdFile* file, uint8_t* arr, uint8_t nu
         memcpy(&curr, &arr[i], sizeof(float));
         (*file).printField(curr, ',', 6);
         
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.print(F("Float: "));
         Serial.println(curr);
         #endif
@@ -530,7 +531,7 @@ uint32_t remoteGatewayData::fileReadInt(SdFile* file, char end, int8_t move) {
 
 //Gets the HTTPS post request based on SD card data
 char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.println(F("Getting post"));
     //delay(250);
     #endif
@@ -545,7 +546,7 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
         return NULL;
     }
     
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.println(F("Mem: "));
     Serial.println(freeMemory());
     //delay(250);
@@ -561,7 +562,7 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
         return NULL;
     }
     
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.println(F("Mem: "));
     Serial.println(freeMemory());
     //delay(250);
@@ -574,7 +575,7 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
         return NULL;
     }
     
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.print(F("Data size: "));
     Serial.println(dataSize);
     Serial.println(F("Mem: "));
@@ -589,7 +590,7 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
         return NULL;
     }
     
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.println(F("Mem: "));
     Serial.println(freeMemory());
     //delay(250);
@@ -601,7 +602,7 @@ char* remoteGatewayData::getPostSD(unsigned int numLoops, void** toFree) {
         return NULL;
     }
     
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.println(F("Mem: "));
     Serial.println(freeMemory());
     //delay(250);
@@ -617,7 +618,7 @@ unsigned int remoteGatewayData::getSendInfoSize(unsigned int numLoops) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card (getSendInfoSize)"));
         #endif
         return -1;
@@ -626,7 +627,7 @@ unsigned int remoteGatewayData::getSendInfoSize(unsigned int numLoops) {
     //Open ToSend.csv
     SdFile file;
     if (!file.open("ToSend.csv", FILE_READ)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error opening ToSend.csv"));
         #endif
         return -1;
@@ -697,7 +698,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card (getSendInfo)"));
         #endif
         return false;
@@ -706,7 +707,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
     //Open ToSend.csv
     SdFile file;
     if (!file.open("ToSend.csv", FILE_READ)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error opening ToSend.csv"));
         #endif
         return false;
@@ -741,7 +742,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
         //Open the current node's file
         char* fileName = (char*) malloc(sizeof(char) * 13);
         if (fileName == NULL) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Ran out of memory making file name"));
             #endif
             file.close();
@@ -750,7 +751,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
         
         //Print the file name to a string
         if (sprintf(fileName, "node%u.csv", currId) < 0) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error printing to node file name"));
             #endif
             free(fileName);
@@ -761,7 +762,7 @@ bool remoteGatewayData::getSendInfo(uint8_t* ans, unsigned int numLoops) {
         //Open the node file
         SdFile nodeFile;
         if (!nodeFile.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening node file"));
             #endif
             free(fileName);
@@ -854,7 +855,7 @@ bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return false;
@@ -863,7 +864,7 @@ bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     //Open the given node's file
     char* fileName = (char*) malloc(sizeof(char) * 13);
     if (fileName == NULL) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Ran out of memory making file name"));
         #endif
         return false;
@@ -871,7 +872,7 @@ bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     
     //Print the file name to a string
     if (sprintf(fileName, "node%u.csv", id) < 0) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error printing to node file name"));
         #endif
         free(fileName);
@@ -881,7 +882,7 @@ bool remoteGatewayData::getTypesInfo(uint8_t* typesInfo, uint16_t id) {
     //Open the file
     SdFile file;
     if (!file.open(fileName, FILE_READ)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error opening node file"));
         #endif
         free(fileName);
@@ -955,14 +956,14 @@ bool remoteGatewayData::buildRequest(char* request, uint8_t* sendInfo) {
         }
     }
     
-    sprintf(&request[curr], " HTTPS/1.1\r\nHost: %s\r\n\r\n", URL_Host); //The last part of the HTTP request
+    sprintf(&request[curr], " HTTP/1.1\r\nHost: %s\r\n\r\n", URL_Host); //The last part of the HTTP request
     
     return true;
 }
 
 //Gets data froma specific node and puts it into the request char array
 bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, uint8_t numData, uint8_t locations, uint32_t position) {
-    #ifdef DEBUG
+    #ifdef DEBUG_GetewayData
     Serial.print(F("Getting data for node: "));
     Serial.println(id);
     #endif
@@ -985,7 +986,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     //Initialise the microSD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return false;
@@ -994,7 +995,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     //Open the current node's file
     char* fileName = (char*) malloc(sizeof(char) * 13);
     if (fileName == NULL) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Ran out of memory making file name"));
         #endif
         return false;
@@ -1002,7 +1003,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     
     //Print the file name to a string
     if (sprintf(fileName, "node%u.csv", id) < 0) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error printing to node file name"));
         #endif
         free(fileName);
@@ -1012,7 +1013,7 @@ bool remoteGatewayData::getNodeData(char* request, uint16_t* curr, uint16_t id, 
     //Open the node file
     SdFile file;
     if (!file.open(fileName, FILE_READ)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error opening node file"));
         #endif
         free(fileName);
@@ -1164,7 +1165,7 @@ void remoteGatewayData::messageSuccessSD() {
     //Initialise the SD card
     SdFat sd;
     if (!sd.begin(SD_CS)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error initialising sd card"));
         #endif
         return;
@@ -1173,7 +1174,7 @@ void remoteGatewayData::messageSuccessSD() {
     //Open ToSend.csv
     SdFile file;
     if (!file.open("ToSend.csv", FILE_WRITE)) {
-        #ifdef DEBUG
+        #ifdef DEBUG_GetewayData
         Serial.println(F("Error openening ToSend.csv"));
         #endif
         return;
@@ -1204,7 +1205,7 @@ void remoteGatewayData::messageSuccessSD() {
         //Open the current node's file
         char* fileName = (char*) malloc(sizeof(char) * 13);
         if (fileName == NULL) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Ran out of memory making file name"));
             #endif
             return;
@@ -1212,7 +1213,7 @@ void remoteGatewayData::messageSuccessSD() {
         
         //Print the file name into a string
         if (sprintf(fileName, "node%u.csv", id) < 0) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error printing to node file name"));
             #endif
             free(fileName);
@@ -1222,7 +1223,7 @@ void remoteGatewayData::messageSuccessSD() {
         //Open the file
         SdFile nodeFile;
         if (!nodeFile.open(fileName, FILE_READ)) {
-            #ifdef DEBUG
+            #ifdef DEBUG_GetewayData
             Serial.println(F("Error opening node file"));
             #endif
             free(fileName);

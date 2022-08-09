@@ -1,6 +1,7 @@
 /*
 Library for using a 3G module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 12, 2019
+Author: Victor Vezina and Tianyu Zhou
+Last updated: July 28, 2022
 Released into the public domain
 */
 
@@ -52,6 +53,23 @@ bool remote3G::initialise() {
     return true;
 }
 
+void remote3G::power(bool on) {
+    if (on){
+        initialise();
+    }else{
+        #if cell3G_Make == Tinysine
+        //Turn off the 3G chip
+        digitalWrite(cell3G_EN, HIGH);
+        delay(4000);
+        digitalWrite(cell3G_EN, LOW);
+        
+        #elif cell3G_Make == Adafruit
+        //Turn the 3G chip off
+        digitalWrite(cell3G_EN, LOW);
+        #endif
+    }
+}
+
 //Start the HTTPS module on the 3G chip
 bool remote3G::startHTTPS() {
     #if cell3G_Make == Adafruit
@@ -69,6 +87,8 @@ bool remote3G::startHTTPS() {
     
     //First send an AT command to make sure the 3G is working
     if (!err) err = check3G(ss);
+
+    if (!err) err = SCRTries(ss, "ATE0", "OK", 2000);
     
     closeHTTPS(ss); //Close HTTPS session if it's open
     
@@ -119,6 +139,10 @@ bool remote3G::post(char* request, const char* host, int portNum) {
     
     //Send HTTP request
     if (!err) err = SCRTries(ss, request, "OK", 10000);
+
+    // sendCheckReply(ss, "AT+CHTTPSRECV?", "OK", 10000);
+
+    // sendCheckReply(ss, "AT+CHTTPSRECV=1000", "OK", 10000);
     
     sendCheckReply(ss, "AT+CHTTPSCLSE", "OK", 1000); //Send close HTTPS session command
     

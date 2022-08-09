@@ -1,6 +1,7 @@
 /*
 Library for using a 3G module (SIM5320), used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Created by Victor Vezina, last modified on August 12, 2019
+Author: Victor Vezina and Tianyu Zhou
+Last updated: July 28, 2022
 Released into the public domain
 */
 
@@ -13,6 +14,7 @@ class remote3G {
     public:
         remote3G();
         bool initialise();
+        void power(bool on);
         bool startHTTPS();
         bool post(char* request, const char* host, int portNum);
         void stopHTTPS();
