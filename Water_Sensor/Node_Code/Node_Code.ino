@@ -211,9 +211,9 @@ void readSensors() {
     
     //Get GPS data from the 3G chip
     #ifdef DEBUG_NO_GPS
-    time = 1563816782 + millis()/1000;
-    lat = 43;
-    lon = -79;
+    time = 1665087790 + millis()/1000;
+    lat = 43.0800453;
+    lon = -80.0769367;
     #else
     cell3G.getGPSData(&time, &lat, &lon, GPS_Time);
     #endif
@@ -267,7 +267,7 @@ void readSensors() {
     free(data);
 }
 
-//Parse registration message and save new node information
+// Parse registration message and save new node information
 void parseRegistration(uint8_t* data) {
     //Parse the registration according to the saved data type
     uint8_t ack = Data.saveRegistration(data);
@@ -568,7 +568,10 @@ void setup() {
     #endif
     
     Serial.println(F("Registering node"));
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
     registerNode(); //Register this node with the gateway
+    digitalWrite(LED_BUILTIN, LOW);
     
     #ifdef DEBUG
     // Resets saved data, used in testing
@@ -669,6 +672,7 @@ void registerNode() {
         memcpy(&dataArr[curr], sensorNames[i], sizeof(char) * currLen);
         curr += currLen;
     }
+    digitalWrite(LED_BUILTIN, HIGH);
     
     uint8_t ack = 0xFF;
     

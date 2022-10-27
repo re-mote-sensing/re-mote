@@ -23,11 +23,12 @@ bool postToServerWithBuffer(){
       return false;
 
     if (lineCount == 1) // Only start on the first loop
-      start3GHTTP(); // Start 3G HTTP
+      if (!start3GHTTP()) // Start 3G HTTP
+        return false;
     
     lineCount+=POST_AMOUNT; // Add the lines that already read
     
-    DEBUG_SERIAL.print("Sending... : ");
+    DEBUG_SERIAL.print(F("Sending... : "));
     DEBUG_SERIAL.println(line);
 
     // Open HTTP Session
@@ -136,7 +137,7 @@ void powerOff3G(){
 }
 
 // Start 3G Shield HTTP Request
-void start3GHTTP() {
+bool start3GHTTP() {
   powerOn3G();
   delay(7000);
   sendCommand("AT", 250, true);
@@ -154,18 +155,18 @@ void start3GHTTP() {
 
   sendCommand("AT+CSOCKSETPN=1", 250, true);
   
-  while (sendCommand("AT+CHTTPSSTART", 10000, true).equals(F("ERROR"))) {
+  while (!sendCommand("AT+CHTTPSSTART", 10000, true).equals(F("OK"))) {
     sendCommand("AT+CHTTPSCLSE", 10000, false);
     sendCommand("AT+CHTTPSSTOP", 10000, false);
+    unsigned long start =  millis();
+    if ((millis() - start) > SIM3G_HTTP_TIMEOUT)
+      return false;
     sendCommand("AT", 250, true);
     sendCommand("ATE0", 250, true);
     delay(1000);
-    sendCommand("AT+CMEE=2", 250, true);
-    sendCommand("AT+CGDCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
-    sendCommand("AT+CGSOCKCONT=1,\"IP\",\"pda.bell.ca\"", 250, true);
-    sendCommand("AT+CSOCKSETPN=1", 250, true);
   }
   delay(500);
+  return true;
 }
 
 // Stop 3G Shield HTTP Request
@@ -335,7 +336,7 @@ bool addDataByte(uint8_t type, uint8_t nodeID, uint8_t* serialNum, uint8_t batte
     File file;
     if (!file.open("ToSend.bin", FILE_WRITE)) {  // Open ToSend.bin
       DEBUG_SERIAL.print(F("Open CSV Failed: "));
-      DEBUG_SERIAL.println("ToSend.bin");
+      DEBUG_SERIAL.println(F("ToSend.bin"));
       return false;
     }
 

@@ -81,11 +81,11 @@ First, you'll need the [Arduino IDE](https://www.arduino.cc/en/main/software). T
 
 ### Program file
 
-Next, you'll need to download [Node_Code.ino](../../Node_Code/Node_Code.ino) from this repository. This is the main program that runs on the Arduino.
+Next, you'll need to download [Node_Code.ino](../../Water_Sensor/Node_Code/Node_Code.ino) from this repository. This is the main program that runs on the Arduino.
 
 ### Libraries
 
-You'll then need to download the libraries from this repository, and add some others from the IDE. First, copy all files found under [Libraries](../../Libraries/Libraries_Victor) into your [Arduino library folder](https://www.arduino.cc/en/guide/libraries), replacing what's already there (if anything). You'll then need to install these other libraries using the IDE's built-in library manager:
+You'll then need to download the libraries from this repository, and add some others from the IDE. First, copy all files found under [Libraries](../../Water_Sensor/Libraries/) into your [Arduino library folder](https://www.arduino.cc/en/guide/libraries), replacing what's already there (if anything). You'll then need to install these other libraries using the IDE's built-in library manager:
 
 * DHT_sensor_library
 * NeoGPS
@@ -100,11 +100,11 @@ If you wish to run the program in "debug mode", you'll need to download the [Mem
 
 ## End node
 
-Read about the setup by clicking [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md).
+Read about the setup by clicking [here](../../Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md).
 
 ## Gateway
 
-Read about the set-up and battery optimization by clicking [here](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/blob/master/Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md).
+Read about the set-up and battery optimization by clicking [here](../../Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md).
 
 <br>  
 

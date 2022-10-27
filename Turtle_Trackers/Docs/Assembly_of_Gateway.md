@@ -18,7 +18,7 @@
 
 (Bended pin image)
 
-![gateway_3g_shield_pin.jpeg](./images/assembly/gateway_3g_shield_pin.jpeg)
+<img src="./images/assembly/gateway_3g_shield_pin.jpeg" width="500px" alt="gateway_3g_shield_pin.jpeg">
 
 **SD Card:**
 
@@ -44,6 +44,8 @@ Flash with Arduino IDE
 
 ## Enclosure
 
-![gateway_small.jpg](./images/assembly/gateway_small.jpg)
+<img src="./images/assembly/gateway_small.jpg" width="500px" alt="gateway_small.jpg">
 
-![gateway_small_side.jpg](./images/assembly/gateway_small_side.jpg)
+<br>
+
+<img src="./images/assembly/gateway_small_side.jpg" width="500px" alt="gateway_small_side.jpg">

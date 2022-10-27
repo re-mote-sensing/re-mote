@@ -12,7 +12,7 @@ If you do not want to modify the enclosure model, skip to part 5.
 - PETG Filament
 - #5x5/8 Screws with Flat Socket Head
 
-![Screws](./images/screws.jpg)
+<img src="./images/screws.jpg" width="300px" alt="Image">
 
 ## 1. Download Autodesk Inventor
 
@@ -54,15 +54,15 @@ Click on `Profiles`, then import `Printing_Profile/krunk.curaprofile`
 
 Click `open` on the top left corner and select the stl file we generated in Inventor.
 
-![open_button](./images/open_button.png)
+<img src="./images/open_button.png" alt="Image">
 
 Align the models, and make sure there is some space between them.
 
-![models](./images/models.png)
+<img src="./images/models.png" width="500px" alt="Image">
 
 Select the profile we just imported
 
-![profile](./images/profile.png)
+<img src="./images/profile.png" width="300px" alt="Image">
 
 Click `slice` then `Save to file`
 

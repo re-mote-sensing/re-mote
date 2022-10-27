@@ -96,8 +96,8 @@ The entire rationale behind this message format is to reduce overall message siz
 
 This is the HTTP request that the gateway nodes send to the raspberry pi server to add the collected data to the database. It's in the form of an HTTPS POST request, with the following form:
 
-POST /ollie/sensor/data?data={data} HTTPS/1.1\
-Host: www.cas.mcmaster.ca
+POST /sensor/data?data={data} HTTPS/1.1\
+Host: {Homepage}
 
 where {data} is a long string of hex characters representing the bytes of the data collected. And, of course, this URL will vary based on what web server is being used. The byte array is in the following form:
 
