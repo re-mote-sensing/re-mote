@@ -1,6 +1,6 @@
 <div align="center">
     <h1>re:mote</h1>
-    <p>Open-source remote sensing with low-cost motes</p>
+    <p>Open-source Low-cost Software and Hardware Infrastructure for Remote Sensing</p>
 </div>
 
 ## 📎 Table of Contents
@@ -17,6 +17,11 @@
 ### Low-cost Water Quality Sensing and Turtle Tracking
 
 The goal is to develop with project partners software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements.
+
+<div align="center">
+    <img src="Documentation/Pictures/mw_tt.webp" height="350px">
+    <p>Working Water Sensor / Turtle Tracker</p>
+</div>
 
 ---
 
@@ -49,6 +54,10 @@ A LoRa mesh network is used for connecting motes.
 - It is a low-bandwidth, low-power and long-range network.
 - The mesh network is tolerant to faults, changing network topology, extension and contraction.
 - Initially, the sensors used are commercial off-the-shelf sensors for dissolved oxygen, pH, electrical conductivity, temperature, etc.
+
+<div align="center">
+    <img src="Documentation/Pictures/Mesh.png" width="800px">
+</div>
 
 ## 🚀 Get started
 
