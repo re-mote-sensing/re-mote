@@ -56,7 +56,7 @@ A LoRa mesh network is used for connecting motes.
 - Initially, the sensors used are commercial off-the-shelf sensors for dissolved oxygen, pH, electrical conductivity, temperature, etc.
 
 <div align="center">
-    <img src="Documentation/Pictures/Mesh.png" width="800px">
+    <img src="Documentation/Pictures/Mesh.webp" width="800px">
 </div>
 
 ## 🚀 Get started
