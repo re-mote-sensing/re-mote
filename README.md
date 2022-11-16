@@ -32,9 +32,15 @@ The goal is to develop with project partners software and hardware infrastructur
 - Limited power supply: low-frequency processors, low-power modes
 
 The network consists of Arduino-based motes:
-- Gateway to relay end-node data to the server over the
+- **Gateway** to relay end-node data to the server over the
 internet using a 3G connection.
-- End nodes to measure water quality parameters through connected sensors.
+- **End nodes** to measure water quality parameters through connected sensors.
+    - pH
+    - Conductivity
+    - Dissolved Oxygen
+    - Water Temperature
+    - Turbidity
+    - [Custom Sensors](Documentation/Software/Custom_Sensors.md)
 
 ### Raspberry Pi Server
 
@@ -50,10 +56,9 @@ A server programmed in Go for fast and concurrent connections.
 
 ### Low-power Long-range Sensor Network
 
-A LoRa mesh network is used for connecting motes.
+A LoRa mesh network is used for connecting motes. [YL-800N Datasheet](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Documentation/Data%20Sheets/LoRa_MESH_Radio_YL-800N_EN.pdf)
 - It is a low-bandwidth, low-power and long-range network.
 - The mesh network is tolerant to faults, changing network topology, extension and contraction.
-- Initially, the sensors used are commercial off-the-shelf sensors for dissolved oxygen, pH, electrical conductivity, temperature, etc.
 
 <div align="center">
     <img src="Documentation/Pictures/Mesh.webp" width="800px">
@@ -65,11 +70,11 @@ This list will guide you to get started step-by-step.
 
 ---
 
-### [Water Quality Sensing](Water_Sensor/)
+### Setup [Water Quality Sensing](Water_Sensor/)
 
 1. Get all the [hardware](Documentation/Hardware/Specification.md) you need
 
-2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a [Raspberry Pi](https://www.raspberrypi.com) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
+2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a Raspberry Pi with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
 
 3. Assembling the Hardware for the [End Node](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md) and [Gateway](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md)
 
@@ -77,19 +82,31 @@ This list will guide you to get started step-by-step.
 
 ---
 
-### [Turtle Trackers](Turtle_Trackers/)
+### Setup [Turtle Trackers](Turtle_Trackers/)
 
 1. Get all the [hardware](Turtle_Trackers/Docs/Specification.md) you need
 
-2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a [Raspberry Pi](https://www.raspberrypi.com) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
+2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a Raspberry Pi with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
 
 3. Assembling the Hardware and flash the firmware for [Tracker](Turtle_Trackers/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Trackers/Docs/Assembly_of_Gateway.md)
+
+---
+
+### Get Help
+
+1. If you have questions go post a issue [here](https://github.com/re-mote-sensing/arduino-motes/issues)
 
 ## 🗂 Documentations
 
  - Water Sensor
-    - [LoRa Message Format](Documentation/Software/Message_Formats.md)
-    - [Saved Data Formats](Documentation/Software/Saved_Data_Formats.md)
-    - [Add Custom Sensors](Documentation/Software/Custom_Sensors.md)
+    - End Node & Gateway
+        - [LoRa Message Format](Documentation/Software/Message_Formats.md)
+        - [Saved Data Formats](Documentation/Software/Saved_Data_Formats.md)
+        - [Add Custom Sensors](Documentation/Software/Custom_Sensors.md)
+    - Pi Server
+        - [REST Api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
+        - [Database Format](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/Documentation/Database_Format.md)
+        - [Juypter Notebook scripts](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/Usefull%20Scripts) for downloading and uploading data to server
  - Turtle Tracker
-    - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
+    - End Node & Gateway
+        - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
