@@ -193,6 +193,11 @@ void remoteSensors::initialiseAtlas(Stream& sensor) {
     
     sensor.print(F("L,0\r")); //Turn off LEDs
     ASWait(sensor);
+
+    #ifdef DEMO_MODE
+    sensor.print(F("L,1\r")); //Turn on LEDs
+    #endif
+    ASWait(sensor);
 }
 
 //Waits for an AS sensor to return a response and dumps it

@@ -1,8 +1,24 @@
 /*
-Header for some config parameters, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
-Author: Victor Vezina, Ryan Tyrrell and Tianyu Zhou
-Last updated: August 7, 2022
-Released into the public domain
+This is an example config file with the following configuration
+
+A node with LoRa and sensors (Gateway needed)
+ - WaterTemperature
+    - Connect to PIN 6(data)
+ - pH
+    - Connect to PIN 8(tx), 9(rx), 7(off)
+ - Dissolved_Oxygen
+    - Connect to PIN 11(tx), 12(rx), 10(off)
+ - Turbidity
+    - Connect to PIN A3(vcc), A2(data)
+ - Conductivity
+    - Connect to PIN A0(tx), A1(rx), 13(off)
+
+A gateway with 3G and DHT22
+ - DHT22 (AirTemperature & Humidity)
+    - Connect to PIN 2(data)
+
+Author: Tianyu Zhou
+Last updated: Dec 24, 2022
 */
 
 /*-----------------------------------------------------------------*/

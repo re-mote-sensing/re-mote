@@ -25,10 +25,17 @@ Things to do:
 
 /*---------------------------INCLUDES---------------------------*/
 
+#ifdef ENABLE_LORA
 #include <remoteLoRa.h>
+#endif
 #include <remote3G.h>
 #include <remoteSensors.h>
 #include <remoteGatewayData.h>
+
+#ifdef ENABLE_RTC
+#include <Wire.h>
+#include <DS3231.h>
+#endif
 
 #ifdef DEBUG
 #include <MemoryFree.h>
@@ -36,7 +43,9 @@ Things to do:
 
 /*------------------------CONSTRUCTORS--------------------------*/
 
+#ifdef ENABLE_LORA
 remoteLoRa LoRa;
+#endif
 remote3G cell3G;
 remoteSensors Sensors;
 remoteGatewayData Data;
@@ -51,21 +60,31 @@ float longitude = 0;
 /*---------------------------SETUP------------------------------*/
 
 void setup() {
-    #ifdef DEBUG
-    Serial.begin(9600);
+
+    #ifdef ENABLE_TPL5110
+    pinMode(TPL5110_DONE, OUTPUT);
+    digitalWrite(TPL5110_DONE, LOW);
     #endif
+    
+    Serial.begin(9600);
+    Serial.println();
+    Serial.println(F("Hello")); //If web serial is connected, tell it ready
     
     #ifdef DEBUG
     Serial.println(F("Init Sensors"));
     #endif
     Sensors.initialise();
-    
+    if (Serial.available())
+      Sensors.configMode(); // Enter Config Mode when serial is available
+
+    #ifdef ENABLE_LORA
     #ifdef DEBUG
     Serial.println(F("Init LoRa"));
     #endif
     while (!LoRa.writeConfig(NETWORK_ID, GATEWAY_ID)) {
         delay(2500);
     }
+    #endif
     
     #ifdef DEBUG
     Serial.println(F("Init 3G"));
@@ -94,6 +113,14 @@ void setup() {
     Serial.println(F("Gateway Register"));
     #endif
     registerThisNode();
+
+    #ifndef DEBUG
+    Serial.end();
+    #endif
+    
+    #ifdef DEMO_MODE
+    cell3G.power(true); // DEMO
+    #endif
 }
 
 
@@ -101,17 +128,37 @@ void setup() {
 
 void loop() {
     unsigned long lastPost = millis(); //Get post time before we start to read sensors and post
-    
+
+    #ifndef DEMO_MODE
     cell3G.power(true);
+    #endif
     readSensors();
     postData(); //Post the saved data
+    #ifndef DEMO_MODE
     cell3G.power(false);
-    
+    #endif
+
+    #ifdef ENABLE_TPL5110
+    pinMode(TPL5110_DONE, OUTPUT);
+    digitalWrite(TPL5110_DONE, LOW);
+    #ifdef DEBUG
+    Serial.println(F("TPL5110 Done"));
+    #endif
+    while ((millis() - lastPost) < Post_Time) {
+      digitalWrite(TPL5110_DONE, HIGH);
+      delay(1);
+      digitalWrite(TPL5110_DONE, LOW);
+      delay(1);
+    }
+    #endif
+
+    #ifdef ENABLE_LORA
+
     #ifdef DEBUG
     Serial.println(F("Wait LoRa"));
     Serial.println(freeMemory());
     #endif
-
+    
     //Just keep checking the LoRa module until the right amount of time has passed
     while ((millis() - lastPost) < Post_Time) {
         uint8_t* loraData = LoRa.readData(); //Read the LoRa module
@@ -152,6 +199,7 @@ void loop() {
             free(loraData); //Free allocated message memory
         }
     }
+    #endif
 }
 
 
@@ -211,11 +259,21 @@ void readSensors() {
     
     //Get GPS data from the 3G chip
     #ifdef DEBUG_NO_GPS
-    time = 1665087790 + millis()/1000;
-    lat = 43.0800453;
-    lon = -80.0769367;
+    time = DEBUG_NO_GPS_DEFAULT_TIME + millis()/1000;
+    lat = DEBUG_NO_GPS_DEFAULT_LAT;
+    lon = DEBUG_NO_GPS_DEFAULT_LON;
     #else
     cell3G.getGPSData(&time, &lat, &lon, GPS_Time);
+    #endif
+
+    #ifdef ENABLE_RTC
+    Serial.println(F("Reading RTC"));
+    RTClib myRTC;
+    Wire.begin();
+    delay(500);
+    DateTime now = myRTC.now();
+    time = now.unixtime()- 946684800UL;
+    Serial.println(time);
     #endif
     
     uint8_t* data; //Array of data
@@ -267,6 +325,7 @@ void readSensors() {
     free(data);
 }
 
+#ifdef ENABLE_LORA
 // Parse registration message and save new node information
 void parseRegistration(uint8_t* data) {
     //Parse the registration according to the saved data type
@@ -275,7 +334,9 @@ void parseRegistration(uint8_t* data) {
     //Send an acknowledgment
     sendAck(ack, data);
 }
+#endif
 
+#ifdef ENABLE_LORA
 //Save the received data into the sd card
 void parseData(uint8_t* data) {
     //Parse the data according to the saved data type
@@ -284,6 +345,7 @@ void parseData(uint8_t* data) {
     //Send an acknowledgment
     sendAck(ack, data);
 }
+#endif
 
 
 /*-----------------Saved Data Posting Functions-----------------*/
@@ -360,7 +422,7 @@ void postData() {
     }
 }
 
-
+#ifdef ENABLE_LORA
 //Send an acknowledgement
 void sendAck(uint8_t ack, uint8_t* data) {
     //The address to send the acknowledgement to
@@ -376,6 +438,7 @@ void sendAck(uint8_t ack, uint8_t* data) {
     
     free(ackData);
 }
+#endif
 
 /*---------------------------TESTING----------------------------*/
 /*
@@ -573,10 +636,10 @@ void setup() {
     registerNode(); //Register this node with the gateway
     digitalWrite(LED_BUILTIN, LOW);
     
-    #ifdef DEBUG
+    // #ifdef DEBUG
     // Resets saved data, used in testing
-    // Data.reset(false);
-    #endif
+    Data.reset(false);
+    // #endif
 
     Serial.println(F("Done Setup"));
     #ifndef DEBUG
@@ -722,8 +785,8 @@ uint8_t* readGPSSensors() {
 
     #ifdef DEBUG_NO_GPS
     time = 1563816782 + millis()/1000;
-    lat = 42;
-    lon = -80;
+    lat = 43.069057;
+    lon = -80.107672;
     #else
     //Try to update gps data for GPS_Time time
     GPS.getData(&time, &lat, &lon, GPS_Time);

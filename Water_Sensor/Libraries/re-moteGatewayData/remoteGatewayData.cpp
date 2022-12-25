@@ -127,7 +127,7 @@ void remoteGatewayData::resetSD(bool hard) {
     
     if (hard) {
         //Remove everything on the sd card
-        (*sd.vwd()).rmRfStar();
+        // (*sd.vwd()).rmRfStar();
     } else {
         //Delete the data in ToSend.csv
         if (sd.exists("ToSend.csv")) {
@@ -846,7 +846,7 @@ unsigned int remoteGatewayData::getDataSize(uint8_t* sendInfo) {
         free(currTypesInfo);
     }
     
-    return (2 * totalLen) + 46 + strlen(URL_Path) + strlen(URL_Host); //Each byte takes two characters, plus size for url
+    return (2 * totalLen) + 46 + strlen(URL_Path) + strlen(API_KEY) + 3 + strlen(URL_Host); //Each byte takes two characters, plus size for url
 }
 
 //Get sensor type information (plus other information) for a specific node
@@ -931,10 +931,10 @@ void remoteGatewayData::skipConstTypes(SdFile* file) {
 
 //Build the HTTPS request we need to post
 bool remoteGatewayData::buildRequest(char* request, uint8_t* sendInfo) {
-    sprintf(request, "POST %s/sensor/data?data=%02X", URL_Path, sendInfo[0]); //The first part of the HTTPS request
+    sprintf(request, "POST %s/sensor/data?k=%s&data=%02X", URL_Path, API_KEY, sendInfo[0]); //The first part of the HTTPS request
     
     //Go through each node and copy its data into the request
-    uint16_t curr = strlen(URL_Path) + 25;
+    uint16_t curr = strlen(URL_Path) + 25 + strlen(API_KEY) + 3;
     for (uint8_t i = 0; i < sendInfo[0]; i++) {
         //Get current node id
         uint16_t currId;
