@@ -10,13 +10,14 @@
 3. [Setup](#-get-started)
     - [Water Quality Sensing](#water-quality-sensing)
     - [Turtle Trackers](#turtle-trackers)
-3. [Documentations](#-documentations)
+4. [Documentation](#-documentation)
+5. [Sponsors](#-sponsors)
 
 ## 📒 About re:mote
 
 ### Low-cost Water Quality Sensing and Turtle Tracking
 
-The goal is to develop with project partners software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements.
+This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements which normally cost $10k or more to make, but you can do it by yourself with less than $1k.
 
 <div align="center">
     <img src="Documentation/Pictures/mw_tt.webp" height="350px">
@@ -27,9 +28,9 @@ The goal is to develop with project partners software and hardware infrastructur
 
 ### Arduino-based motes
 
-- Software correctness is a must
-- Unreliable communication, changing network topology, long distances
-- Limited power supply: low-frequency processors, low-power modes
+- Can be config with different sensors and different forms
+- They have Unreliable long distances communications, network topology always changing
+- Limited power supply in remote area
 
 The network consists of Arduino-based motes:
 - **Gateway** to relay end-node data to the server over the
@@ -74,7 +75,7 @@ This list will guide you to get started step-by-step.
 
 1. Get all the [hardware](Documentation/Hardware/Specification.md) you need
 
-2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a Raspberry Pi with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
+2. Setup a [Docker Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md) on a Raspberry Pi or [build by yourself](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/macwater-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
 
 3. Assembling the Hardware for the [End Node](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md) and [Gateway](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md)
 
@@ -96,7 +97,7 @@ This list will guide you to get started step-by-step.
 
 1. If you have questions go post a issue [here](https://github.com/re-mote-sensing/arduino-motes/issues)
 
-## 🗂 Documentations
+## 🗂 Documentation
 
  - Water Sensor
     - End Node & Gateway
@@ -110,3 +111,11 @@ This list will guide you to get started step-by-step.
  - Turtle Tracker
     - End Node & Gateway
         - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
+
+## 🏆 Sponsors
+
+[Global Water Futures](https://gwf.usask.ca)
+
+[MacWater](http://www.macwater.org)
+
+[Ontario Research Fund](https://www.ontario.ca/page/ontario-research-fund)

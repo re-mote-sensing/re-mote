@@ -18,8 +18,6 @@
 | EZO™ pH Circuit         | https://atlas-scientific.com/embedded-solutions/ezo-ph-circuit/    |
 | GPS Receiver - GP-735   | https://www.sparkfun.com/products/13670                            |
 | JST connector (for GPS) | https://www.digikey.ca/en/products/detail/sparkfun-electronics/PRT-10361/6605206 |
-| SLA Batteries           | https://www.canadiantire.ca/en/pdp/mk-battery-12-volt-7-2-ah-sla-battery-0102038p.html#plp |
-| Battery Voltage Converter | https://www.amazon.ca/gp/product/B01FQH4M82/                     |
 
 ## Water Sensor Gateway Node
 
@@ -31,9 +29,6 @@
 | MicroSD Card                                | https://www.amazon.ca/gp/product/B08J4HJ98L/                                     |
 | MicroSD Card Reader Module                  | https://www.amazon.ca/gp/product/B07GXBP672/                                     |
 | DHT Sensor                                  | https://www.amazon.ca/gp/product/B07CM2VLBK/                                     |
-| SLA Batteries                               | https://www.canadiantire.ca/en/pdp/mk-battery-12-volt-7-2-ah-sla-battery-0102038p.html#plp |
-| Battery Voltage Converter                   | https://www.amazon.ca/gp/product/B01FQH4M82/                                     |
-| Battery Connectors                          | https://www.amazon.ca/gp/product/B08F784R9W/                                     |
 | SIM Card with data plan (120 days)          |                                                                                  |
 
 ## Server Node
