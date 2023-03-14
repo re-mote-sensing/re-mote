@@ -1,7 +1,7 @@
 /*
 Header for some config parameters, used in the re-mote setup found at https://gitlab.cas.mcmaster.ca/re-mote
 Author: Victor Vezina, Ryan Tyrrell and Tianyu Zhou
-Last updated: August 7, 2022
+Last updated: Mar 14, 2023
 Released into the public domain
 */
 
@@ -28,6 +28,7 @@ Released into the public domain
 #define URL_Host "macwater.cas.mcmaster.ca"     // Host of the URL to post data to
 #define URL_Path ""                             // Path after the URL to post data to
 #define URL_Port 80                             // Port of the URL to open an HTTPS session with
+#define API_KEY "remote"                        // Server api key - Default is 'remote'
 
 /*---------Type specific Settings---------*/
 

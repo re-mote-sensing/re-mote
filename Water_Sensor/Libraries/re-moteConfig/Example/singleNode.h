@@ -16,7 +16,7 @@ A single node with 3G and sensors (No Gateway needed)
     - Connect to PIN 25(data)
 
 Author: Tianyu Zhou
-Last updated: Dec 24, 2022
+Last updated: Mar 14, 2023
 */
 
 #ifndef remoteConfig_h
@@ -37,6 +37,7 @@ Last updated: Dec 24, 2022
 #define URL_Host "macwater.cas.mcmaster.ca"     // Host of the URL to post data to
 #define URL_Path ""                             // Path after the URL to post data to
 #define URL_Port 80                             // Port of the URL to open an HTTPS session with
+#define API_KEY "remote"                        // Server api key - Default is 'remote'
 
 /*-----------------------------------------------------------*/
 /*--------------------------Gateway--------------------------*/
