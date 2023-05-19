@@ -62,7 +62,7 @@ A LoRa mesh network is used for connecting motes. [YL-800N Datasheet](https://gi
 - The mesh network is tolerant to faults, changing network topology, extension and contraction.
 
 <div align="center">
-    <img src="Documentation/Pictures/Mesh.webp" width="800px">
+    <img src="Documentation/Pictures/Mesh_Tube.png" width="800px">
 </div>
 
 ## 🚀 Get started
@@ -112,7 +112,9 @@ This list will guide you to get started step-by-step.
     - End Node & Gateway
         - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
 
-## 🏆 Sponsors
+## 🏆 Acknowledgement
+
+[McMaster University](https://www.mcmaster.ca)
 
 [Global Water Futures](https://gwf.usask.ca)
 
