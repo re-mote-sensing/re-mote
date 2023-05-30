@@ -8,6 +8,10 @@
 
 This is an option using mesh network where 3G signal is not available/stable on the water.
 
+<div align="center">
+    <img src="Documentation/Pictures/Mesh_Tube.png" width="60%">
+</div>
+
 A gateway is required to relay the data from node to server.
 
 ## Build Sensor Node
@@ -69,6 +73,10 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 
 This is an option using 3G on all sensor nodes where all nodes have 3G signal available and they are far from each other.
 
+<div align="center">
+    <img src="Documentation/Pictures/SingleNode.png" width="60%">
+</div>
+
 ## Build Sensor Node
 
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
@@ -107,6 +115,10 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 <br>
 
 This is an option if you do not need real-time data and retrieve data only from an SD card.
+
+<div align="center">
+    <img src="Documentation/Pictures/DataLogger.png" width="60%">
+</div>
 
 ## Build Sensor Node
 
