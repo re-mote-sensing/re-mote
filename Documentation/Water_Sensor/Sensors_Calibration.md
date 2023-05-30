@@ -10,7 +10,7 @@ Connect the Arduino board to your computer using USB.
 
 Click `Connect` and select the device
 
-<img src="Documentation/Pictures/calibrate/Screenshot 2023-05-29 at 2.31.41 PM.png">
+<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.41PM.png">
 
 ### Supported Sensors
 
@@ -24,7 +24,7 @@ Click `Connect` and select the device
 
 <img src="Documentation/Pictures/calibrate/IMG_3443.jpeg" width="50%">
 
-<img src="Documentation/Pictures/calibrate/Screenshot 2023-05-29 at 2.31.22 PM.png" width="50%">
+<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.22PM.png" width="50%">
 
 Put the pH sensor into pH7 calibration liquid, using the `read x10` button to check when the reading is stable.
 
@@ -42,7 +42,7 @@ Press the `View Calibration Info` button, and make sure the reading is `cal, 3` 
 
 ## EC Sensor Calibration
 
-<img src="Documentation/Pictures/calibrate/Screenshot 2023-05-29 at 2.31.24 PM.png" width="50%">
+<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.24PM.png" width="50%">
 
 Ensure the sensor is dry, using the `read x10` button to check when the reading is stable.
 
@@ -80,7 +80,7 @@ Follow the instruction on the Atlas Scientific documents to [recondition the lab
 
 <img src="Documentation/Pictures/calibrate/IMG_3444.jpeg" width="50%">
 
-<img src="Documentation/Pictures/calibrate/Screenshot 2023-05-29 at 2.31.18 PM.png" width="50%">
+<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.18PM.png" width="50%">
 
 Ensure the sensor is dry, using the `read x10` button to check when the reading is stable.
 
