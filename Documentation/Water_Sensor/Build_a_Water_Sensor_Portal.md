@@ -1,11 +1,9 @@
 # Build a Water Sensor
 
-Click on the text to show the documentation
-
 ### Choose one of the options below
 
 <details>
-<summary>Using mesh network with a gateway</summary>
+<summary>Using mesh network (LoRa) with a gateway</summary>
 <br>
 
 This is an option using mesh network where 3G signal is not available/stable on the water.
@@ -25,7 +23,7 @@ Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 - Connect LoRA Tx with Arduino A4
 - Connect LoRA Rx with Arduino A5
 
-<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_LoRa.png">
+<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_LoRa.png" width="50%">
 
 ## Build Gateway
 
@@ -71,6 +69,8 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 
 This is an option using 3G on all sensor nodes where all nodes have 3G signal available and they are far from each other.
 
+## Build Sensor Node
+
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 
 ## Connect 3G Module
@@ -82,7 +82,7 @@ Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 - Connect 3G Tx with Arduino 11
 - Connect 3G Rx with Arduino 10
 
-<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png">
+<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png" width="50%">
 
 ## Flash firmware for Nodes
 
@@ -103,10 +103,12 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 ---
 
 <details>
-<summary>Using as a data logger without gateway</summary>
+<summary>Using as a data logger and store data on SD card without uploading to server</summary>
 <br>
 
 This is an option if you do not need real-time data and retrieve data only from an SD card.
+
+## Build Sensor Node
 
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 

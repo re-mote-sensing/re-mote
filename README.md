@@ -35,13 +35,13 @@ This is a software and hardware infrastructure for long-term monitoring of water
 The network consists of Arduino-based motes:
 - **Gateway** to relay end-node data to the server over the
 internet using a 3G connection.
-- **End nodes** to measure water quality parameters through connected sensors.
-    - pH
-    - Conductivity
-    - Dissolved Oxygen
-    - Water Temperature
-    - Turbidity
-    - [Custom Sensors](Documentation/Software/Custom_Sensors.md)
+- **End Nodes** to measure water quality parameters through connected sensors.
+    - **pH** shows the acidity or alkalinity, helping detect imbalances.
+    - **Conductivity** sensor reveals the amount of salts present, providing insight into water quality.
+    - **Dissolved Oxygen** sensor measures oxygen levels in the water, indicating the health of aquatic life.
+    - **Water Temperature** sensor helps calibrate all sensor levels.
+    - **Turbidity** sensor indicates water clarity, with changes signalling potential disturbances.
+    - **[Custom Sensors](Documentation/Software/Custom_Sensors.md)**
 
 ### Raspberry Pi Server
 
@@ -77,7 +77,7 @@ This list will guide you to get started step-by-step.
 
 2. Setup a [Docker Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md) on a Raspberry Pi or [build by yourself](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/macwater-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
 
-3. Assembling the Hardware for the [End Node](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/End%20Node/End_Node%20Setup.md) and [Gateway](Documentation/Hardware/Assembly%20of%20Nodes%20and%20Solar%20Power%20Unit/Gateway%20Node/Gateway%20Assembly.md)
+3. Assembling the Hardware for the [SensorNode and/or Gateway](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md)
 
 4. [Configuring](Documentation/Setup/Water_Quality_Setup.md#configuring-and-uploading-the-software) and Uploading the Software
 
