@@ -140,6 +140,8 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 
 </details>
 
+<br><br><br>
+
 ## Build a Pipe Enclosure
 
 Link: [Pipe Enclosure Assembly](Documentation/Water_Sensor/Pipe_Enclosure_Assembly.md)
