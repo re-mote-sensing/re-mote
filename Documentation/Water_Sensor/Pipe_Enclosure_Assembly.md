@@ -41,7 +41,7 @@
 
 ## Pipe assembly
 
-Cut ABS pipe to 15 inch long.
+Cut ABS pipe about 15 inch long.
 
 Use cermet to seal connecter between each connector using the following order:
 
@@ -66,6 +66,8 @@ Stick antenna at the top, let the cable go through one of the hole and use gaske
 <img src="Documentation/Pictures/pipe_assembly/IMG_2392.jpeg" width="50%">
 
 Secure SMA extender onto the holes, and use gasket inside the cap to make it waterproof
+
+Stick the lead weight in to the bottom (On the Permanent Cap)
 
 ## Check if pipe is waterproofed and floated
 

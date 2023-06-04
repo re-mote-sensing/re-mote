@@ -11,13 +11,13 @@
     - [Water Quality Sensing](#water-quality-sensing)
     - [Turtle Trackers](#turtle-trackers)
 4. [Documentation](#-documentation)
-5. [Sponsors](#-sponsors)
+5. [Acknowledgement](#-acknowledgement)
 
 ## 📒 About re:mote
 
 ### Low-cost Water Quality Sensing and Turtle Tracking
 
-This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements which normally cost $10k or more to make, but you can do it by yourself with less than $1k.
+This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements which normally cost 10k or more to make, but you can do it by yourself with 1/10 of the price.
 
 <div align="center">
     <img src="Documentation/Pictures/mw_tt.webp" height="350px">
@@ -57,7 +57,7 @@ A server programmed in Go for fast and concurrent connections.
 
 ### Low-power Long-range Sensor Network
 
-A LoRa mesh network is used for connecting motes. [YL-800N Datasheet](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Documentation/Data%20Sheets/LoRa_MESH_Radio_YL-800N_EN.pdf)
+A LoRa mesh network is a optional used for connecting motes. [YL-800N Datasheet](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Documentation/Data%20Sheets/LoRa_MESH_Radio_YL-800N_EN.pdf)
 - It is a low-bandwidth, low-power and long-range network.
 - The mesh network is tolerant to faults, changing network topology, extension and contraction.
 
@@ -73,7 +73,7 @@ This list will guide you to get started step-by-step.
 
 ### Setup [Water Quality Sensing](Water_Sensor/)
 
-1. Get all the [hardware](Documentation/Hardware/Specification.md) you need
+1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need
 
 2. Setup a [Docker Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md) on a Raspberry Pi or [build by yourself](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/macwater-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
 
