@@ -10,13 +10,13 @@
 
 ## Security requirements:
  1. No one can receive our data (if received, cannot decrypt)
-  - Solution: any encryption (either symmetric or asymmetric) solves this problem
+    - Solution: any encryption (either symmetric or asymmetric) solves this problem
  2. If someone physically gets the tracker, they will get the key stored in the tracker, therefore we should not store the key (plaintext) in the tracker 
-  - Candidate solution: no good solution for now, but it's a little impossible that someone could get a tracker and try to decode it.
+    - Candidate solution: no good solution for now, but it's a little impossible that someone could get a tracker and try to decode it.
  3. No one can send us faked data 
- - This issue only exists when the asymmetric algorithm is selected
- - Candidate solution: use serials number to distinguish unique hardware (e.g. by using some hardware id that are globally identified)
- - Note: currently, the `id` is hard coded in the source code (different source codes) 
+    - This issue only exists when the asymmetric algorithm is selected
+    - Candidate solution: use serials number to distinguish unique hardware (e.g. by using some hardware id that are globally identified)
+    - Note: currently, the `id` is hard coded in the source code (different source codes) 
 
 ## Analysis
  - AES is symmetric encryption. LoranWAN officially uses AES 128 bits to secure LoRa physical layer.
