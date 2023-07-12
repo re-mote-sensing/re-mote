@@ -1,4 +1,4 @@
-## Differences between Lora and Lorawan
+## Differences between Lora and LoraWan
  - Lora: https://forum.arduino.cc/t/lora-encryption/587754 
     - Data consists simply of a collection of bytes. The radio does not know or care whether the collection being sent is encrypted.
     - There are many different encryption libraries for Arduino. (Just pick one, learn how to use it, and encrypt the data buffer before sending it by radio. Decrypt at the other end.)
