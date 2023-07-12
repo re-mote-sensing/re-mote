@@ -8,8 +8,8 @@ Think about the trade-off between speed (time) and code size (space).
 The creators of AES designed the algorithm in such a way that implementations could make a trade-off between speed and code size. There are 4 possible levels, increasing in size and speed:
 
 0kB - no lookup tables, all steps are calculated, including substitution.
-256 bytes x 2 - s-box and inverse-s-box are stored as lookup tables.
-4kB x 2 - the Galois field multiplication tables are stored. (approach taken by my impl.)
+256 bytes x 2 - s-box and inverse-s-box are stored as lookup tables. **(choosen for current implementation)**
+4kB x 2 - the Galois field multiplication tables are stored. 
 24kB x2 - The entire round (subBytes, shiftRows and mixColumns) are replaced by a lookup table. The only operation left is addRoundKey.
 
 The last is the fastest possible software implementation. Such an implementation can be found in the Go standard library here. If the CPU's cache is large enough to accommodate the entire table, it will be really fast.
