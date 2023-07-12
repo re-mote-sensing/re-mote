@@ -41,8 +41,8 @@
 
 ## Useful implementation hints:
  - Diffie–Hellman for bi-direction communication between tracker and gateway.
-  - tracker -> gateway: to send the data 
-  - gateway -> tracker: to see if the tracker is still alive, remotely configure the setting
+    - tracker -> gateway: to send the data 
+    - gateway -> tracker: to see if the tracker is still alive, remotely configure the setting
  - A helpful article about security in Arduino: https://blog.arduino.cc/2020/07/02/arduino-security-primer/
 
 ## Current chosen solution
