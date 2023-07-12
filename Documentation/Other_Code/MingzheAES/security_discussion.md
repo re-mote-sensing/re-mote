@@ -19,9 +19,11 @@
     - Note: currently, the `id` is hard coded in the source code (different source codes) 
 
 ## Analysis
- - AES is symmetric encryption. LoranWAN officially uses AES 128 bits to secure LoRa physical layer.
- - ![](Symmetric-Encryption.png) (src: https://www.ssl2buy.com/wiki/symmetric-vs-asymmetric-encryption-what-are-differences)
- - ![](Asymmetric-Encryption.png) (src: https://www.ssl2buy.com/wiki/symmetric-vs-asymmetric-encryption-what-are-differences)
+ - AES is symmetric encryption. LoranWan officially uses AES 128 bits to secure Lora physical layer.
+ - ![](Symmetric-Encryption.png)  
+ (src: https://www.ssl2buy.com/wiki/symmetric-vs-asymmetric-encryption-what-are-differences)
+ - ![](Asymmetric-Encryption.png)  
+ (src: https://www.ssl2buy.com/wiki/symmetric-vs-asymmetric-encryption-what-are-differences)
  - The main constrains of selecting an encryption method should be the **energy cost** and **memory usage** in the encryption stage (where both the battery and memory is limited), so we need an algorithm that makes sure the above 3 security requirements with the least time and space comlexity.
 
 
@@ -41,12 +43,12 @@
  - Diffie–Hellman for bi-direction communication between tracker and gateway.
   - tracker -> gateway: to send the data 
   - gateway -> tracker: to see if the tracker is still alive, remotely configure the setting
- - a helpful article: https://blog.arduino.cc/2020/07/02/arduino-security-primer/
+ - A helpful article about security in Arduino: https://blog.arduino.cc/2020/07/02/arduino-security-primer/
 
 ## Current chosen solution
 - Tturtle trackers: automatically generate the key (Diffie–Hellman), and then combine that key with AES 128 to finish the encryption.
- - ![Diffie-Hellman](Diffie-Hellman.png)
-    (src: https://www.practicalnetworking.net/series/cryptography/diffie-hellman/)
- - ![AES 128](AES.png)
-    (src: https://www.researchgate.net/figure/llustrates-the-encryption-decryption-rounds-of-the-AES-128-The-cipher-maintains-an_fig1_274027061)
- - Water sensor: to avoid the gateway storage to be hacked, an asymmetric algorithm must be used. (SSL)
+  - ![Diffie-Hellman](Diffie-Hellman.png)  
+  (src: https://www.practicalnetworking.net/series/cryptography/diffie-hellman/)
+  - ![AES 128](AES.png)  
+  (src: https://www.researchgate.net/figure/llustrates-the-encryption-decryption-rounds-of-the-AES-128-The-cipher-maintains-an_fig1_274027061)
+ - Water sensor: to avoid the gateway storage to be hacked, an asymmetric algorithm must be used. (e.g. by using the `SSL` library in C)
