@@ -1,12 +1,12 @@
 ## Differences between lora and lorawan
  - Lora: https://forum.arduino.cc/t/lora-encryption/587754 
-  - Data consists simply of a collection of bytes. The radio does not know or care whether the collection being sent is encrypted.
-  - There are many different encryption libraries for Arduino. (Just pick one, learn how to use it, and encrypt the data buffer before sending it by radio. Decrypt at the other end.)
-  - Encryption library document: https://rweather.github.io/arduinolibs/crypto.html 
-  - Encryption library src: https://github.com/rweather/arduinolibs 
+    - Data consists simply of a collection of bytes. The radio does not know or care whether the collection being sent is encrypted.
+    - There are many different encryption libraries for Arduino. (Just pick one, learn how to use it, and encrypt the data buffer before sending it by radio. Decrypt at the other end.)
+    - Encryption library document: https://rweather.github.io/arduinolibs/crypto.html 
+    - Encryption library src: https://github.com/rweather/arduinolibs 
  - LoraWan: 
-  - Architecture: https://lora-alliance.org/about-lorawan/ 
-  - Security implementation (AES 128 bits): https://lora-alliance.org/resource_hub/lorawan-is-secure-but-implementation-matters/
+    - Architecture: https://lora-alliance.org/about-lorawan/ 
+    - Security implementation (AES 128 bits): https://lora-alliance.org/resource_hub/lorawan-is-secure-but-implementation-matters/
 
 ## Security requirements:
  1. No one can receive our data (if received, cannot decrypt)
@@ -31,7 +31,7 @@
  - Moteino datasheet:  
  https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf 
 
-## Dr. Jelle's suggestion: 
+## Dr. Jelle's suggestions: 
  - For turtle trackers, we don't care if someone sees the history of a tracker, so symmetric.
  - For water sensor: we want long-term privacy, so asymmetric.
  - Diffie–Hellman in Arduino (search in Google)
