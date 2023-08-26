@@ -41,9 +41,9 @@
 
 ## Pipe assembly
 
-Cut ABS pipe about 15 inch long.
+Cut an ABS pipe about 15 inches long.
 
-Use cermet to seal connecter between each connector using the following order:
+Use cermet to seal the connecter between each connector using the following order:
 
 	Cleanout Adapter with Plug
 		->
@@ -55,22 +55,22 @@ Use cermet to seal connecter between each connector using the following order:
 
 <img src="Documentation/Pictures/pipe_assembly/IMG_2376.jpeg" width="50%">
 
-Using drill to drill 4 hole on the clean out adapter cap for sensor connector and antenna
+Using a drill to drill 4 holes in the clean-out adapter cap for sensor connector and antenna.
 
 <img src="Documentation/Pictures/pipe_assembly/IMG_2372.jpeg" width="50%">
 
-Stick antenna at the top, let the cable go through one of the hole and use gasket to waterproof the gap.
+Stick antenna at the top, let the cable go through one of the holes, and use gasket to waterproof the gap.
 
 <img src="Documentation/Pictures/pipe_assembly/IMG_3449.jpeg" width="50%">
 <img src="Documentation/Pictures/pipe_assembly/IMG_3450.jpeg" width="50%">
 <img src="Documentation/Pictures/pipe_assembly/IMG_2392.jpeg" width="50%">
 
-Secure SMA extender onto the holes, and use gasket inside the cap to make it waterproof
+Secure the SMA extender onto the holes and use a gasket inside the cap to make it waterproof.
 
-Stick the lead weight in to the bottom (On the Permanent Cap)
+Stick the lead weight in to the bottom (on the permanent cap).
 
-## Check if pipe is waterproofed and floated
+## Check if the pipe is waterproofed and floated
 
-Put a tissue paper inside the enclousure and submerge the pipe into a water tank, check if the paper is wet after some time.
+Put a tissue paper inside the enclosure and submerge the pipe into a water tank, check if the paper is wet after some time.
 
 <img src="Documentation/Pictures/pipe_assembly/IMG_2393.jpeg" width="50%">

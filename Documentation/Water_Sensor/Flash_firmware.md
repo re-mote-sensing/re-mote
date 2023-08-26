@@ -2,39 +2,39 @@
 
 ### Arduino IDE
 
-First, you'll need the [Arduino IDE](https://www.arduino.cc/en/main/software). This will be used to upload the code from your computer to the Arduino compatible micro controller. If you want, you could also use the Arduino web editor, or any other IDE that supports uploading .ino files to Arduinos.
+First, download and install the [Arduino IDE](https://www.arduino.cc/en/main/software). This software allows you to upload code from your computer to the Arduino-compatible microcontroller. Alternatively, you can use the Arduino web editor or any other IDE that supports uploading .ino files to Arduino devices.
 
 ### Program file
 
-Next, you'll need to download [Node_Code.ino](Water_Sensor/Node_Code/Node_Code.ino) from this repository. This is the main program that runs on the Arduino.
+Next, download the [Node_Code.ino](Water_Sensor/Node_Code/Node_Code.ino) file from the provided repository. This file contains the primary program that will execute on the Arduino.
 
 ### Libraries
 
-You'll then need to download the libraries from this repository, and add some others from the IDE. First, copy all files found under [Libraries](Water_Sensor/Libraries/) into your [Arduino library folder](https://www.arduino.cc/en/guide/libraries), 
+Next, you'll need to incorporate the required libraries. Start by downloading the library files from the [Libraries](Water_Sensor/Libraries/) directory of this repository. Once downloaded, copy all the files into your [Arduino library folder](https://www.arduino.cc/en/guide/libraries).
 
 - Mac: ~/Documents/Arduino/libraries/
 - Windows: /Users/{username}/Documents/Arduino/libraries/
 
-replacing what's already there (if anything).
+Replacing what is already there (if anything).
 
-### Select dev board
+### Select the development board
 
 #### Using Arduino Mega
 
-Select `Tools -> Board -> Arduino AVR Boards -> Arduino Mega` from the top bar
+Select `Tools -> Board -> Arduino AVR Boards -> Arduino Mega` from the top bar.
 
 #### Using Moteino Mega
 
-Install the `Moteino AVR Boards` package in Arduino IDE: [Programming & Libraries](https://lowpowerlab.com/guide/moteino/programming-libraries/)
+Install the `Moteino AVR Boards` package in Arduino IDE: [Programming & Libraries](https://lowpowerlab.com/guide/moteino/programming-libraries/).
 
-Select `Tools -> Board -> Moteino AVR Boards -> Moteino Mega` from the top bar
+Select `Tools -> Board -> Moteino AVR Boards -> Moteino Mega` from the top bar.
 
 ---
 
-Connect arduino to computer by usb cable or FTDI cable.
+Connect the arduino to the computer by USB cable or FTDI cable.
 
-Open `Node_Code.ino` in Arduino App
+Open `Node_Code.ino` in Arduino App.
 
 ## Flash
 
-Flash with Arduino IDE by click the flash (->) button
+Flash with Arduino IDE by clicking the flash (->) button.

@@ -1,6 +1,6 @@
 # Build a Sensor Node
 
-## Get all parts ready
+## Get all parts ready.
 
 [Specification](./Documentation/Water_Sensor/Specification.md)
 
@@ -8,20 +8,20 @@
 
 **KEY POINTS:**  
 
-- All the modules have a power pin (commonly known as Vcc) and a ground pin (GND).
+- All modules have a power pin (commonly known as Vcc) and a ground pin (GND).
 
 - Vcc pin of all the modules must be connected to the 5V pin of Arduino. 
 
-  - Before connecting any sensors to the 5V supply from the Arduino, please make sure that the sensors can operate at 5V input supply. This can be easily confirmed from the datasheet of the product.
+  - Before connecting any sensors to the 5V supply from the Arduino, please make sure that the sensors can operate at the 5V input supply. This can be easily confirmed from the product datasheet.
 
-- For all of the modules except Turbidity sensor, pins such as Rx(Receiving), Tx(Transmitting), and En(Enable) or OFF can be connected to either analog or digital input/output pins of Arduino. This is because Arduino's analog pins can be easily configured and used as digital I/O pins.
-  - In this project, Turbidity sensor is transceiving signals in analog form. Please remember to only connect the turbidity sensors Data pin to an analog pin of Arduino.
+- For all of the modules except the Turbidity sensor, pins such as Rx(Receiving), Tx(Transmitting), and En(Enable) or OFF can be connected to either analog or digital input/output pins of Arduino. This is because Arduino's analog pins can be easily configured and used as digital I/O pins.
+  - In this project, the Turbidity sensor is transceiving signals in analog form. Please remember to only connect the turbidity sensors data pin to an analog pin of Arduino.
 
 - After you have finished connecting all the pins as discussed below, please keep in mind that you are required to switch the Rx and Tx pins of all the sensors (except temperature and turbidity sensors) in the software.
 
-- In the software, Arduino's digital I/O pins can be assigned by using their pin numbers and Arduino Nano has 13 digital I/O pins. In case analog pins are needed to function as digital I/O pins, use the following numbers:
+- In the software, Arduino's digital I/O pins can be assigned by using their pin numbers, and Arduino Nano has 13 digital I/O pins. In case analog pins are needed to function as digital I/O pins, use the following numbers:
 
-  | Analog Pins | Designated Number for the Software |
+  | Analog pins | Designated Number for the Software |
   | ----------- | ---------------------------------- |
   | A0          | 14                                 |
   | A1          | 15                                 |
@@ -63,7 +63,7 @@ Using [IO Sensor Shield For Arduino Mega](https://www.dfrobot.com/product-560.ht
 - Connect Turbidity-PWR to Arduino-A4
 - Connect Turbidity-GND to Arduino-GND
 - Connect Turbidity-D to Arduino-A5
-Important Note: Turbidity's Data pin needs Analog connection to the Arduino.
+Important Note: Turbidity's Data pin needs analog connection to the Arduino
 
 **Temperature Sensor:**
 

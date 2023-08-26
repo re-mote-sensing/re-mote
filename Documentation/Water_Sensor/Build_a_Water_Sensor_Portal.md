@@ -1,20 +1,20 @@
 # Build a Water Sensor
 
-### Choose one of the options below
+### Depending on your network preference, please select one of the options provided below.
 
 <details>
 <summary>Using mesh network (LoRa) with a gateway</summary>
 <br>
 
-This is an option using mesh network where 3G signal is not available/stable on the water.
+This approach employs a mesh network, ideal for situations where the 3G signal is unstable or unavailable over water.
 
 <div align="center">
     <img src="Documentation/Pictures/Mesh_Tube.png" width="60%">
 </div>
 
-A gateway is required to relay the data from node to server.
+A gateway is essential to facilitate the transmission of data from the node to the server.
 
-## Build Sensor Node
+## Build a Sensor Node
 
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 
@@ -22,26 +22,33 @@ Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 
 **LoRA:**
 
-- Total 7 pins on the chip: Used Tx, Rx, Vcc and GND <u>(IGNORE SET, AUX and EN pins)</u>.
-- Connect the Vcc of LoRA with the 5V of Arduino. Secondly, GND of LoRA with GND
-- Connect LoRA Tx with Arduino A4
-- Connect LoRA Rx with Arduino A5
+- Total of 7 pins on the chip: Used Tx, Rx, Vcc and GND <u>(IGNORE SET, AUX and EN pins)</u>.
+- Connect the Vcc of LoRA to the 5V of Arduino. Second, GND of LoRA with GND.
+- Connect LoRA Tx with Arduino A4.
+- Connect LoRA Rx with Arduino A5.
 
 <img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_LoRa.png" width="50%">
 
-## Build Gateway
+## Build gateway
 
 Link: [Build Gateway](Documentation/Water_Sensor/Build_Gateway.md)
 
 Link: [Gateway Enclosure](Documentation/Water_Sensor/Gateway_Enclosure_Assembly.md)
 
-## Flash firmware for Nodes
+## Flash firmware for nodes
 
 ### remoteConfig.h
 
-The main configuration file, remoteConfig.h, can be found under the re-moteConfig library file `Arduino/libraries/re-moteConfig/remoteConfig.h`. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines depending on your configuration, change `Node_Type` if you're uploading to a Gateway or an End node. The settings in the file all have clear comments that explain what that setting does.
+The primary configuration file is remoteConfig.h, located within the `Arduino/libraries/re-moteConfig/` directory. To configure your Arduinos:
 
-Follow the following example to config the sensor node
+1. Navigate to the re-moteConfig library: `Arduino/libraries/re-moteConfig/remoteConfig.h`.
+2. This is the sole file you'll need to modify, unless you're introducing custom functionalities.
+3. Within the file, comment or uncomment lines as per your desired configuration.
+4. Adjust the `Node_Type` value based on whether you're working with a Gateway or an End node.
+5. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
+6. Ensure you follow the instructions carefully for optimal performance.
+
+To configure the sensor node, please refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
@@ -53,9 +60,16 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 
 ### remoteConfig.h
 
-The main configuration file, remoteConfig.h, can be found under the re-moteConfig library file `Arduino/libraries/re-moteConfig/remoteConfig.h`. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines depending on your configuration, change `Node_Type` if you're uploading to a Gateway or an End node. The settings in the file all have clear comments that explain what that setting does.
+The primary configuration file is remoteConfig.h, located within the `Arduino/libraries/re-moteConfig/` directory. To configure your Arduinos:
 
-Follow the following example to config the gateway node
+1. Navigate to the re-moteConfig library: `Arduino/libraries/re-moteConfig/remoteConfig.h`.
+2. This is the sole file you'll need to modify, unless you're introducing custom functionalities.
+3. Within the file, comment or uncomment lines as per your desired configuration.
+4. Adjust the `Node_Type` value based on whether you're working with a Gateway or an End node.
+5. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
+6. Ensure you follow the instructions carefully for optimal performance.
+
+To configure the gateway node, please refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
@@ -71,34 +85,40 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 <summary>Using 3G on sensor node without gateway</summary>
 <br>
 
-This is an option using 3G on all sensor nodes where all nodes have 3G signal available and they are far from each other.
+This approach involves equipping all sensor nodes with 3G connectivity. It's ideal for setups where all nodes are within areas with available 3G signal and are spaced at considerable distances from one another.
 
 <div align="center">
     <img src="Documentation/Pictures/SingleNode.png" width="60%">
 </div>
 
-## Build Sensor Node
+## Build a Sensor Node
 
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 
-## Connect 3G Module
+## Connect the 3G Module
 
-**3G Shield:**
+**3G shield:**
 
-- Total 7 pins on the chip: Used Tx, Rx, Vcc and GND <u>(IGNORE SET, AUX and EN pins)</u>.
-- Attach 3G Shield to Arduino Mega or only connect the Pins
-- Connect 3G Tx with Arduino 11
-- Connect 3G Rx with Arduino 10
+- Total of 7 pins on the chip: Used Tx, Rx, Vcc and GND <u>(IGNORE SET, AUX and EN pins)</u>.
+- Attach 3G shield to Arduino Mega or only connect the pins.
+- Connect 3G Tx with Arduino 11.
+- Connect 3G Rx with Arduino 10.
 
 <img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png" width="50%">
 
-## Flash firmware for Nodes
+## Flash firmware for nodes
 
 ### remoteConfig.h
 
-The main configuration file, remoteConfig.h, can be found under the re-moteConfig library file `Arduino/libraries/re-moteConfig/remoteConfig.h`. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines depending on your configuration. The settings in the file all have clear comments that explain what that setting does.
+The primary configuration file is remoteConfig.h, located within the `Arduino/libraries/re-moteConfig/` directory. To configure your Arduinos:
 
-Follow the following example to config the sensor node
+1. Navigate to the re-moteConfig library: `Arduino/libraries/re-moteConfig/remoteConfig.h`.
+2. This is the sole file you'll need to modify, unless you're introducing custom functionalities.
+3. Within the file, comment or uncomment lines as per your desired configuration.
+4. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
+5. Ensure you follow the instructions carefully for optimal performance.
+
+To configure the sensor node, please refer to the example provided below.
 
 [3G remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/singleNode.h)
 
@@ -114,23 +134,29 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 <summary>Using as a data logger and store data on SD card without uploading to server</summary>
 <br>
 
-This is an option if you do not need real-time data and retrieve data only from an SD card.
+This option is suitable if you don't require real-time data and prefer to retrieve information solely from an SD card.
 
 <div align="center">
     <img src="Documentation/Pictures/DataLogger.png" width="60%">
 </div>
 
-## Build Sensor Node
+## Build a Sensor Node
 
 Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 
-## Flash firmware for Nodes
+## Flash firmware for nodes
 
 ### remoteConfig.h
 
-The main configuration file, remoteConfig.h, can be found under the re-moteConfig library file `Arduino/libraries/re-moteConfig/remoteConfig.h`. This is the only file you need to change to configure the Arduinos (assuming you aren't adding custom support). You need to comment and uncomment out lines depending on your configuration. The settings in the file all have clear comments that explain what that setting does.
+The primary configuration file is remoteConfig.h, located within the `Arduino/libraries/re-moteConfig/` directory. To configure your Arduinos:
 
-Follow the following example to config the sensor node
+1. Navigate to the re-moteConfig library: `Arduino/libraries/re-moteConfig/remoteConfig.h`.
+2. This is the sole file you'll need to modify, unless you're introducing custom functionalities.
+3. Within the file, comment or uncomment lines as per your desired configuration.
+4. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
+5. Ensure you follow the instructions carefully for optimal performance.
+
+To configure the sensor node, please refer to the example provided below.
 
 [dataLogger remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/dataLogger.h)
 

@@ -17,7 +17,7 @@
 
 ### Low-cost Water Quality Sensing and Turtle Tracking
 
-This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements which normally cost 10k or more to make, but you can do it by yourself with 1/10 of the price.
+This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements that normally cost a lot more to make, but you can do it by yourself at a fraction of the price compared to commercial products.
 
 <div align="center">
     <img src="Documentation/Pictures/mw_tt.webp" height="350px">
@@ -28,38 +28,40 @@ This is a software and hardware infrastructure for long-term monitoring of water
 
 ### Arduino-based motes
 
-- Can be config with different sensors and different forms
-- They have Unreliable long distances communications, network topology always changing
-- Limited power supply in remote area
+- Can be configure with different sensors and different forms.
+    - Different network options.
+    - Different sensors.
+    - Different enclosure.
+- Low power cunsumption and can be deployed to remote areas.
 
-The network consists of Arduino-based motes:
-- **Gateway** to relay end-node data to the server over the
+The network consists of:
+- **Gateway** (one or multiple) to relay end-node data to the server over the
 internet using a 3G connection.
-- **End Nodes** to measure water quality parameters through connected sensors.
-    - **pH** shows the acidity or alkalinity, helping detect imbalances.
+- **End Nodes** (one or multiple) to measure water quality parameters through attached sensors.
+    - **pH** sensor shows the acidity or alkalinity, helping to detect imbalances.
     - **Conductivity** sensor reveals the amount of salts present, providing insight into water quality.
     - **Dissolved Oxygen** sensor measures oxygen levels in the water, indicating the health of aquatic life.
     - **Water Temperature** sensor helps calibrate all sensor levels.
     - **Turbidity** sensor indicates water clarity, with changes signalling potential disturbances.
-    - **[Custom Sensors](Documentation/Software/Custom_Sensors.md)**
+    - **[Custom sensors](Documentation/Software/Custom_Sensors.md)**
 
 ### Raspberry Pi Server
 
-- Large amounts of simply-structured data
-- Erroneous data with “real” anomalies
-- Visualization and further programmatic analysis
+Used for real-time monitoring, the Raspberry Pi is inexpensive and can also use a regular PC.
 
 A server programmed in Go for fast and concurrent connections.
 - A progressive web application designed in React with a custom API.
-- A time-series database (InfluxDB) for simple data storage and a smaller footprint. Time series databases assume insertions are more frequent than queries, so it allows for the fast insertion of large amounts of data such as water quality data. [Learn More](https://gitlab.cas.mcmaster.ca/re-mote/publications/-/tree/master/FadhelSekerinskiYao18Timeseries)
+    - Progressive web application allows you to browse your data on your phone.
+    - CCustom API makes it easily integrate with other systems.
+- A time-series database (InfluxDB) for simple data storage and a smaller footprint. Time series databases assume that insertions are more frequent than queries, so it allows for the fast insertion of large amounts of data, such as water quality data. [Learn More](https://gitlab.cas.mcmaster.ca/re-mote/publications/-/tree/master/FadhelSekerinskiYao18Timeseries).
 
 ## 🛰 LoRa & Mesh Network
 
 ### Low-power Long-range Sensor Network
 
-A LoRa mesh network is a optional used for connecting motes. [YL-800N Datasheet](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Documentation/Data%20Sheets/LoRa_MESH_Radio_YL-800N_EN.pdf)
-- It is a low-bandwidth, low-power and long-range network.
-- The mesh network is tolerant to faults, changing network topology, extension and contraction.
+A LoRa mesh network is optionally used for connecting motes (nodes can operate standalone).
+- It is a low-bandwidth, low-power, and long-range network.
+- The mesh network is tolerant to faults, changing network topology, extension, and contraction.
 
 <div align="center">
     <img src="Documentation/Pictures/Mesh_Tube.png" width="800px">
@@ -67,35 +69,40 @@ A LoRa mesh network is a optional used for connecting motes. [YL-800N Datasheet]
 
 ## 🚀 Get started
 
-This list will guide you to get started step-by-step.
+This list will guide you step by step to get started.
 
 ---
 
 ### Setup [Water Quality Sensing](Water_Sensor/)
 
-1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need
+1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need.
 
-2. Setup a [Docker Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md) on a Raspberry Pi or [build by yourself](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/macwater-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
+2. Setup a water sensor server with one of the options below.
+    - Install water sensor server on [Docker](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md). **(Recommend)**
+    - Install water sensor server on [Linux](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md).
+    - Install water sensor server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
-3. Assembling the Hardware for the [SensorNode and/or Gateway](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md)
+3. Assembly of Hardware for the [SensorNodes and/or Gateways](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md).
 
-4. [Configuring](Documentation/Setup/Water_Quality_Setup.md#configuring-and-uploading-the-software) and Uploading the Software
+4. [Configuring, Testing and Deploying](Documentation/Setup/Water_Quality_Setup.md#configuring-and-uploading-the-software).
 
 ---
 
 ### Setup [Turtle Trackers](Turtle_Trackers/)
 
-1. Get all the [hardware](Turtle_Trackers/Docs/Specification.md) you need
+1. Get all the [hardware](Turtle_Trackers/Docs/Specification.md) you need.
 
-2. Setup a [Server](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) on a Raspberry Pi with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver) or on a [Cloud Service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage)
+2. Setup a water sensor server with one of the options below.
+    - Install water sensor server on [Linux](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver).
+    - Install turtle tracker server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
-3. Assembling the Hardware and flash the firmware for [Tracker](Turtle_Trackers/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Trackers/Docs/Assembly_of_Gateway.md)
+3. Assemble Hardware and Flash the Firmware for [Tracker](Turtle_Trackers/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Trackers/Docs/Assembly_of_Gateway.md).
 
 ---
 
-### Get Help
+### Get help
 
-1. If you have questions go post a issue [here](https://github.com/re-mote-sensing/arduino-motes/issues)
+1. If you have questions, post an issue [here](https://github.com/re-mote-sensing/arduino-motes/issues)
 
 ## 🗂 Documentation
 
@@ -107,12 +114,12 @@ This list will guide you to get started step-by-step.
     - Pi Server
         - [REST Api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
         - [Database Format](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/Documentation/Database_Format.md)
-        - [Juypter Notebook scripts](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/Usefull%20Scripts) for downloading and uploading data to server
+        - [Jupyter Notebook scripts](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/Usefull%20Scripts) for downloading and uploading data to server
  - Turtle Tracker
     - End Node & Gateway
         - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
 
-## 🏆 Acknowledgement
+## 🏆 Acknowledgment
 
 [McMaster University](https://www.mcmaster.ca)
 
