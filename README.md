@@ -52,8 +52,8 @@ Used for real-time monitoring, the Raspberry Pi is inexpensive and can also use 
 A server programmed in Go for fast and concurrent connections.
 - A progressive web application designed in React with a custom API.
     - Progressive web application allows you to browse your data on your phone.
-    - CCustom API makes it easily integrate with other systems.
-- A time-series database (InfluxDB) for simple data storage and a smaller footprint. Time series databases assume that insertions are more frequent than queries, so it allows for the fast insertion of large amounts of data, such as water quality data. [Learn More](https://gitlab.cas.mcmaster.ca/re-mote/publications/-/tree/master/FadhelSekerinskiYao18Timeseries).
+    - Custom API makes it easily integrate with other systems.
+- A time-series database (InfluxDB) for simple data storage and a smaller footprint. Time series databases assume that insertions are more frequent than queries, so it allows for the fast insertion of large amounts of data, such as water quality data. [Learn More](https://gitlab.cas.mcmaster.ca/re-mote/publications/-/tree/master/FadhelSekerinskiYao18Timeseries)
 
 ## 🛰 LoRa & Mesh Network
 
@@ -75,7 +75,7 @@ This list will guide you step by step to get started.
 
 ### Setup [Water Quality Sensing](Water_Sensor/)
 
-1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need.
+1. Get all the [hardwares](Documentation/Water_Sensor/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
     - Install water sensor server on [Docker](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md). **(Recommend)**
@@ -90,7 +90,7 @@ This list will guide you step by step to get started.
 
 ### Setup [Turtle Trackers](Turtle_Trackers/)
 
-1. Get all the [hardware](Turtle_Trackers/Docs/Specification.md) you need.
+1. Get all the [hardwares](Turtle_Trackers/Docs/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
     - Install water sensor server on [Linux](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver).

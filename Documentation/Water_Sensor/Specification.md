@@ -76,9 +76,10 @@ A gateway is essential to facilitate the transmission of data from the node to t
 | MicroSD Card                                | https://www.amazon.ca/gp/product/B08J4HJ98L/                                     |
 | MicroSD Card Reader Module                  | https://www.amazon.ca/gp/product/B07GXBP672/                                     |
 | DHT Sensor                                  | https://www.amazon.ca/gp/product/B07CM2VLBK/                                     |
-| SIM Card with data plan (120 days)          |                                                                                  |
+| SIM Card with data plan (120 days) *        |                                                                                  |
 
 * Depending on your location or country, you may require a different version of the 3G shield that is compatible with your SIM card.
+* As of 2023 in Canada, Virgin/Fido offers a $10 tablet plan that aligns well with the requirements of this project. Alternatively, considering an IoT SIM card could also be an effective solution.
 
 </details>
 
