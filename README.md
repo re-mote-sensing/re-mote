@@ -45,19 +45,19 @@ internet using a 3G connection.
     - **Turbidity** sensor indicates water clarity, with changes signalling potential disturbances.
     - **[Custom sensors](Documentation/Software/Custom_Sensors.md)**
 
-### Raspberry Pi Server
+### Raspberry Pi server
 
-Used for real-time monitoring, the Raspberry Pi is inexpensive and can also use a regular PC.
+For real-time monitoring, the Raspberry Pi is an affordable option. However, a regular PC can also be utilized if preferred.
 
-A server programmed in Go for fast and concurrent connections.
+The server is programmed in Golang for fast and concurrent connections.
 - A progressive web application designed in React with a custom API.
-    - Progressive web application allows you to browse your data on your phone.
-    - Custom API makes it easily integrate with other systems.
+    - A Progressive Web Application (PWA) enables you to access and browse your data conveniently on your phone.
+    - A custom API facilitates easy integration with various other systems.
 - A time-series database (InfluxDB) for simple data storage and a smaller footprint. Time series databases assume that insertions are more frequent than queries, so it allows for the fast insertion of large amounts of data, such as water quality data. [Learn More](https://gitlab.cas.mcmaster.ca/re-mote/publications/-/tree/master/FadhelSekerinskiYao18Timeseries)
 
 ## 🛰 LoRa & Mesh Network
 
-### Low-power Long-range Sensor Network
+### Low-power long-range sensor network
 
 A LoRa mesh network is optionally used for connecting motes (nodes can operate standalone).
 - It is a low-bandwidth, low-power, and long-range network.
@@ -84,7 +84,7 @@ This list will guide you step by step to get started.
 
 3. Assembly of Hardware for the [SensorNodes and/or Gateways](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md).
 
-4. [Configuring, Testing and Deploying](Documentation/Setup/Water_Quality_Setup.md#configuring-and-uploading-the-software).
+4. [Testing and Deploying](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md#testing).
 
 ---
 
