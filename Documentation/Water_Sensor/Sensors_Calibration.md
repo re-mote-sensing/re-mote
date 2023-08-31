@@ -10,7 +10,7 @@ Connect the Arduino board to your computer using USB.
 
 Click `Connect` and select the device.
 
-<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.41PM.png">
+<img src="/Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.41PM.png">
 
 ### Supported Sensors
 
@@ -18,13 +18,13 @@ Click `Connect` and select the device.
 - Atlas Scienticfic EC Sensor
 - Atlas Scienticfic DO Sensor
 
-<img src="Documentation/Pictures/calibrate/IMG_3448.jpg" width="50%">
+<img src="/Documentation/Pictures/calibrate/IMG_3448.jpg" width="50%">
 
 ## pH Sensor Calibration
 
-<img src="Documentation/Pictures/calibrate/IMG_3443.jpg" width="50%">
+<img src="/Documentation/Pictures/calibrate/IMG_3443.jpg" width="50%">
 
-<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.22PM.png" width="50%">
+<img src="/Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.22PM.png" width="50%">
 
 Place the pH sensor in the pH7 calibration liquid, using the `read x10` button to check that the reading is stable.
 
@@ -42,7 +42,7 @@ Press the `View Calibration Info` button, and make sure the reading is `cal, 3` 
 
 ## EC Sensor Calibration
 
-<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.24PM.png" width="50%">
+<img src="/Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.24PM.png" width="50%">
 
 Ensure that the sensor is dry, using the `read x10` button to check when the reading is stable.
 
@@ -50,7 +50,7 @@ After the reading is stable, press `Calibration Air`.
 
 ### K = 0.1
 
-<img src="Documentation/Pictures/calibrate/IMG_3445.jpg" width="50%">
+<img src="/Documentation/Pictures/calibrate/IMG_3445.jpg" width="50%">
 
 Put the EC sensor into the 84us calibration liquid, using the `read x10` button to check that the reading is stable.
 
@@ -62,7 +62,7 @@ After the reading is stable, press `Calibration High Point`.
 
 ### K = 1
 
-<img src="Documentation/Pictures/calibrate/IMG_3446.jpg" width="50%">
+<img src="/Documentation/Pictures/calibrate/IMG_3446.jpg" width="50%">
 
 Place the EC sensor into the 12,880us calibration liquid, using the `read x10` button to check when the reading is stable.
 
@@ -78,9 +78,9 @@ Press the `View Calibration Info` button, make sure that the reading is `cal, 2`
 
 Follow the instructions in the Atlas Scientific documents to [recondition the lab-grade dissolved oxygen probe](https://files.atlas-scientific.com/LG_DO_probe.pdf#page=9)
 
-<img src="Documentation/Pictures/calibrate/IMG_3444.jpg" width="50%">
+<img src="/Documentation/Pictures/calibrate/IMG_3444.jpg" width="50%">
 
-<img src="Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.18PM.png" width="50%">
+<img src="/Documentation/Pictures/calibrate/Screenshot2023-05-29at2.31.18PM.png" width="50%">
 
 Ensure that the sensor is dry, using the `read x10` button to check when the reading is stable.
 

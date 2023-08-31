@@ -56,7 +56,7 @@ Depending on your network preference, please select one of the options provided 
 This approach employs a mesh network, ideal for situations where the 3G signal is unstable or unavailable over water.
 
 <div align="center">
-    <img src="Documentation/Pictures/Mesh_Tube.png" width="60%">
+    <img src="/Documentation/Pictures/Mesh_Tube.png" width="60%">
 </div>
 
 A gateway is essential to facilitate the transmission of data from the node to the server.
@@ -65,7 +65,7 @@ A gateway is essential to facilitate the transmission of data from the node to t
 
 | Part                    | Link                                                               |
 | ----------------------- | ------------------------------------------------------------------ |
-| Mesh LoRa [YL-800N Datasheet](https://gitlab.cas.mcmaster.ca/re-mote/arduino-motes/-/blob/master/Documentation/Data%20Sheets/LoRa_MESH_Radio_YL-800N_EN.pdf)               | https://www.dfrobot.com/product-1670.html                          |
+| Mesh LoRa [YL-800N Datasheet](/Documentation/Datasheets/LoRa_MESH_Radio_YL-800N_EN.pdf)               | https://www.dfrobot.com/product-1670.html                          |
 
 <br>
 
@@ -97,7 +97,7 @@ A gateway is essential to facilitate the transmission of data from the node to t
 This approach involves equipping all sensor nodes with 3G connectivity. It's ideal for setups where all nodes are within areas with available 3G signal and are spaced at considerable distances from one another.
 
 <div align="center">
-    <img src="Documentation/Pictures/SingleNode.png" width="60%">
+    <img src="/Documentation/Pictures/SingleNode.png" width="60%">
 </div>
 
 ## Water Sensor End Node with **3G** Additional Components
@@ -121,7 +121,7 @@ This approach involves equipping all sensor nodes with 3G connectivity. It's ide
 This option is suitable if you don't require real-time data and prefer to retrieve information solely from an SD card.
 
 <div align="center">
-    <img src="Documentation/Pictures/DataLogger.png" width="60%">
+    <img src="/Documentation/Pictures/DataLogger.png" width="60%">
 </div>
 
 No additional hardware needed.

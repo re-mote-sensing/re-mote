@@ -20,7 +20,7 @@ Code used in the Turtle Tracker project, 2022 version. This version differs from
 
  - [Assembly of Trackers](./Docs/Assembly_of_Trackers.md) | [Trackers Enclosure](./Docs/3D_Printed_Enclosure/README.md)
 
- - [Pi Server Source Code](./turtle-tracker-webserver) | [How to Setup Server](Documentation/Water_Sensor_Server/Server_Instructions.md)
+ - [Pi Server Source Code](./turtle-tracker-webserver) | [How to Setup Server](/Documentation/Water_Sensor_Server/Server_Instructions.md)
 
 ###### Code:
 

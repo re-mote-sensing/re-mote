@@ -2,7 +2,7 @@
 
 ## Get all parts ready.
 
-[Specification](./Documentation/Water_Sensor/Specification.md)
+[Specification](/Documentation/Water_Sensor/Specification.md)
 
 ## Arduino Assembly
 
@@ -32,7 +32,7 @@
 
 Using [IO Sensor Shield For Arduino Mega](https://www.dfrobot.com/product-560.html) can make cable connection easier.
 
-<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb.png">
+<img src="/Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb.png">
 
 **pH Sensor:**
 
@@ -73,4 +73,4 @@ Important Note: Turbidity's Data pin needs analog connection to the Arduino
 
 ## Completed Arduino
 
-<img src="Documentation/Pictures/water_arduino/IMG_2225.jpeg">
+<img src="/Documentation/Pictures/water_arduino/IMG_2225.jpeg">

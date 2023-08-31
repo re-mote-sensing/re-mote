@@ -20,7 +20,7 @@
 This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements that normally cost a lot more to make, but you can do it by yourself at a fraction of the price compared to commercial products.
 
 <div align="center">
-    <img src="Documentation/Pictures/mw_tt.webp" height="350px">
+    <img src="/Documentation/Pictures/mw_tt.webp" height="350px">
     <p>Working Water Sensor / Turtle Tracker</p>
 </div>
 
@@ -43,7 +43,7 @@ internet using a 3G connection.
     - **Dissolved Oxygen** sensor measures oxygen levels in the water, indicating the health of aquatic life.
     - **Water Temperature** sensor helps calibrate all sensor levels.
     - **Turbidity** sensor indicates water clarity, with changes signalling potential disturbances.
-    - **[Custom sensors](Documentation/Water_Sensor/Custom_Sensors.md)**
+    - **[Custom sensors](/Documentation/Water_Sensor/Custom_Sensors.md)**
 
 ### Server
 
@@ -64,7 +64,7 @@ A LoRa mesh network is optionally used for connecting motes (nodes can operate s
 - The mesh network is tolerant to faults, changing network topology, extension, and contraction.
 
 <div align="center">
-    <img src="Documentation/Pictures/Mesh_Tube.png" width="800px">
+    <img src="/Documentation/Pictures/Mesh_Tube.png" width="800px">
 </div>
 
 ## 🚀 Get started
@@ -75,16 +75,16 @@ This list will guide you step by step to get started.
 
 ### Setup [Water Quality Sensing](Water_Sensor/)
 
-1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need.
+1. Get all the [hardware](/Documentation/Water_Sensor/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
     - Install water sensor server on [Docker](Water_Sensor/re-mote-webserver/). **(Recommend)**
-    - Install water sensor server on [Linux](Documentation/Water_Sensor_Server/Server_Instructions.md).
+    - Install water sensor server on [Linux](/Documentation/Water_Sensor_Server/Server_Instructions.md).
     - Install water sensor server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
-3. Assembly of Hardware for the [SensorNodes and/or Gateways](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md).
+3. Assembly of Hardware for the [SensorNodes and/or Gateways](/Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md).
 
-4. [Testing and Deploying](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md#testing).
+4. [Testing and Deploying](/Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md#testing).
 
 ---
 
@@ -93,7 +93,7 @@ This list will guide you step by step to get started.
 1. Get all the [hardware](Turtle_Tracker/Docs/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
-    - Install water sensor server on [Linux](Documentation/Water_Sensor_Server/Server_Instructions.md) with the [source code](Turtle_Tracker/turtle-tracker-webserver).
+    - Install water sensor server on [Linux](/Documentation/Water_Sensor_Server/Server_Instructions.md) with the [source code](Turtle_Tracker/turtle-tracker-webserver).
     - Install turtle tracker server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
 3. Assemble Hardware and Flash the Firmware for [Tracker](Turtle_Tracker/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Tracker/Docs/Assembly_of_Gateway.md).
@@ -108,13 +108,13 @@ This list will guide you step by step to get started.
 
  - Water Sensor
     - End Node & Gateway
-        - [LoRa message format](Documentation/Water_Sensor/Message_Formats.md)
-        - [Saved data formats](Documentation/Water_Sensor/Saved_Data_Formats.md)
-        - [Add custom sensors](Documentation/Water_Sensor/Custom_Sensors.md)
+        - [LoRa message format](/Documentation/Water_Sensor/Message_Formats.md)
+        - [Saved data formats](/Documentation/Water_Sensor/Saved_Data_Formats.md)
+        - [Add custom sensors](/Documentation/Water_Sensor/Custom_Sensors.md)
     - Server
         - [Jupyter analysis](Jupyter_analysis/)
         - [REST api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
-        - [Database format](Documentation/Water_Sensor_Server/Database_Format.md)
+        - [Database format](/Documentation/Water_Sensor_Server/Database_Format.md)
  - Turtle Tracker
     - End Node & Gateway
         - [LoRa message format](Turtle_Tracker/Docs/message_format_turtle_tracker.xlsx)

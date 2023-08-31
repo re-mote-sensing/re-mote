@@ -194,7 +194,7 @@ This request doesn't return any data
 
 **Type:** POST  
 **URL:** {Homepage}/sensor/data?data={data}  
-**Description:** Adds sensor and information data from multiple nodes to the database all at once. This is the request that the Arduino gateway nodes use to interact with the web server. Specifications and examples on how to format {data} can be found in the [Arduino message format specification file](Documentation/Water_Sensor/Message_Formats.md#data-post-to-server).  
+**Description:** Adds sensor and information data from multiple nodes to the database all at once. This is the request that the Arduino gateway nodes use to interact with the web server. Specifications and examples on how to format {data} can be found in the [Arduino message format specification file](/Documentation/Water_Sensor/Message_Formats.md#data-post-to-server).  
 
 
 

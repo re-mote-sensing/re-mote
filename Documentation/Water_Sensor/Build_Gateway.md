@@ -2,7 +2,7 @@
 
 ## Get all parts ready.
 
-[Specification](./Documentation/Water_Sensor/Specification.md)
+[Specification](/Documentation/Water_Sensor/Specification.md)
 
 ## Breakdown of all connections:
 

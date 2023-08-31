@@ -100,6 +100,6 @@ Once both a Location and Sensor Type have been selected, a table containing the 
 <summary>Run without Docker (If you do not have virtualization on your machine)</summary>
 <br>
 
-- See [Server Build Instructions](Documentation/Water_Sensor_Server/Server_Instructions.md) for instruction on how to setup the server without Docker.
+- See [Server Build Instructions](/Documentation/Water_Sensor_Server/Server_Instructions.md) for instruction on how to setup the server without Docker.
 
 </details>

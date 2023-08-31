@@ -9,14 +9,14 @@
 This approach employs a mesh network, ideal for situations where the 3G signal is unstable or unavailable over water.
 
 <div align="center">
-    <img src="Documentation/Pictures/Mesh_Tube.png" width="60%">
+    <img src="/Documentation/Pictures/Mesh_Tube.png" width="60%">
 </div>
 
 A gateway is essential to facilitate the transmission of data from the node to the server.
 
 ## Build a Sensor Node
 
-Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
+Link: [Build EndNode](/Documentation/Water_Sensor/Build_EndNode.md)
 
 ### Connect LoRa Module
 
@@ -27,13 +27,13 @@ Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 - Connect LoRA Tx with Arduino A4.
 - Connect LoRA Rx with Arduino A5.
 
-<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_LoRa.png" width="50%">
+<img src="/Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_LoRa.png" width="50%">
 
 ## Build gateway
 
-Link: [Build Gateway](Documentation/Water_Sensor/Build_Gateway.md)
+Link: [Build Gateway](/Documentation/Water_Sensor/Build_Gateway.md)
 
-Link: [Gateway Enclosure](Documentation/Water_Sensor/Gateway_Enclosure_Assembly.md)
+Link: [Gateway Enclosure](/Documentation/Water_Sensor/Gateway_Enclosure_Assembly.md)
 
 ## Flash firmware for nodes
 
@@ -54,7 +54,7 @@ To configure the sensor node, please refer to the example provided below.
 
 ### Flash
 
-Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
 
 ## Flash firmware for Gateway
 
@@ -75,7 +75,7 @@ To configure the gateway node, please refer to the example provided below.
 
 ### Flash
 
-Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
 
 </details>
 
@@ -88,12 +88,12 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 This approach involves equipping all sensor nodes with 3G connectivity. It's ideal for setups where all nodes are within areas with available 3G signal and are spaced at considerable distances from one another.
 
 <div align="center">
-    <img src="Documentation/Pictures/SingleNode.png" width="60%">
+    <img src="/Documentation/Pictures/SingleNode.png" width="60%">
 </div>
 
 ## Build a Sensor Node
 
-Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
+Link: [Build EndNode](/Documentation/Water_Sensor/Build_EndNode.md)
 
 ## Connect the 3G Module
 
@@ -104,7 +104,7 @@ Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
 - Connect 3G Tx with Arduino 11.
 - Connect 3G Rx with Arduino 10.
 
-<img src="Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png" width="50%">
+<img src="/Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png" width="50%">
 
 ## Flash firmware for nodes
 
@@ -124,7 +124,7 @@ To configure the sensor node, please refer to the example provided below.
 
 ### Flash
 
-Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
 
 </details>
 
@@ -137,12 +137,12 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 This option is suitable if you don't require real-time data and prefer to retrieve information solely from an SD card.
 
 <div align="center">
-    <img src="Documentation/Pictures/DataLogger.png" width="60%">
+    <img src="/Documentation/Pictures/DataLogger.png" width="60%">
 </div>
 
 ## Build a Sensor Node
 
-Link: [Build EndNode](Documentation/Water_Sensor/Build_EndNode.md)
+Link: [Build EndNode](/Documentation/Water_Sensor/Build_EndNode.md)
 
 ## Flash firmware for nodes
 
@@ -162,7 +162,7 @@ To configure the sensor node, please refer to the example provided below.
 
 ### Flash
 
-Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
 
 </details>
 
@@ -170,11 +170,11 @@ Link: [Flash firmware](Documentation/Water_Sensor/Flash_firmware.md)
 
 ## Build a Pipe Enclosure
 
-Link: [Pipe Enclosure Assembly](Documentation/Water_Sensor/Pipe_Enclosure_Assembly.md)
+Link: [Pipe Enclosure Assembly](/Documentation/Water_Sensor/Pipe_Enclosure_Assembly.md)
 
 ## Calibrate Sensors
 
-Link: [Sensors Calibration](Documentation/Water_Sensor/Sensors_Calibration.md)
+Link: [Sensors Calibration](/Documentation/Water_Sensor/Sensors_Calibration.md)
 
 
 # Testing
