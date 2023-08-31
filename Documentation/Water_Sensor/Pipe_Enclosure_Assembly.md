@@ -23,15 +23,15 @@
 
 <b>Permanent Cap</b>
 
-<img src="/Documentation/Pictures/pipe_assembly/cap.png" width="50%">
+<img src="/Documentation/Pictures/pipe_assembly/cap.jpeg" width="50%">
 
 <b>Cleanout Adapter with Plug</b>
 
-<img src="/Documentation/Pictures/pipe_assembly/cleanoutadapter.png" width="50%">
+<img src="/Documentation/Pictures/pipe_assembly/cleanoutadapter.jpeg" width="50%">
 
 <b>Pipe Connector</b>
 
-<img src="/Documentation/Pictures/pipe_assembly/connector.png" width="50%">
+<img src="/Documentation/Pictures/pipe_assembly/connector.jpeg" width="50%">
 
 <b>2lb Lead Weight</b>
 
