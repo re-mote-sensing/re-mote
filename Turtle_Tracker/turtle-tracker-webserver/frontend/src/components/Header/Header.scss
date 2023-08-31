@@ -1,0 +1,47 @@
+.header {
+    text-align: center;
+    background-color: #7e3e98;
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+
+    h2 {
+        margin: 0;
+        padding: 0;
+    }
+
+    img {
+        height:20px;
+        padding-right: 10px;
+    }
+
+    button {
+      background-color: #008CBA;
+      border: none;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      border-radius:3px;
+      margin: 3px 5px;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+
+        h2 {
+            font-size: 4vw;
+        }
+
+        img {
+            display: none;
+        }
+    }
+}

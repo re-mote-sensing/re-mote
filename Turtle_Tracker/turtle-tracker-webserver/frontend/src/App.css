@@ -1,0 +1,7 @@
+.leaflet-container {
+  height: 100vh !important;
+}
+
+.leaflet-top {
+  margin-top: 80px !important;
+}

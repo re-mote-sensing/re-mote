@@ -1,0 +1,372 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script>document.getElementsByTagName("html")[0].className += " js";</script>
+  <link rel="stylesheet" href="https://api-frame.krunk.cn/main/assets/css/style.min.css">
+  <title>MacWater End Node Configuration Toolkit</title>
+  <script src="./serial.js"></script>
+
+  <style>
+    #text{
+      display: none;
+    }
+
+    #Sensor-Area{
+      display: none;
+    }
+
+    button {
+      margin-bottom: 5px !important;
+    }
+
+    hr {
+      margin-top: 15px !important;
+      margin-bottom: 15px !important;
+    }
+
+    .text-component ul {
+     list-style-type: none !important; 
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container max-width-md">
+    
+
+    <section id="connect-button" class="bg-light radius-lg inner-glow shadow-xs padding-md padding-lg@md">
+      <div class="grid gap-md items-center">
+        <div class="col-6@md">
+          <div class="text-component">
+            <h3>Calibration Toolkit</h3>
+            <p class="color-contrast-medium">Connect via Serial Port, available on Chrome desktop version</p>
+          </div>
+        </div>
+      
+        <div class="col-6@md">
+          <div class="flex gap-xs flex-column flex-row@xs justify-end@md">
+            <button class="btn btn--primary" id="connect-button" onclick="onButtonConnectToSerialDevice()">Connect</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="text" class="bg-light radius-lg inner-glow shadow-xs padding-md padding-lg@md">
+      <div class="grid gap-md items-center">
+          <div class="text-component">
+            <h3>Serial: <span id="received-text">Waiting for connection</span></h3>
+            <p>Message Received: <span id="count-text">0</span></p>
+          </div>
+      </div>
+    </section>
+
+    <br>
+
+    <div id="Sensor-Area">
+      <div class="tabs-v3 js-tabs">
+        <h5>Configuration Menu | Select a tab</h5><br>
+        <ul class="tabs-v3__controls js-tabs__controls" aria-label="Tabs Interface">
+          <li><a href="#tab1Panel0" class="tabs-v3__control js-tab-focus" aria-selected="true">Tools</a></li>
+          <li><a href="#tab1Panel1" class="tabs-v3__control js-tab-focus">DO Sensor</a></li>
+          <li><a href="#tab1Panel2" class="tabs-v3__control js-tab-focus">pH Sensor</a></li>
+          <li><a href="#tab1Panel3" class="tabs-v3__control js-tab-focus">EC Sensor</a></li>
+        </ul>
+
+        <div class="tabs-v3__panels js-tabs__panels">
+
+          <section id="tab1Panel0" class="tabs-v3__panel is-visible js-tabs__panel">
+            <div class="text-component">
+              <h4>Tools</h4><br>
+              <button class="btn btn--accent btn--sm" onclick="serialWriteTextData('e',1)">Exit Config Mode</button><br>
+            </div>
+          </section>
+
+          <section id="tab1Panel1" class="tabs-v3__panel js-tabs__panel">
+            <div class="text-component">
+              <h4>Dissolved Oxygen | <a href="https://www.atlas-scientific.com/files/DO_EZO_Datasheet.pdf#page=9" target="_blank">Docs</a></h4><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorInfo('do')">Circuit Info</button><span> - I,Type,FirmwareVer</span><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('do',5)">Read x5</button>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('do',10)">Read x10</button><br>
+              <hr>
+              <button class="btn btn--primary btn--sm" onclick="sensorSendCommand('do','Cal,?')">View Calibration info</button><span> - CAL,0: None | CAL,1: One point | CAL,2: Two point</span><br>
+              <button class="btn btn--accent btn--sm" onclick="sensorSendCommand('do','Cal,clear')">Clear Calibration Data</button><br>
+              <button class="btn btn--subtle btn--sm" onclick="setSensorTempCompensation('ec')">Set Temperature Compensation</button><span> - No need for DO calibration (Cleared after reboot)</span><br>
+              <br>
+              <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('do','Cal')">Calibration Air</button><span> - Expose to air until stablilze</span><br>
+              <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('do','cal,0')">Calibration Zero DO</button><span> - Put into DO 0 liquid until stablilze</span><br>
+              <hr>
+              <button class="btn btn--accent btn--sm" onclick="sensorSendCommandByUserInput('do')">Send Command Directly</button><br>
+            </div>
+          </section>
+
+          <section id="tab1Panel2" class="tabs-v3__panel js-tabs__panel">
+            <div class="text-component">
+              <h4>Potential of Hydrogen | <a href="https://www.atlas-scientific.com/files/pH_EZO_Datasheet.pdf#page=11" target="_blank">Docs</a></h4><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorInfo('ph')">Circuit Info</button><span> - I,Type,FirmwareVer</span><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('ph',5)">Read x5</button>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('ph',10)">Read x10</button><br>
+              <hr>
+              <button class="btn btn--primary btn--sm" onclick="sensorSendCommand('ph','Cal,?')">View Calibration info</button><span> - CAL,0: None | CAL,1: One point | CAL,2: Two point | CAL,3: Three point</span><br>
+              <button class="btn btn--accent btn--sm" onclick="sensorSendCommand('ph','Cal,clear')">Clear Calibration Data</button><br>
+              <button class="btn btn--subtle btn--sm" onclick="setSensorTempCompensation('ec')">Set Temperature Compensation</button><span> - Set before calibration (Cleared after reboot)</span><br>
+              <br>
+              <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ph','cal,mid,7')">Calibration Mid Point</button><span> - Put into pH7 until stablilze</span><br>
+              <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ph','cal,low,4')">Calibration Low Point</button><span> - Put into pH4 until stablilze</span><br>
+              <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ph','cal,high,10')">Calibration High Point</button><span> - Put into pH10 until stablilze</span><br>
+              <hr>
+              <button class="btn btn--accent btn--sm" onclick="sensorSendCommandByUserInput('ph')">Send Command Directly</button><br>
+            </div>
+          </section>
+
+          <section id="tab1Panel3" class="tabs-v3__panel js-tabs__panel">
+            <div class="text-component">
+              <h4>Electrical Conductivity | <a href="https://www.atlas-scientific.com/files/EC_EZO_Datasheet.pdf#page=12" target="_blank">Docs</a></h4><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorInfo('ec')">Circuit Info</button><span> - I,Type,FirmwareVer</span><br>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('ec',5)">Read x5</button>
+              <button class="btn btn--primary btn--sm" onclick="sensorRead('ec',10)">Read x10</button><br>
+              <hr>
+              <button class="btn btn--primary btn--sm" onclick="sensorSendCommand('ec','Cal,?')">View Calibration info</button><span> - CAL,0: None | CAL,1: One point | CAL,2: Two point</span><br>
+              <button class="btn btn--accent btn--sm" onclick="sensorSendCommand('ec','Cal,clear')">Clear Calibration Data</button><br>
+              <button class="btn btn--subtle btn--sm" onclick="setSensorTempCompensation('ec')">Set Temperature Compensation</button><span> - Set before calibration (Cleared after reboot)</span><br>
+              <br>
+
+              <ul class="accordion-v2 flex flex-column gap-xxxs js-accordion" data-animation="on" data-multi-items="on" data-version="v2">
+
+                <li class="accordion-v2__item  js-accordion__item">
+                  <button class="reset accordion-v2__header padding-y-sm padding-x-md js-tab-focus" type="button" style="margin-bottom: 0px !important;">
+                    <span class="text-md">K = 0.1</span>
+                    <svg class="icon accordion-v2__icon-arrow no-js:is-hidden" viewBox="0 0 20 20">
+                      <g class="icon__group" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="3" x2="17" y2="17" />
+                        <line x1="17" y1="3" x2="3" y2="17" />
+                      </g>
+                    </svg>
+                  </button>
+                  <div class="accordion-v2__panel padding-top-xxxs padding-x-md padding-bottom-md js-accordion__panel" style="margin-bottom: 0px !important;">
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','K,0.1')">Calibration Set K to 0.1</button><span> - Set before calibration begin</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','Cal,dry')">Calibration Dry</button><span> - Expose to air until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,low,84')">Calibration Low Point</button><span> - Put into 84uS until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,high,1413')">Calibration High Point</button><span> - Put into 1413uS until stablilze</span><br>
+                  </div>
+                </li>
+
+                <li class="accordion-v2__item  js-accordion__item">
+                  <button class="reset accordion-v2__header padding-y-sm padding-x-md js-tab-focus" type="button" style="margin-bottom: 0px !important;">
+                    <span class="text-md">K = 1.0</span>
+                    <svg class="icon accordion-v2__icon-arrow no-js:is-hidden" viewBox="0 0 20 20">
+                      <g class="icon__group" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="3" x2="17" y2="17" />
+                        <line x1="17" y1="3" x2="3" y2="17" />
+                      </g>
+                    </svg>
+                  </button>
+                  <div class="accordion-v2__panel padding-top-xxxs padding-x-md padding-bottom-md js-accordion__panel">
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','K,1.0')">Calibration Set K to 1.0</button><span> - Set before calibration begin</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','Cal,dry')">Calibration Dry</button><span> - Expose to air until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,low,12880')">Calibration Low Point</button><span> - Put into 12880uS until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,high,80000')">Calibration High Point</button><span> - Put into 80000uS until stablilze</span><br>
+                  </div>
+                </li>
+
+                <li class="accordion-v2__item  js-accordion__item">
+                  <button class="reset accordion-v2__header padding-y-sm padding-x-md js-tab-focus" type="button" style="margin-bottom: 0px !important;">
+                    <span class="text-md">K = 10</span>
+                    <svg class="icon accordion-v2__icon-arrow no-js:is-hidden" viewBox="0 0 20 20">
+                      <g class="icon__group" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="3" x2="17" y2="17" />
+                        <line x1="17" y1="3" x2="3" y2="17" />
+                      </g>
+                    </svg>
+                  </button>
+                  <div class="accordion-v2__panel padding-top-xxxs padding-x-md padding-bottom-md js-accordion__panel">
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','K,10')">Calibration Set K to 10</button><span> - Set before calibration begin</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','Cal,dry')">Calibration Dry</button><span> - Expose to air until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,low,12880')">Calibration Low Point</button><span> - Put into 12880uS until stablilze</span><br>
+                    <button class="btn btn--subtle btn--sm" onclick="sensorSendCommand('ec','cal,high,150000')">Calibration High Point</button><span> - Put into 150000uS until stablilze</span><br>
+                  </div>
+                </li>
+
+              </ul>
+
+                    <hr>
+                    <button class="btn btn--accent btn--sm" onclick="sensorSendCommandByUserInput('ec')">Send Command Directly</button><br>
+            </div>
+          </section>
+
+        </div>
+      </div>
+      <br>
+    </div>
+  </div>
+  <script>
+    var totalMsgReceived = 0;
+    var inConfigMode = false;
+
+    const rcvdText = document.getElementById('received-text');
+    const countText = document.getElementById('count-text');
+    const sensorArea = document.getElementById('Sensor-Area');
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // Sensor pin config
+    function getSensorPinByType(type) {
+      if (type == "do") {
+        return ",63,47,46";
+      }else if (type == "ph") {
+        return ",62,45,44";
+      }else if (type == "ec") {
+        return ",65,49,48";
+      }
+    }
+
+    function askUserInput(text, placeholder) {
+      let person = prompt(text, placeholder);
+      if (person == null || person == "") {
+        return null;
+      }
+      return person;
+    }
+
+    async function setSensorTempCompensation(type) {
+      disableButton(true);
+      serialWriteTextData("c"+getSensorPinByType(type),1);
+      await sleep(2000);
+      const temp = askUserInput("Input the temperature", "");
+      if (temp != null)
+        serialWriteTextData("T,"+temp,0);
+      await sleep(2000);
+      serialWriteTextData("exit",0);
+      disableButton(false);
+    }
+
+    async function sensorSendCommandByUserInput(type) {
+      disableButton(true);
+      serialWriteTextData("c"+getSensorPinByType(type),1);
+      await sleep(2000);
+      const cmd = askUserInput("Input the command", "i");
+      if (cmd != null)
+        serialWriteTextData(cmd,0);
+      await sleep(2000);
+      serialWriteTextData("exit",0);
+      disableButton(false);
+    }
+
+    async function sensorSendCommand(type, cmd) {
+      disableButton(true);
+      serialWriteTextData("c"+getSensorPinByType(type),1);
+      await sleep(2000);
+      serialWriteTextData(cmd,0);
+      await sleep(2000);
+      serialWriteTextData("exit",0);
+      disableButton(false);
+    }
+
+    function disableButton(disable) {
+      const inputs = document.getElementsByTagName("button");
+      for (const input of inputs) {
+        input.disabled = disable
+      }
+    }
+
+    // Read sensor info
+    async function sensorInfo(type) {
+      disableButton(true);
+      serialWriteTextData("c"+getSensorPinByType(type),1);
+      await sleep(2000);
+      serialWriteTextData("i",0);
+      await sleep(2000);
+      serialWriteTextData("exit",0);
+      disableButton(false);
+    }
+
+    // Read sensor data
+    async function sensorRead(type, count) {
+      disableButton(true);
+      serialWriteTextData("c"+getSensorPinByType(type),1);
+      await sleep(2000);
+      for (var i = count; i > 0; i--) {
+        serialWriteTextData("R",0);
+        await sleep(2000);
+      }
+      await sleep(2000);
+      serialWriteTextData("exit",0);
+      disableButton(false);
+    }
+
+    // Setup Web Serial using serial.js
+    const serial = new Serial();
+    serial.on(SerialEvents.CONNECTION_OPENED, onSerialConnectionOpened);
+    serial.on(SerialEvents.CONNECTION_CLOSED, onSerialConnectionClosed);
+    serial.on(SerialEvents.DATA_RECEIVED, onSerialDataReceived);
+    serial.on(SerialEvents.ERROR_OCCURRED, onSerialErrorOccurred);
+
+    // Callback function for when the connect button is pressed
+    async function onButtonConnectToSerialDevice() {
+      console.log("onButtonConnectToSerialDevice");
+      if (!navigator.serial) {
+        alert("Your browser is not supported, or you are not in the HTTPS session.");
+      }
+      if (!serial.isOpen()) {
+        await serial.connectAndOpen();
+      }
+    }
+
+    // Send data over serial
+    async function serialWriteTextData(textData, ifWriteLine) {
+      if (serial.isOpen()) {
+        console.log("TO: ", textData);
+        if (ifWriteLine)
+          serial.writeLine(textData);
+        else
+          serial.write(textData);
+      }
+    }
+
+    // Callback function by serial.js when there is an error on web serial
+    function onSerialErrorOccurred(eventSender, error) {
+      //console.log("onSerialErrorOccurred", error);
+    }
+
+    // Callback function by serial.js when web serial connection is opened
+    function onSerialConnectionOpened(eventSender) {
+      console.log("Connection Opened");
+      document.getElementById("connect-button").style.display = "none";
+      document.getElementById("text").style.display = "block";
+    }
+
+    // Callback function by serial.js when web serial connection is closed
+    function onSerialConnectionClosed(eventSender) {
+      console.log("Connection Closed");
+      document.getElementById("connect-button").style.display = "block";
+      document.getElementById("text").style.display = "none";
+    }
+
+    function onSerialDataReceived(eventSender, newData) {
+      console.log("FROM: ", newData);
+      totalMsgReceived ++;
+      countText.textContent = totalMsgReceived;
+      if (newData === "Hello") {
+        serialWriteTextData("ConfigMode",1);
+        rcvdText.textContent = "Connected";
+        return;
+      }
+      rcvdText.textContent = newData;
+      if (newData === "ConfigMode") {
+        sensorArea.style.display = "block";
+        inConfigMode = true;
+      }else if (newData === "ConfigModeExit") {
+        sensorArea.style.display = "none";
+        inConfigMode = false;
+      }
+    }
+  </script>
+  <script src="https://api-frame.krunk.cn/main/assets/js/scripts.min.js"></script>
+</body>
+
+</html>

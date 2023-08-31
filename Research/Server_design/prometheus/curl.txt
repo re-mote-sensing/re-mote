@@ -1,0 +1,17 @@
+push a single sample
+echo "some_metric 3.14" | curl --data-binary @- http://pushgateway.example.org:9091/metrics/job/some_job
+
+push more complex
+cat <<EOF | curl --data-binary @- http://pushgateway.example.org:9091/metrics/job/some_job/instance/some_instance
+  # TYPE some_metric counter
+  some_metric{label="val1"} 42
+  # TYPE another_metric gauge
+  # HELP another_metric Just an example.
+  another_metric 2398.283
+  EOF
+
+Delete by job and instance
+curl -X DELETE http://pushgateway.example.org:9091/metrics/job/some_job/instance/some_instance
+
+Delete by job
+curl -X DELETE http://pushgateway.example.org:9091/metrics/job/some_job

@@ -1,0 +1,44 @@
+.tracker_button {
+    background-color: #7e3e98;
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius:3px;
+    margin: 3px 5px;
+}
+
+.onMobile {
+    display: none;
+}
+
+.slide-pane__overlay{
+    z-index: 1000000 !important;
+    position: fixed;
+}
+
+.slide-pane__header{
+    background: #7e3e98 !important;
+    color: white !important;
+}
+
+.right-panel-log{
+    width: 50% !important;
+}
+
+@media (max-width: 1150px) {
+    .right-panel-log{
+        width: 80% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .right-panel-log{
+        width: 100% !important;
+    }
+    .onMobile {
+        display: block;
+    }
+}

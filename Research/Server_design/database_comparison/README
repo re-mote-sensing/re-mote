@@ -1,0 +1,5 @@
+This folder contains the raw data of database comparison.
+
+The pi server run on 130.113.68.111:80, we use curl command to send HTTP requests to the server:
+    `curl http://130.113.68.111:80/sensor/data?id={location_id}&measurement={string}&value={number}`
+The influxdb listens on the port : localhost:8086 

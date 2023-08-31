@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "module": "amd",
+    "allowJs": true,
+    "target": "es6",
+    "lib": ["dom","es6","scripthost", "es2015.collection"],
+    "sourceMap": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ]
+    },
+    "jsx": "react", //Transform the JSX embedded tags to React calls
+//    "noImplicitReturns": true, //"no*" flags enable some of the newer, stricter, checks
+//    "noImplicitThis": true,
+//    "noImplicitAny": true,
+//    "suppressExcessPropertyErrors": false,
+//    "suppressImplicitAnyIndexErrors": false,
+    "noErrorTruncation": true,
+    "alwaysStrict": true,
+//    "strict": true,
+//    "strictNullChecks": true,
+//    "strictFunctionTypes": true,
+//    "strictPropertyInitialization": false,
+    "preserveConstEnums": true,
+    "moduleResolution": "node", //Look for modules in the "node_modules" folder using package entry points
+    "rootDir": "src",
+    "forceConsistentCasingInFileNames": true,
+    "keyofStringsOnly": false // Breaking change from 2.9+, keyof includes `number | symbol`
+  },
+  "include": [
+    "src/**/*",
+    "typings/**/*"
+  ],
+  "exclude": [
+    "node_modules/**/*"
+  ]
+}

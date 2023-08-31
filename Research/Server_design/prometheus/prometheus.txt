@@ -1,0 +1,16 @@
+add config as localhost:9091 to prometheus config.yml
+
+Title : Show Data from prometheus
+URL : /dataset/{job}
+Method : GET 
+URL Params :  Required: job=[string]
+
+Title : Create Data to prometheus
+URL : /adddataset/{job}
+Method : POST
+URL Params :  Required: job=[string] 
+
+Title : Delete Data from prometheus
+URL : /deletedataset/{job}
+Method : GET 
+URL Params :  Required: job=[string]

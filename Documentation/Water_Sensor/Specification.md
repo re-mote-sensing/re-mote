@@ -2,7 +2,7 @@
 
 ## Server Node
 
-Any PC that runs Docker can be used (Windows, Linux, MacOS).
+Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Windows, Linux, MacOS).
 
 | Part           | Link                                                         |
 | -------------- | ------------------------------------------------------------ |
@@ -18,8 +18,6 @@ Any PC that runs Docker can be used (Windows, Linux, MacOS).
 | Part                            | Link                                                               |
 | ------------------------------- | ------------------------------------------------------------------ |
 | Arduino Mega                    | https://www.amazon.ca/gp/product/B01H4ZDYCE/                       |
-| GPS Receiver - GP-735           | https://www.sparkfun.com/products/13670                            |
-| JST connector (for GPS)         | https://www.digikey.ca/en/products/detail/sparkfun-electronics/PRT-10361/6605206 |
 | MicroSD Card *                  | https://www.amazon.ca/gp/product/B08J4HJ98L/                                     |
 | MicroSD Card Reader Module      | https://www.amazon.ca/gp/product/B07GXBP672/                                     |
 | AA Battery Holder (3 x 1.5v) *  | https://www.amazon.ca/gp/product/B07PJT5NHL/                       |
@@ -27,9 +25,16 @@ Any PC that runs Docker can be used (Windows, Linux, MacOS).
 * You're not limited to a specific SD card; here's an example for your consideration. However, it's essential to note that the SPI card reader lacks error correction. To mitigate potential issues, opt for a reputable, high-quality brand.
 * You can explore alternative battery options, provided the voltage falls within the 4.5 to 5.5V range.
 
+| Part                            | Link                                                               |
+| ------------------------------- | ------------------------------------------------------------------ |
+| GPS Receiver - GP-735           | https://www.sparkfun.com/products/13670                            |
+| JST connector (for GPS)         | https://www.digikey.ca/en/products/detail/sparkfun-electronics/PRT-10361/6605206 |
+
+* GPS is optional, if you prefer enter coordinates by your self
+
 ## Sensors
 
-- It's recommended to use the specified sensors. However, if you opt for alternative sensors, be aware that programming skills might be necessary for proper integration.
+- It's recommended to use the one or more specified sensors. However, if you opt for alternative sensors, be aware that programming skills are necessary for proper integration.
 
 | Part                    | Link                                                               |
 | ----------------------- | ------------------------------------------------------------------ |
@@ -37,9 +42,7 @@ Any PC that runs Docker can be used (Windows, Linux, MacOS).
 | Dissolved Oxygen Kit    | https://atlas-scientific.com/kits/dissolved-oxygen-kit/            |
 | Turbidity Sensor        | https://www.dfrobot.com/product-1394.html                          |
 | Temperature Sensor Kit  | https://www.dfrobot.com/product-1354.html                          |
-| Industrial pH Probe     | https://atlas-scientific.com/probes/industrial-ph-probe/           |
-| EZO™ Carrier Board for pH | https://atlas-scientific.com/carrier-boards/electrically-isolated-ezo-carrier-board-gen-2/ |
-| EZO™ pH Circuit         | https://atlas-scientific.com/embedded-solutions/ezo-ph-circuit/    |
+| Industrial pH Probe<br><br>EZO™ Carrier Board for pH<br><br>EZO™ pH Circuit     | https://atlas-scientific.com/probes/industrial-ph-probe/<br><br>https://atlas-scientific.com/carrier-boards/electrically-isolated-ezo-carrier-board-gen-2/<br><br>https://atlas-scientific.com/embedded-solutions/ezo-ph-circuit/|
 
 ### Additional Hardware
 Depending on your network preference, please select one of the options provided below.
@@ -47,7 +50,7 @@ Depending on your network preference, please select one of the options provided 
 ---
 
 <details>
-<summary>Using mesh network (LoRa) with a gateway</summary>
+<summary>Using LoRa with one or more gateways</summary>
 <br>
 
 This approach employs a mesh network, ideal for situations where the 3G signal is unstable or unavailable over water.
@@ -70,15 +73,17 @@ A gateway is essential to facilitate the transmission of data from the node to t
 
 | Part                                        | Link                                                                             |
 | ------------------------------------------- | -------------------------------------------------------------------------------- |
-| Arduino Uno                                 | https://www.canadarobotix.com/products/60                                        |
+| Arduino Uno *                               | https://www.canadarobotix.com/products/60                                        |
 | 3G Shield *                                 | https://www.tinyosshop.com/3g-gprs-gsm-shield-for-arduino-sim5320a               |
 | Mesh LoRa                                   | https://www.dfrobot.com/product-1670.html                                        |
-| MicroSD Card                                | https://www.amazon.ca/gp/product/B08J4HJ98L/                                     |
-| MicroSD Card Reader Module                  | https://www.amazon.ca/gp/product/B07GXBP672/                                     |
+| MicroSD Card *                              | https://www.amazon.ca/gp/product/B08J4HJ98L/                                     |
+| MicroSD Card Reader Module *                | https://www.amazon.ca/gp/product/B07GXBP672/                                     |
 | DHT Sensor                                  | https://www.amazon.ca/gp/product/B07CM2VLBK/                                     |
 | SIM Card with data plan (120 days) *        |                                                                                  |
 
+* Other Arduino based board also works.
 * Depending on your location or country, you may require a different version of the 3G shield that is compatible with your SIM card.
+* You're not limited to a specific SD card; here's an example for your consideration. However, it's essential to note that the SPI card reader lacks error correction. To mitigate potential issues, opt for a reputable, high-quality brand.
 * As of 2023 in Canada, Virgin/Fido offers a $10 tablet plan that aligns well with the requirements of this project. Alternatively, considering an IoT SIM card could also be an effective solution.
 
 </details>

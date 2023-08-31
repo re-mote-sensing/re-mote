@@ -6,12 +6,12 @@
 ## 📎 Table of Contents
 
 1. [About re:mote](#-about-remote)
-2. [LoRa & Mesh Network](#-lora-mesh-network)
+2. [LoRa & Mesh Network](#-lora--mesh-network)
 3. [Setup](#-get-started)
-    - [Water Quality Sensing](#water-quality-sensing)
-    - [Turtle Trackers](#turtle-trackers)
+    - [Water Quality Sensing](#setup-water-quality-sensing)
+    - [Turtle Tracker](#setup-turtle-tracker)
 4. [Documentation](#-documentation)
-5. [Acknowledgement](#-acknowledgement)
+5. [Acknowledgement](#-acknowledgment)
 
 ## 📒 About re:mote
 
@@ -43,9 +43,9 @@ internet using a 3G connection.
     - **Dissolved Oxygen** sensor measures oxygen levels in the water, indicating the health of aquatic life.
     - **Water Temperature** sensor helps calibrate all sensor levels.
     - **Turbidity** sensor indicates water clarity, with changes signalling potential disturbances.
-    - **[Custom sensors](Documentation/Software/Custom_Sensors.md)**
+    - **[Custom sensors](Documentation/Water_Sensor/Custom_Sensors.md)**
 
-### Raspberry Pi server
+### Server
 
 For real-time monitoring, the Raspberry Pi is an affordable option. However, a regular PC can also be utilized if preferred.
 
@@ -75,11 +75,11 @@ This list will guide you step by step to get started.
 
 ### Setup [Water Quality Sensing](Water_Sensor/)
 
-1. Get all the [hardwares](Documentation/Water_Sensor/Specification.md) you need.
+1. Get all the [hardware](Documentation/Water_Sensor/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
-    - Install water sensor server on [Docker](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/macwater-webserver/README.md). **(Recommend)**
-    - Install water sensor server on [Linux](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md).
+    - Install water sensor server on [Docker](Water_Sensor/re-mote-webserver/). **(Recommend)**
+    - Install water sensor server on [Linux](Documentation/Water_Sensor_Server/Server_Instructions.md).
     - Install water sensor server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
 3. Assembly of Hardware for the [SensorNodes and/or Gateways](Documentation/Water_Sensor/Build_a_Water_Sensor_Portal.md).
@@ -88,36 +88,38 @@ This list will guide you step by step to get started.
 
 ---
 
-### Setup [Turtle Trackers](Turtle_Trackers/)
+### Setup [Turtle Tracker](Turtle_Tracker/)
 
-1. Get all the [hardwares](Turtle_Trackers/Docs/Specification.md) you need.
+1. Get all the [hardware](Turtle_Tracker/Docs/Specification.md) you need.
 
 2. Setup a water sensor server with one of the options below.
-    - Install water sensor server on [Linux](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/blob/master/Documentation/RaspberryPi_Instructions.md) with the [source code](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/turtle-tracker-webserver).
+    - Install water sensor server on [Linux](Documentation/Water_Sensor_Server/Server_Instructions.md) with the [source code](Turtle_Tracker/turtle-tracker-webserver).
     - Install turtle tracker server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).
 
-3. Assemble Hardware and Flash the Firmware for [Tracker](Turtle_Trackers/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Trackers/Docs/Assembly_of_Gateway.md).
+3. Assemble Hardware and Flash the Firmware for [Tracker](Turtle_Tracker/Docs/Assembly_of_Trackers.md) and [Gateway](Turtle_Tracker/Docs/Assembly_of_Gateway.md).
 
 ---
 
 ### Get help
 
-1. If you have questions, post an issue [here](https://github.com/re-mote-sensing/arduino-motes/issues)
+- If you have any questions or encounter issues, please post them [here](https://github.com/re-mote-sensing/re-mote/issues).
 
 ## 🗂 Documentation
 
  - Water Sensor
     - End Node & Gateway
-        - [LoRa Message Format](Documentation/Software/Message_Formats.md)
-        - [Saved Data Formats](Documentation/Software/Saved_Data_Formats.md)
-        - [Add Custom Sensors](Documentation/Software/Custom_Sensors.md)
-    - Pi Server
-        - [REST Api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
-        - [Database Format](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/blob/master/Documentation/Database_Format.md)
-        - [Jupyter Notebook scripts](https://gitlab.cas.mcmaster.ca/re-mote/pi-server/-/tree/master/Usefull%20Scripts) for downloading and uploading data to server
+        - [LoRa message format](Documentation/Water_Sensor/Message_Formats.md)
+        - [Saved data formats](Documentation/Water_Sensor/Saved_Data_Formats.md)
+        - [Add custom sensors](Documentation/Water_Sensor/Custom_Sensors.md)
+    - Server
+        - [Jupyter analysis](Jupyter_analysis/)
+        - [REST api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
+        - [Database format](Documentation/Water_Sensor_Server/Database_Format.md)
  - Turtle Tracker
     - End Node & Gateway
-        - [LoRa Message Format](Turtle_Trackers/Docs/message_format_turtle_tracker.xlsx)
+        - [LoRa message format](Turtle_Tracker/Docs/message_format_turtle_tracker.xlsx)
+ - Research
+    - [Research documents](Research/)
 
 ## 🏆 Acknowledgment
 

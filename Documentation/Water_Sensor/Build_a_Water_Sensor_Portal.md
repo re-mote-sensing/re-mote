@@ -3,7 +3,7 @@
 ### Depending on your network preference, please select one of the options provided below.
 
 <details>
-<summary>Using mesh network (LoRa) with a gateway</summary>
+<summary>Using LoRa with one or more gateways</summary>
 <br>
 
 This approach employs a mesh network, ideal for situations where the 3G signal is unstable or unavailable over water.

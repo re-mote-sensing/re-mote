@@ -1,0 +1,50 @@
+.right-panel-settings {
+    width: 30% !important;
+
+    button {
+        background-color: #7e3e98;
+        border: none;
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius:3px;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        padding: 10px 15px;
+        width: 100%;
+    }
+
+    .noti {
+        text-align: center;
+        font-weight: bold;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        color: #ffffff;
+        background-color: #3498db;
+        padding: 10px 0px;
+        width: 100%;
+    }
+
+    .title {
+        margin: 10px 1px;
+    }
+
+    .subtitle {
+        margin: 5px 1px;
+    }
+}
+
+@media (max-width: 1150px) {
+    .right-panel-settings {
+        width: 50% !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .right-panel-settings {
+        width: 100% !important;
+    }
+}

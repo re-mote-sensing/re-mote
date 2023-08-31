@@ -1,0 +1,131 @@
+<!doctype html>
+
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+
+  <title>
+    Home
+  </title>
+
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+
+
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+
+  <!-- CSS Files -->
+  <link href="./material-dashboard-master/assets/css/material-dashboard.css?v=2.1.0" rel="stylesheet" />
+
+
+  <!--   Core JS Files   -->
+  <script src="./material-dashboard-master/assets/js/core/jquery.min.js" type="text/javascript"></script>
+  <script src="./material-dashboard-master/assets/js/core/popper.min.js" type="text/javascript"></script>
+  <script src="./material-dashboard-master/assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
+  <script src="./material-dashboard-master/assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+
+  <!-- Chartist JS -->
+  <script src="./material-dashboard-master/assets/js/plugins/chartist.min.js"></script>
+
+  <!--  Notifications Plugin    -->
+  <script src="./material-dashboard-master/assets/js/plugins/bootstrap-notify.js"></script>
+
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="./material-dashboard-master/assets/js/material-dashboard.min.js?v=2.1.0" type="text/javascript"></script>
+</head>
+
+<body>
+
+  <div class="sidebar" data-color="green" data-background-color="white" data-image=".\material-dashboard-master\assets\img\sidebar-1.jpg">
+    <!--
+      Tip 1: You can change the color of the sidebar using: data-color="purple | azure | green | orange | danger"
+
+      Tip 2: you can also add an image using data-image tag
+  -->
+    <div class="logo">
+      <a href="./index.html" class="simple-text logo-normal">
+        McMaster Water Quality
+      </a>
+    </div>
+    <div class="sidebar-wrapper">
+      <ul class="nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="./index.html">
+            <i class="material-icons">home</i>
+            <p>Home</p>
+          </a>
+        </li>
+        <li class="nav-item ">
+          <a class="nav-link" href="./graph.html">
+            <i class="material-icons">map</i>
+            <p>Map</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="main-panel">
+
+
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+      <div class="container-fluid">
+
+        <button style="margin-left:auto"class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="navbar-toggler-icon icon-bar"></span>
+          <span class="navbar-toggler-icon icon-bar"></span>
+          <span class="navbar-toggler-icon icon-bar"></span>
+        </button>
+
+      </div>
+    </nav>
+
+    <div class="container">
+      <h1>Home</h1>
+      <img src="waterflowingnew.gif" alt="waterflow" style="height:120%;width:100%">
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card">
+            <img class="card-img-top" src="maclogo.svg" alt="maclogo">
+            <div class="card-body">
+              <h4 class="card-title">MacWater</h4>
+              <p class="card-text">MacWater is a collaborative project involving various disciplines of Scientists and Engineers
+                 working together to tackle water quality problems.
+               </p>
+              <a href="http://www.macwater.org/" class="btn btn-primary">Learn more</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card">
+            <img class="card-img-top" style="width:150px;height:150px;margin-left:auto;margin-right:auto" src="GWFlogo.png" alt="GWFlogo" >
+            <div class="card-body">
+              <h4 class="card-title">Global Water Futures</h4>
+              <p class="card-text">Global Water Future is a joint effort by the University of Saskatchewan, University of Waterloo and
+                McMaster University to manage water futures in the face of dramatically increasing risks.
+               </p>
+              <a href="https://gwf.usask.ca/about/about-us.php" class="btn btn-info">Learn more</a>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-4">
+          <div class="card">
+            <div class="card-body">
+              <a class="twitter-timeline" data-width="300" data-height="400" href="https://twitter.com/GWFutures?ref_src=twsrc%5Etfw">Tweets by GWFutures</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
