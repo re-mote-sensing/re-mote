@@ -1,0 +1,32 @@
+name: Docker continuous integration for water sensor
+
+on:
+  push:
+    paths:
+      - 'Water_Sensor/re-mote-webserver/**'
+      - 'Water_Sensor/re-mote-webserver/**/**'
+      - 'Water_Sensor/re-mote-webserver/**/**/**'
+      - 'Water_Sensor/re-mote-webserver/**/**/**/**'
+  pull_request:
+    paths:
+      - Water_Sensor/re-mote-webserver
+
+defaults:
+  run:
+    working-directory: ./Water_Sensor/re-mote-webserver
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: |
+        docker run --privileged --rm tonistiigi/binfmt --install all
+        docker login -u="${{ secrets.DOCKER_UN }}" -p="${{ secrets.DOCKER_PW }}"
+        docker buildx create --name krunkbuilder
+        docker buildx ls
+        docker buildx use krunkbuilder
+    - name: Build the Docker image date
+      run: docker buildx build . -t remotesensing/re-mote-server:$(date +%s) --platform=linux/arm64,linux/amd64 --push
+    - name: Build the Docker image latest
+      run: docker buildx build . -t remotesensing/re-mote-server:latest --platform=linux/arm64,linux/amd64 --push

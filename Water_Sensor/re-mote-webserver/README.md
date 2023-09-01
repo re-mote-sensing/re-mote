@@ -10,9 +10,9 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 
 1. Install Docker (Windows, Linux, MacOS) [Download Docker](https://www.docker.com/get-started/).
 
-2. Pull the Docker image from the [Docker Hub](https://hub.docker.com/r/remotesensing/macwater-server/) using command line ([Command line crash course](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line)).
+2. Pull the Docker image from the [Docker Hub](https://hub.docker.com/r/remotesensing/re-mote-server/) using command line ([Command line crash course](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line)).
 	 ```
-	 docker pull remotesensing/macwater-server:latest
+	 docker pull remotesensing/re-mote-server:latest
 	 ```
 
 	<img src="/Documentation/Pictures/server/docker_pull.png" width="50%">
@@ -27,7 +27,7 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 		--volume=/DATA/AppData/remote-server:/var/lib/influxdb \
 		-p 8080:8080 \
 		-e apiKey="remote" \
-		-d remotesensing/macwater-server:latest
+		-d remotesensing/re-mote-server:latest
 	```
 
 	<img src="/Documentation/Pictures/server/docker_run.png" width="50%">
@@ -83,10 +83,10 @@ Once both a Location and Sensor Type have been selected, a table containing the 
 <br>
 
 1. Install Docker (Windows, Linux, MacOS) [Download Docker](https://www.docker.com/get-started/).
-2. Download the [source code](/macwater-webserver).
+2. Download the [source code](/re-mote-webserver).
 2. Open the command line and navigate to this folder.
 	```
-	cd macwater-webserver
+	cd re-mote-webserver
 	```
 3. Build the Container.
 	 ```
