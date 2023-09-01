@@ -4,7 +4,7 @@
 If you already know the IP address/hostname of your RPi, you can login by following the steps below (otherwise start from the RPi setup - given after step 3's completion):
 The following steps are for SSH connection:
 
-1. Download and install PuTTY software using: <https://www.putty.org/> (or a quick google search will show other websites too)
+1. Download and install PuTTY software using: <https://www.putty.org/>
 
  
 

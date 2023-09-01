@@ -1,6 +1,6 @@
 # Build a Water Sensor
 
-### Depending on your network preference, please select one of the options provided below.
+### Depending on your network preference, select one of the options provided below.
 
 <details>
 <summary>Using LoRa with one or more gateways</summary>
@@ -48,7 +48,7 @@ The primary configuration file is remoteConfig.h, located within the `Arduino/li
 5. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
 6. Ensure you follow the instructions carefully for optimal performance.
 
-To configure the sensor node, please refer to the example provided below.
+To configure the sensor node, refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
@@ -69,7 +69,7 @@ The primary configuration file is remoteConfig.h, located within the `Arduino/li
 5. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
 6. Ensure you follow the instructions carefully for optimal performance.
 
-To configure the gateway node, please refer to the example provided below.
+To configure the gateway node, refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
@@ -118,7 +118,7 @@ The primary configuration file is remoteConfig.h, located within the `Arduino/li
 4. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
 5. Ensure you follow the instructions carefully for optimal performance.
 
-To configure the sensor node, please refer to the example provided below.
+To configure the sensor node, refer to the example provided below.
 
 [3G remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/singleNode.h)
 
@@ -156,7 +156,7 @@ The primary configuration file is remoteConfig.h, located within the `Arduino/li
 4. Each setting within the file comes with comprehensive comments to guide you on its purpose and function.
 5. Ensure you follow the instructions carefully for optimal performance.
 
-To configure the sensor node, please refer to the example provided below.
+To configure the sensor node, refer to the example provided below.
 
 [dataLogger remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/dataLogger.h)
 

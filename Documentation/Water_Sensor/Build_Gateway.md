@@ -39,8 +39,6 @@ This module requires SPI communication with the Arduino. Thus, it is imperative 
 - Connect LoRA Tx to Arduino D6
 - Connect LoRA Rx to Arduino D7
 
-**<u>Remember to flip the Rx and Tx pins of all modules in the config file.</u>**
-
 ------
 
 #### Optimize battery life (Optional and require soldering skill):

@@ -12,12 +12,12 @@
 
 - Vcc pin of all the modules must be connected to the 5V pin of Arduino. 
 
-  - Before connecting any sensors to the 5V supply from the Arduino, please make sure that the sensors can operate at the 5V input supply. This can be easily confirmed from the product datasheet.
+  - Before connecting any sensors to the 5V supply from the Arduino, make sure that the sensors can operate at the 5V input supply. This can be easily confirmed from the product datasheet.
 
-- For all of the modules except the Turbidity sensor, pins such as Rx(Receiving), Tx(Transmitting), and En(Enable) or OFF can be connected to either analog or digital input/output pins of Arduino. This is because Arduino's analog pins can be easily configured and used as digital I/O pins.
+- For all of the modules except the Turbidity sensor, pins such as Rx (Receiving), Tx (Transmitting), and En (Enable) or OFF can be connected to either analog or digital input/output pins of Arduino. This is because Arduino's analog pins can be easily configured and used as digital I/O pins.
   - In this project, the Turbidity sensor is transceiving signals in analog form. Please remember to only connect the turbidity sensors data pin to an analog pin of Arduino.
 
-- After you have finished connecting all the pins as discussed below, please keep in mind that you are required to switch the Rx and Tx pins of all the sensors (except temperature and turbidity sensors) in the software.
+- After you have finished connecting all the pins as discussed below, keep in mind that you are required to switch the Rx and Tx pins of all the sensors (except temperature and turbidity sensors) in the software.
 
 - In the software, Arduino's digital I/O pins can be assigned by using their pin numbers, and Arduino Nano has 13 digital I/O pins. In case analog pins are needed to function as digital I/O pins, use the following numbers:
 

@@ -102,7 +102,7 @@ This list will guide you step by step to get started.
 
 ### Get help
 
-- If you have any questions or encounter issues, please post them [here](https://github.com/re-mote-sensing/re-mote/issues).
+- If you have any questions or encounter issues, post them [here](https://github.com/re-mote-sensing/re-mote/issues).
 
 ## 🗂 Documentation
 

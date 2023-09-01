@@ -4,7 +4,7 @@ This file contains some specification on the different formats in which data is 
 
 ## Arduino End Node
 
-The format that the Arduino end node uses to save the time, location, and sensor data in its EEPROM. If the EEPROM on the Arduino that you are using has been used before, please make sure to set the first 4 bytes according to the default values of Last Saved Data Address and Valid Data From Address. The format of the data is as follows: 
+The format that the Arduino end node uses to save the time, location, and sensor data in its EEPROM. If the EEPROM on the Arduino that you are using has been used before, make sure to set the first 4 bytes according to the default values of Last Saved Data Address and Valid Data From Address. The format of the data is as follows: 
 
 | **Description**   | Last Saved Data Address | Valid Data From Address | Data Points |
 |-------------------|-------------------------|-------------------------|-------------|

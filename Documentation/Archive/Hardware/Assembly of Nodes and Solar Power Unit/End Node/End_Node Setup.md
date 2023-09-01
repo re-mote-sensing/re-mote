@@ -48,7 +48,7 @@ In the following description, the alpha-numeric code in square-brackets is refer
 
   Since Arduino Nano has only one 5V pin on the board, the 5V terminal of Arduino Nano is extended both upwards and downwards to minimize complexity and good wire network on the board.
 
-  Before connecting any sensors to the 5V supply from the Arduino, please make sure that the sensors can operate at 5V input supply. This can be easily confirmed from the datasheet of the product.
+  Before connecting any sensors to the 5V supply from the Arduino, make sure that the sensors can operate at 5V input supply. This can be easily confirmed from the datasheet of the product.
 
 - Similarly, extend the GNDs[*E11* & *G5*] of Arduino Nano (Nano offers 2 GND pins).
 
@@ -58,7 +58,7 @@ In the following description, the alpha-numeric code in square-brackets is refer
 
   In this project, Turbidity sensor is transceiving signals in analog form. Please remember to only connect the turbidity sensors Data pin to an analog pin of Arduino.
 
-- After you have finished connecting all the pins as discussed below, please keep in mind that you are required to switch the Rx and Tx pins of all the sensors (except temperature and turbidity sensors) in the software.
+- After you have finished connecting all the pins as discussed below, keep in mind that you are required to switch the Rx and Tx pins of all the sensors (except temperature and turbidity sensors) in the software.
 
 - In the software, Arduino's digital I/O pins can be assigned by using their pin numbers and Arduino Nano has 13 digital I/O pins. In case analog pins are needed to function as digital I/O pins, use the following numbers:
 
