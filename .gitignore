@@ -1,2 +1,52 @@
-.ipynb_checkpoints/
 .DS_Store
+nohup.out
+
+### IPython
+.ipynb_checkpoints/
+
+### Python package
+*.egg-info/
+__pycache__/
+*.py[cod]
+*$py.class
+
+### mypy
+.mypy_cache/
+
+### npm project
+.npm
+node_modules/
+package-lock.json
+
+### Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### IntelliJ project files
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+### Eclipse workspace files
+.classpath
+.project
+.settings/
+
+### NetBeans project files
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+
+### Binaries
+*.exe
+
+*.suo
+*.sqlite
+VSWorkspaceState.json

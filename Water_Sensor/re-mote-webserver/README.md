@@ -9,11 +9,14 @@ A **Docker container image** is a lightweight, standalone, executable package of
 This prebuild Docker image contains the re:mote server program and influxdb.
 
 1. Install Docker (Windows, Linux, MacOS) [Download Docker](https://www.docker.com/get-started/).
+
 2. Pull the Docker image from the [Docker Hub](https://hub.docker.com/r/remotesensing/macwater-server/) using command line ([Command line crash course](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line)).
 	 ```
 	 docker pull remotesensing/macwater-server:latest
 	 ```
+
 	<img src="/Documentation/Pictures/server/docker_pull.png" width="50%">
+
 3. Run the Docker Container.
 	- In the command below, Change `/DATA/AppData/remote-server` to desired location, for example if you want to store it on your desktop.
 		- Windows: `C:/Users/username/Desktop/remote-server`
@@ -26,13 +29,17 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 		-e apiKey="remote" \
 		-d remotesensing/macwater-server:latest
 	```
+
 	<img src="/Documentation/Pictures/server/docker_run.png" width="50%">
+
 4. (Optional) Use reverse proxy to setup SSL and expose to public address (Ex. Nginx Proxy Manager).
 
 5. You are all set! If you have docker desktop, you can see it in the GUI interface.
+
 	<img src="/Documentation/Pictures/server/docker_desktop.png" width="50%">
 
 6. Using your IP address to view your website.
+
 	<img src="/Documentation/Pictures/server/website.gif" width="50%">
 
 ---
@@ -109,3 +116,5 @@ Once both a Location and Sensor Type have been selected, a table containing the 
 - See [Server Build Instructions](/Documentation/Water_Sensor_Server/Server_Instructions.md) for instruction on how to setup the server without Docker.
 
 </details>
+
+<br><br><br><br>

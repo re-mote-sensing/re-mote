@@ -112,7 +112,7 @@ This list will guide you step by step to get started.
         - [Saved data formats](/Documentation/Water_Sensor/Saved_Data_Formats.md)
         - [Add custom sensors](/Documentation/Water_Sensor/Custom_Sensors.md)
     - Server
-        - [Jupyter analysis](Jupyter_analysis/)
+        - [Jupyter analysis](Jupyter_Analysis/)
         - [REST api](https://documenter.getpostman.com/view/5847961/2s83tDpshb)
         - [Database format](/Documentation/Water_Sensor_Server/Database_Format.md)
  - Turtle Tracker
