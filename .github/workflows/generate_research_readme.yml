@@ -1,0 +1,33 @@
+name: Generate research README
+
+on:
+  push:
+    paths:
+      - 'Research/**/README.md'
+      
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Generate README for Research directory
+      run: |
+        echo "# Research Projects" > Research/README.md
+        for dir in Research/*/
+        do
+          if [[ -f "$dir/README.md" ]]; then
+            echo "## $(basename $dir)" >> Research/README.md
+            cat "$dir/README.md" >> Research/README.md
+            echo "" >> Research/README.md
+          fi
+        done
+        
+    - name: Commit and push changes
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "GitHub Actions"
+        git add Research/README.md
+        git commit -m "Automatically update Research README"
+        git push
