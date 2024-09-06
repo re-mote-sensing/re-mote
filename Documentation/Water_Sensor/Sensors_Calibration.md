@@ -72,7 +72,7 @@ Put the EC sensor into the calibration liquid 80,000us, using the `read x10` but
 
 After the reading is stable, press `Calibration High Point`.
 
-Press the `View Calibration Info` button, make sure that the reading is `cal, 2`.
+Press the `View Calibration Info` button, and make sure that the reading is `cal, 2`.
 
 ## DO Sensor Calibration
 
@@ -98,7 +98,7 @@ Press the `View Calibration Info` button, make sure that the reading is `cal, 2`
 
 # Sensors Calibration through UART
 
-Follow the instruction on the Atlas Scientific documents to calibrate the sensors, calibrate info is stored on the chip.
+Follow the instructions on the Atlas Scientific documents to calibrate the sensors, calibrate info is stored on the chip.
 
 - pH
 	- https://www.atlas-scientific.com/files/pH_EZO_Datasheet.pdf#page=11

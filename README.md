@@ -17,7 +17,7 @@
 
 ### Low-cost Water Quality Sensing and Turtle Tracking
 
-This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements that normally cost a lot more to make, but you can do it by yourself at a fraction of the price compared to commercial products. It supports various configurations, including different sensors, network options, and enclosures, making it adaptable to diverse environments. Designed for low power consumption for 3 month using 6 AA batteries., it can be deployed in a remote area with limited cell connection.
+This is a software and hardware infrastructure for long-term monitoring of water quality parameters and seasonal monitoring of turtle movements that normally cost a lot more to make, but you can do it by yourself at a fraction of the price compared to commercial products. It supports various configurations, including different sensors, network options, and enclosures, making it adaptable to diverse environments. Designed for low power consumption for 3 months using 6 AA batteries, it can be deployed in a remote area with limited cell connection.
 
 <div align="center">
     <img src="/Documentation/Pictures/mw_tt.webp" height="350px">
@@ -40,7 +40,7 @@ A LoRa mesh network is optionally used for connecting motes (motes can operate s
 
 ### Motes
 
-- Mote is an old term of an IoT device which is connected to network.
+- Mote is an old term for an IoT device which is connected to the network.
 
 Water monitoring network:
 - **Gateway** (one or multiple) to relay motes data to the server over the
@@ -73,7 +73,7 @@ This list will guide you step by step to get started.
 
 1. Get all the [hardware](/Documentation/Water_Sensor/Specification.md) you need.
 
-2. Setup a water sensor server with one of the options below. They perform with the same functionaility, with docker you do not need to configured all dependency and run on your own server or computer.
+2. Setup a water sensor server with one of the options below. They perform with the same functionality, with docker you do not need to configure all dependencies and run on your own server or computer.
     - Install water sensor server on [Docker](Water_Sensor/re-mote-webserver/). **(Recommended)**
     - Install water sensor server on [Linux](/Documentation/Water_Sensor_Server/Server_Instructions.md).
     - Install water sensor server on a [cloud service](https://gitlab.cas.mcmaster.ca/re-mote/publications/tree/master/HuangMengqi19Encryption&Storage).

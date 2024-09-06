@@ -32,7 +32,7 @@ Select `Tools -> Board -> Moteino AVR Boards -> Moteino Mega` from the top bar.
 
 ---
 
-Connect the arduino to the computer by USB cable or FTDI cable.
+Connect the Arduino to the computer by USB cable or FTDI cable.
 
 Open `Node_Code.ino` in Arduino App.
 

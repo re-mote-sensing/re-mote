@@ -2,7 +2,7 @@
 
 ## Server Node
 
-Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Windows, Linux, MacOS).
+Raspberry Pi is the inexpansive option, any PC that runs Docker can be used (Windows, Linux, MacOS).
 
 | Part           | Link                                                         |
 | -------------- | ------------------------------------------------------------ |
@@ -30,7 +30,7 @@ Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Win
 | GPS Receiver - GP-735           | https://www.sparkfun.com/products/13670                            |
 | JST connector (for GPS)         | https://www.digikey.ca/en/products/detail/sparkfun-electronics/PRT-10361/6605206 |
 
-* GPS is optional, if you prefer enter coordinates by yourself
+* GPS is optional, if you prefer to enter coordinates by yourself
 
 ## Sensors
 
@@ -42,7 +42,7 @@ Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Win
 | Temperature Sensor Kit  | https://www.dfrobot.com/product-1354.html                          |
 | Industrial pH Probe<br><br>EZO™ Carrier Board for pH<br><br>EZO™ pH Circuit     | https://atlas-scientific.com/probes/industrial-ph-probe/<br><br>https://atlas-scientific.com/carrier-boards/electrically-isolated-ezo-carrier-board-gen-2/<br><br>https://atlas-scientific.com/embedded-solutions/ezo-ph-circuit/|
 
-- It's recommended to use the one or more specified sensors. However, if you opt for alternative sensors, be aware that programming skills are necessary for proper integration.
+- It's recommended to use one or more specified sensors. However, if you opt for alternative sensors, be aware that programming skills are necessary for proper integration.
 
 ### Additional Hardware
 Depending on your network preference, select one of the options provided below.
@@ -115,7 +115,7 @@ This approach involves equipping all sensor nodes with 3G connectivity. It's ide
 ---
 
 <details>
-<summary>Using as a data logger and store data on SD card without uploading to server</summary>
+<summary>Using as a data logger and store data on the SD card without uploading to server</summary>
 <br>
 
 This option is suitable if you don't require real-time data and prefer to retrieve information solely from an SD card.
@@ -124,6 +124,6 @@ This option is suitable if you don't require real-time data and prefer to retrie
     <img src="/Documentation/Pictures/DataLogger.png" width="60%">
 </div>
 
-No additional hardware needed.
+No additional hardware is needed.
 
 </details>

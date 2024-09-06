@@ -6,11 +6,11 @@ A **Docker container image** is a lightweight, standalone, executable package of
 
 ## Run a prebuilt Docker image (recommended)
 
-This prebuild Docker image contains the re:mote server program and influxdb.
+This prebuilt Docker image contains the re:mote server program and influxDB.
 
 1. Install Docker (Windows, Linux, MacOS) [Download Docker](https://www.docker.com/get-started/).
 
-2. Pull the Docker image from the [Docker Hub](https://hub.docker.com/r/remotesensing/re-mote-server/) using command line ([Command line crash course](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line)).
+2. Pull the Docker image from the [Docker Hub](https://hub.docker.com/r/remotesensing/re-mote-server/) using the command line ([Command line crash course](https://developer.mozilla.org/en-US/docs/Learn/Tools_and_testing/Understanding_client-side_tools/Command_line)).
 	 ```
 	 docker pull remotesensing/re-mote-server:latest
 	 ```
@@ -18,7 +18,7 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 	<img src="/Documentation/Pictures/server/docker_pull.png" width="50%">
 
 3. Run the Docker Container.
-	- In the command below, Change `/DATA/AppData/remote-server` to desired location, for example if you want to store it on your desktop.
+	- In the command below, Change `/DATA/AppData/remote-server` to the desired location, for example, if you want to store it on your desktop.
 		- Windows: `C:/Users/{username}/Desktop/remote-server`
 		- Linux: `/home/{username}/Desktop/remote-server`
 		- MacOS: `/Users/{username}/Desktop/remote-server`
@@ -34,12 +34,12 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 
 4. (Optional) Use reverse proxy to setup SSL and expose to public address (Ex. Nginx Proxy Manager).
 
-5. You are all set! If you have docker desktop, you can see it in the GUI interface, docker desktop can view all instances and easier to maintain or restart after shutdown.
+5. You are all set! If you have a docker desktop, you can see it in the GUI interface, docker desktop can view all instances and easier to maintain or restart after shutdown.
 
 	<img src="/Documentation/Pictures/server/docker_desktop.png" width="50%">
 
 6. Using your IP address to view your website.
-	- Find local IP address
+	- Find the local IP address
 		- Windows: `ipconfig`
 		- Linux/MacOS: `ifconfig`
 
@@ -65,7 +65,7 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 
 - The entry point of the container.
 
-- It starts influxdb and creates a database "MacWater" and then starts the go server.
+- It starts influxDB and creates a database "MacWater" and then starts the go server.
 
 ---
 
@@ -86,7 +86,7 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 	 docker build --tag remote-server .
 	 ```
 4. Run the Docker Container.
-	- In the command below, Change `/DATA/AppData/remote-server` to desired location, for example if you want to store it on your desktop.
+	- In the command below, Change `/DATA/AppData/remote-server` to the desired location, for example, if you want to store it on your desktop.
 		- Windows: `C:/Users/username/Desktop/remote-server`
 		- Linux: `/home/username/Desktop/remote-server`
 		- MacOS: `/Users/username/Desktop/remote-server`
@@ -106,7 +106,7 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 <summary>Run without Docker (If you do not have virtualization on your machine)</summary>
 <br>
 
-- See [Server Build Instructions](/Documentation/Water_Sensor_Server/Server_Instructions.md) for instruction on how to setup the server without Docker.
+- See [Server Build Instructions](/Documentation/Water_Sensor_Server/Server_Instructions.md) for instructions on how to setup the server without Docker.
 
 </details>
 
