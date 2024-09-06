@@ -2,7 +2,7 @@
 
 Ensure that all sensors are attached properly and that room temperature is around 25 degrees.
 
-Open the calibration website at https://serverip/configuration on Chrome or a web browser with USB web serial supported (Public website: https://macwater.cas.mcmaster.ca/configuration/).
+Open the calibration website at `https://{your-server-ip}/configuration` (replace your-server-ip to your own server IP) on Chrome or a web browser with USB web serial supported (Public website: https://macwater.cas.mcmaster.ca/configuration/).
 
 Press `F12` to open the development tool and navigate to the `Console` tab.
 

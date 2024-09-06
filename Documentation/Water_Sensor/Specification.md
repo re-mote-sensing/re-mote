@@ -30,11 +30,9 @@ Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Win
 | GPS Receiver - GP-735           | https://www.sparkfun.com/products/13670                            |
 | JST connector (for GPS)         | https://www.digikey.ca/en/products/detail/sparkfun-electronics/PRT-10361/6605206 |
 
-* GPS is optional, if you prefer enter coordinates by your self
+* GPS is optional, if you prefer enter coordinates by yourself
 
 ## Sensors
-
-- It's recommended to use the one or more specified sensors. However, if you opt for alternative sensors, be aware that programming skills are necessary for proper integration.
 
 | Part                    | Link                                                               |
 | ----------------------- | ------------------------------------------------------------------ |
@@ -43,6 +41,8 @@ Raspberry pi is the inexpansive option, any PC that runs Docker can be used (Win
 | Turbidity Sensor        | https://www.dfrobot.com/product-1394.html                          |
 | Temperature Sensor Kit  | https://www.dfrobot.com/product-1354.html                          |
 | Industrial pH Probe<br><br>EZO™ Carrier Board for pH<br><br>EZO™ pH Circuit     | https://atlas-scientific.com/probes/industrial-ph-probe/<br><br>https://atlas-scientific.com/carrier-boards/electrically-isolated-ezo-carrier-board-gen-2/<br><br>https://atlas-scientific.com/embedded-solutions/ezo-ph-circuit/|
+
+- It's recommended to use the one or more specified sensors. However, if you opt for alternative sensors, be aware that programming skills are necessary for proper integration.
 
 ### Additional Hardware
 Depending on your network preference, select one of the options provided below.

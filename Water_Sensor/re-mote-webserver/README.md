@@ -19,9 +19,9 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 
 3. Run the Docker Container.
 	- In the command below, Change `/DATA/AppData/remote-server` to desired location, for example if you want to store it on your desktop.
-		- Windows: `C:/Users/username/Desktop/remote-server`
-		- Linux: `/home/username/Desktop/remote-server`
-		- MacOS: `/Users/username/Desktop/remote-server`
+		- Windows: `C:/Users/{username}/Desktop/remote-server`
+		- Linux: `/home/{username}/Desktop/remote-server`
+		- MacOS: `/Users/{username}/Desktop/remote-server`
 	```
 	docker run \
 		--volume=/DATA/AppData/remote-server:/var/lib/influxdb \
@@ -34,23 +34,16 @@ This prebuild Docker image contains the re:mote server program and influxdb.
 
 4. (Optional) Use reverse proxy to setup SSL and expose to public address (Ex. Nginx Proxy Manager).
 
-5. You are all set! If you have docker desktop, you can see it in the GUI interface.
+5. You are all set! If you have docker desktop, you can see it in the GUI interface, docker desktop can view all instances and easier to maintain or restart after shutdown.
 
 	<img src="/Documentation/Pictures/server/docker_desktop.png" width="50%">
 
 6. Using your IP address to view your website.
+	- Find local IP address
+		- Windows: `ipconfig`
+		- Linux/MacOS: `ifconfig`
 
 	<img src="/Documentation/Pictures/server/website.gif" width="50%">
-
----
-
-# Using the website
-
-To use your website, enter either the IP address of your personal server into a web browser (for your own server), or go to the website that hosts your website (for a cloud service). You may need to add a /# after the IP/URL. Once there, you should be able to see a map with the locations of all the nodes you have setup. To select a node, click on its pin on the map or select it from the Location drop-down menu. You can then select the measurement for which you wish to see the data in the Sensor Type drop-down menu. Sensor Types in black are available at that node, and Sensor Types in gray are not.
-
-To see a list of nodes that contain a certain measurement, first unselect a location from the Location dropdown menu, then select the measurement you wish to use. When you expand the Location drop-down menu, the locations in black contain that measurement, and the locations in gray do not. You may also notice that when you have a location selected, it will create a path with circles on the map. Each circle represents GPS coordinates where that node was located.
-
-Once both a Location and Sensor Type have been selected, a table containing the date, time, and value of every data point will appear under the map. Underneath the table, you will see a graph representing the sensor data through time.
 
 ---
 

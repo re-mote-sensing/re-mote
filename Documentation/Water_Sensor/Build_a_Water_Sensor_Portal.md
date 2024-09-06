@@ -35,7 +35,7 @@ Link: [Build Gateway](/Documentation/Water_Sensor/Build_Gateway.md)
 
 Link: [Gateway Enclosure](/Documentation/Water_Sensor/Gateway_Enclosure_Assembly.md)
 
-## Flash firmware for nodes
+## Upload firmware for nodes
 
 ### remoteConfig.h
 
@@ -52,11 +52,11 @@ To configure the sensor node, refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
-### Flash
+### Upload
 
-Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Upload firmware](/Documentation/Water_Sensor/Upload_firmware.md)
 
-## Flash firmware for Gateway
+## Upload firmware for Gateway
 
 ### remoteConfig.h
 
@@ -73,9 +73,9 @@ To configure the gateway node, refer to the example provided below.
 
 [Mesh remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/meshNode.h)
 
-### Flash
+### Upload
 
-Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Upload firmware](/Documentation/Water_Sensor/Upload_firmware.md)
 
 </details>
 
@@ -106,7 +106,7 @@ Link: [Build EndNode](/Documentation/Water_Sensor/Build_EndNode.md)
 
 <img src="/Documentation/Pictures/water_arduino/Water_Sensor_End_Node_2023_bb_3g.png" width="50%">
 
-## Flash firmware for nodes
+## Upload firmware for nodes
 
 ### remoteConfig.h
 
@@ -122,9 +122,9 @@ To configure the sensor node, refer to the example provided below.
 
 [3G remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/singleNode.h)
 
-### Flash
+### Upload
 
-Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Upload firmware](/Documentation/Water_Sensor/Upload_firmware.md)
 
 </details>
 
@@ -144,7 +144,7 @@ This option is suitable if you don't require real-time data and prefer to retrie
 
 Link: [Build EndNode](/Documentation/Water_Sensor/Build_EndNode.md)
 
-## Flash firmware for nodes
+## Upload firmware for nodes
 
 ### remoteConfig.h
 
@@ -160,9 +160,9 @@ To configure the sensor node, refer to the example provided below.
 
 [dataLogger remoteConfig.h](Water_Sensor/Libraries/re-moteConfig/Example/dataLogger.h)
 
-### Flash
+### Upload
 
-Link: [Flash firmware](/Documentation/Water_Sensor/Flash_firmware.md)
+Link: [Upload firmware](/Documentation/Water_Sensor/Upload_firmware.md)
 
 </details>
 
@@ -187,7 +187,7 @@ Once everything is completely ready to be deployed, it is important to deploy th
 
 The next thing to consider when deploying your nodes is hardware safety. It is important to make sure that your nodes will not be dislodged or washed array by heavy rains, strong winds, or snow (depending on the weather where you're deploying). Depending on your deployment locations, it may also be important to consider hiding/securing your nodes in some way to prevent vandalism. This could be done by burying your nodes (although this may affect GPS and LoRa connectivity), painting them to blend in, or covering them with something (could be leaves, or even trash, etc.).
 
-Once the nodes have been secured, it is important to deploy the sensors so that they are secure. For us, this involved putting a large steel pole into the water, and securing the sensor probes to it using water proof tape. The steps to do this will depend on the location and sensor probes you are using.
+Once the nodes have been secured, it is important to deploy the sensors so that they are secure. For us, this involved putting a anchor into the water, and securing the sensor probes to it using water proof tape. The steps to do this will depend on the location and sensor probes you are using.
 
 # Troubleshooting
 

@@ -272,7 +272,7 @@ void readSensors() {
     Wire.begin();
     delay(500);
     DateTime now = myRTC.now();
-    time = now.unixtime()- 946684800UL;
+    time = now.unixtime(); //- 946684800UL;
     Serial.println(time);
     #endif
     
