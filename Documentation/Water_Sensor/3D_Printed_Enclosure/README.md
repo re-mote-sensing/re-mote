@@ -21,7 +21,7 @@ Shapr3D's [educational license](hhttps://www.shapr3d.com/education) is free for 
 
 Open `.shapr` project file
 
-<img src="./images/shapr3d.png" width="300px" alt="Image">
+<img src="./images/shapr3d.png" width="500px" alt="Image">
 
 Select `File` - `Export` - Choose `.stl` format- Click`Export`
 
@@ -81,6 +81,7 @@ Copy the file into a MicroSD card
 - Loading Filament: page 28 - 31
 - Printing Models: page 32
 
-
-<img src="./images/IMG_1525.jpeg" width="300px" alt="Image">
-<img src="./images/IMG_1527.jpeg" width="300px" alt="Image">
+<p float="left">
+  <img src="./images/IMG_1525.jpeg" width="250px" alt="Image">
+  <img src="./images/IMG_1527.jpeg" width="250px" alt="Image">
+</p>
